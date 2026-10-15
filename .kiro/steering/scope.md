@@ -55,3 +55,20 @@ Bottom navigation: **Home | My Chits | Payments | Assistant | Profile**
 
 Dashboard | Members | Chit Groups | Installments | Payments | Ledger | Reports | AI Tools | Settings  
 (KYC and Auctions sidebar items do not exist in this release.)
+
+
+---
+
+## Available skills
+
+When implementing features, activate the relevant skill for step-by-step guidance:
+
+| Task | Skill to use |
+|---|---|
+| Implementing a Jetpack Compose screen | `android-screen` |
+| Implementing a FastAPI endpoint | `fastapi-endpoint` |
+| Creating an Alembic migration | `database-migration` |
+| Implementing a React admin dashboard page/component | `admin-dashboard-component` |
+| Working on the AI assistant, RAG pipeline, or OpenAI tools | `ai-rag-assistant` |
+
+Skills are in `.kiro/skills/`. To use one, reference it in your prompt: "Use the android-screen skill to implement the Login screen."

@@ -261,10 +261,30 @@ Once the Figma file is created, record its details here and in `docs/design/figm
 
 | Field | Value |
 |---|---|
-| Figma File Name | ChitSmart — GenAI Chit Fund Platform |
-| Figma File URL | PLACEHOLDER — update after file creation |
-| Figma File Key | PLACEHOLDER |
-| Owner | PLACEHOLDER |
-| Created | PLACEHOLDER |
-| Last Updated | PLACEHOLDER |
-| MCP Connection Status | Not connected |
+| Figma File Name | Untitled (rename to "ChitSmart — GenAI Chit Fund Platform") |
+| Figma File URL | https://www.figma.com/design/H3sDKKBcj9dveyJdgs7Jn5/Untitled |
+| Figma File Key | H3sDKKBcj9dveyJdgs7Jn5 |
+| Owner | Project owner |
+| Created | 15/10/2026 |
+| Last Updated | 15/10/2026 |
+| MCP Connection Status | Rate-limited (Starter plan) — retry when limit resets |
+
+## Node ID Registry — Batch A + B (transferred 15/10/2026)
+
+| Frame Name | Node ID |
+|---|---|
+| App-Auth-1.1-Splash-Default | 1:1415 |
+| App-Auth-1.2-Onboarding-Default | 1:1468 |
+| App-Auth-1.3-MobileLogin-Default | 1:2 |
+| App-Auth-1.4-OTPVerification-Default | 1:115 |
+| App-Auth-1.5-Registration-Default | 1:1570 |
+| App-Home-2.1-Dashboard-Default | 1:467 |
+| App-Home-2.2-Notifications-Default | 1:1965 |
+| App-MyChits-3.1-BrowseGroups-Default | 1:1737 |
+| App-MyChits-3.4-ActiveMemberships-Default | 1:263 |
+| App-Payment-3.6-PaymentFlow-Default | 1:939 |
+| App-Payment-3.7-PaymentHistory-Default | 1:2165 |
+| App-Payments-4.1-PaymentsHome-Default | 1:717 |
+| App-Payments-4.2-PayoutHistory-Default | 1:2471 |
+| App-Assistant-5.2-AIChat-Default | 1:1220 |
+| App-Profile-6.1-ProfileSettings-Default | 1:2753 |

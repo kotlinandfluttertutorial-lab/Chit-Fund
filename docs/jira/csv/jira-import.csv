@@ -1,0 +1,85 @@
+Issue Type,Summary,Description,Priority,Epic Link,Story Points,Labels,Status
+Epic,Authentication & Registration,"Mobile OTP login, basic registration (name/mobile/email), JWT session management",Highest,,13,android;backend,To Do
+Epic,Chit Group Management — Customer,"Browse chit groups, group details, membership enrollment, active memberships view",Highest,,21,android;backend,To Do
+Epic,Installment Payments,"Full payment flow (UPI/NB/Card/NEFT), payment history, statements, digital receipts",Highest,,34,android;backend,To Do
+Epic,GenAI Assistant,"Multilingual AI chat, policy RAG, policy reference viewer, human support escalation",High,,21,android;backend;ai,To Do
+Epic,Customer Profile & Settings,"Personal info, bank accounts, nominees, security settings, preferences, help centre",High,,13,android,To Do
+Epic,Notifications,"Push notifications, SMS, in-app notification centre",Medium,,8,android;backend,To Do
+Epic,Admin — Member Management,"Member search, details view, create/edit, suspend, export",Highest,,13,admin;backend,To Do
+Epic,Admin — Chit Group Management,"Group list, create/edit form, detail view with tabs",Highest,,13,admin;backend,To Do
+Epic,Admin — Installment Management,"Installment schedule, collection view, bulk reminders",Highest,,8,admin;backend,To Do
+Epic,Admin — Payment Operations,"Transaction table, reconciliation, refunds, disputes",Highest,,13,admin;backend,To Do
+Epic,Admin — Ledger & Statements,"Double-entry ledger view, member account statement, PDF export",High,,8,admin;backend,To Do
+Epic,Admin — Payout Records,"Read-only payout history and certificates (no approval workflow)",High,,5,admin;backend,To Do
+Epic,Admin — Reports & Exports,"Collections, member activity, payouts, AI usage — report builder + scheduler",High,,13,admin;backend,To Do
+Epic,Admin — AI Tools,"AI collection summary, natural-language reporting",Medium,,8,admin;backend;ai,To Do
+Epic,Admin — Settings & RBAC,"4 roles, permission matrix, admin user management",High,,8,admin,To Do
+Epic,Backend — Core API,"FastAPI project setup, auth endpoints, shared models, Alembic migrations, OpenAPI docs",Highest,,21,backend,To Do
+Epic,Infrastructure,"PostgreSQL Docker setup, CI/CD pipeline, env configs, health checks",Highest,,13,devops,To Do
+Story,Splash screen,"Implement ChitSmart splash screen with logo, tagline and loading indicator",Medium,Authentication & Registration,2,android,To Do
+Story,Onboarding carousel,"3-slide onboarding with savings/payments/AI illustrations — Skip and Get Started CTAs",Medium,Authentication & Registration,3,android,To Do
+Story,Mobile number login screen,"Login screen with +91 chip, 10-digit validation, Send OTP CTA, loading state",High,Authentication & Registration,3,android,To Do
+Story,OTP verification screen,"6-box OTP input, countdown timer, resend, error state, Verify CTA",High,Authentication & Registration,3,android,To Do
+Story,New user registration,"Name, mobile (pre-filled), email, DOB, gender — no Aadhaar/PAN in this release",High,Authentication & Registration,3,android,To Do
+Story,Auth API — send OTP,"POST /auth/send-otp — validate mobile, generate 6-digit OTP, send SMS, store hash",Highest,Backend — Core API,3,backend,To Do
+Story,Auth API — verify OTP,"POST /auth/verify-otp — validate OTP, return JWT access + refresh tokens",Highest,Backend — Core API,3,backend,To Do
+Story,Auth API — register member,"POST /auth/register — collect name/mobile/email, create member record, return JWT",Highest,Backend — Core API,3,backend,To Do
+Story,Auth API — refresh token,"POST /auth/refresh — validate refresh token, return new access token",High,Backend — Core API,2,backend,To Do
+Story,Home dashboard screen,"Greeting, active memberships card with Pay Now, quick actions (4), recent transactions, AI promo",High,Chit Group Management — Customer,5,android,To Do
+Story,Notifications screen,"Grouped notification list with types: Payment Due, Confirmed, Installment Reminder, Payout, System",Medium,Notifications,3,android,To Do
+Story,Browse chit groups screen,"Search + filter chips, group cards with enroll CTA, Full badge",High,Chit Group Management — Customer,3,android,To Do
+Story,Chit group details screen,"Hero card, 4 tabs: Overview, Schedule (installments only), Members, FAQs",High,Chit Group Management — Customer,5,android,To Do
+Story,Membership enrollment flow,"Nominee form, bank mandate setup, e-sign, success screen with membership ID",High,Chit Group Management — Customer,5,android,To Do
+Story,My active memberships screen,"List with status chips, installments paid, payout received, next due date",High,Chit Group Management — Customer,3,android,To Do
+Story,Group member view,"Installment calendar (paid/due/upcoming), Pay Now FAB, payout history (read-only)",High,Chit Group Management — Customer,3,android,To Do
+Story,Payment summary screen — step 1,"Due amount, late fee, total, Pay CTA",Highest,Installment Payments,2,android,To Do
+Story,Select payment method screen — step 2,"UPI (default), Net Banking, Debit Card, NEFT/RTGS, saved UPI IDs",Highest,Installment Payments,3,android,To Do
+Story,Payment processing screen — step 3,"Full-screen spinner, do not press back advisory",Highest,Installment Payments,1,android,To Do
+Story,Payment success screen — step 4A,"Checkmark animation, transaction details, Download Receipt, View Statement, Done",Highest,Installment Payments,2,android,To Do
+Story,Payment failure screen — step 4B,"Error animation, failure reason, Retry, Try Different Method, Contact Support",High,Installment Payments,2,android,To Do
+Story,Payment history & statement,"Outstanding balance, filterable transaction list, Download Statement",High,Installment Payments,3,android,To Do
+Story,Digital receipt screen,"Perforated receipt card, all payment details, Download PDF, Share WhatsApp/email",High,Installment Payments,3,android,To Do
+Story,Payments home screen,"Active dues list with Pay CTA per group, payment history link, payout history link",High,Installment Payments,2,android,To Do
+Story,Payout history screen — read-only,"List of received payouts with date, amount, bank reference — empty state",Medium,Installment Payments,2,android,To Do
+Story,Payments API — create payment intent,"POST /payments — validate installment, create payment record, return gateway order",Highest,Backend — Core API,5,backend,To Do
+Story,Payments API — payment webhook,"POST /payments/webhook — handle gateway callbacks, update payment status, trigger ledger entry",Highest,Backend — Core API,5,backend,To Do
+Story,Payments API — get payment history,"GET /payments — paginated list for authenticated member with filters",High,Backend — Core API,3,backend,To Do
+Story,Payments API — get receipt,"GET /payments/{id}/receipt — generate PDF receipt",High,Backend — Core API,3,backend,To Do
+Story,AI assistant home screen,"Language selector, 3 suggested questions (no auction question), recent conversations",High,GenAI Assistant,3,android,To Do
+Story,AI chat interface,"Chat bubbles, typing indicator, policy chip citations, quick replies, Helpful/Not Helpful",High,GenAI Assistant,5,android,To Do
+Story,Multilingual AI interaction,"Hindi script display, language auto-detect, Hinglish example",Medium,GenAI Assistant,3,android,To Do
+Story,Policy reference viewer modal,"Document title, section, highlighted excerpt, View Full, Share, Bookmark",Medium,GenAI Assistant,3,android,To Do
+Story,Human support escalation,"Talk to Agent CTA, connecting screen, support chat screen, share transcript toggle",Medium,GenAI Assistant,3,android,To Do
+Story,AI backend — chat endpoint,"POST /ai/chat — RAG pipeline, policy document retrieval, member account tool calls, response streaming",High,Backend — Core API,8,backend;ai,To Do
+Story,Profile screen,"Avatar, name, member ID, account status, menu sections (no KYC/Documents in this release)",Medium,Customer Profile & Settings,2,android,To Do
+Story,Personal information edit screen,"Editable: name, email, alt mobile. Locked: primary mobile, DOB, member ID",Medium,Customer Profile & Settings,2,android,To Do
+Story,Bank accounts screen,"Linked accounts list, primary indicator, Add Bank Account (penny-drop), remove confirmation",High,Customer Profile & Settings,3,android,To Do
+Story,Security settings screen,"Change MPIN, biometric toggle, active sessions, login history",Medium,Customer Profile & Settings,3,android,To Do
+Story,Help centre screen,"Search, 3 categories (Payments, Account, Technical), FAQ accordion, AI/Human Support CTA",Low,Customer Profile & Settings,2,android,To Do
+Story,Language and preferences screen,"Language selector, notification toggles per category × channel, statement format",Low,Customer Profile & Settings,2,android,To Do
+Story,Admin executive dashboard,"5 KPI cards, collection analytics bar chart, group performance table, recent activity, quick actions",Highest,Admin — Member Management,5,admin,To Do
+Story,Admin collection analytics deep-dive,"Date range + group filters, line chart, payment methods donut, heatmap, member table, export",High,Admin — Member Management,5,admin,To Do
+Story,Admin member search & list,"Type-ahead search, filter panel (no KYC filter), data table, pagination, export",Highest,Admin — Member Management,3,admin,To Do
+Story,Admin member details,"4 tabs: Overview, Memberships, Payments, Activity Log — no KYC/Documents/Auctions tabs",High,Admin — Member Management,5,admin,To Do
+Story,Admin member create/edit,"4-step form: Personal Info, Contact, Bank Accounts, Nominees — no KYC step",High,Admin — Member Management,5,admin,To Do
+Story,Admin chit groups list,"Table with filters, status chips, + Create Group CTA",Highest,Admin — Chit Group Management,3,admin,To Do
+Story,Admin create/edit chit group,"Group Details + Installment Config + Terms upload — no Auction Rules section",Highest,Admin — Chit Group Management,5,admin,To Do
+Story,Admin chit group detail view,"4 tabs: Overview, Members, Installments, Financials — no Auctions tab",High,Admin — Chit Group Management,5,admin,To Do
+Story,Admin installment schedule,"Group selector, schedule table, inline due date edit, Send Reminder CTA",High,Admin — Installment Management,3,admin,To Do
+Story,Admin installment collection view,"Month/group selector, collection progress bar, member table, bulk actions, export",High,Admin — Installment Management,3,admin,To Do
+Story,Admin payment transactions,"Master table with all filters, export CSV, View Details slide-in, Download Receipt, Initiate Refund",Highest,Admin — Payment Operations,3,admin,To Do
+Story,Admin payment reconciliation,"Day selector, 3-column comparison, unmatched list, Approve Reconciliation",High,Admin — Payment Operations,5,admin,To Do
+Story,Admin refunds & disputes,"Open disputes table, dispute detail panel, communication thread, Approve/Reject with reason",High,Admin — Payment Operations,5,admin,To Do
+Story,Admin ledger view,"Group + date range, double-entry table with running balance, PDF/Excel export",High,Admin — Ledger & Statements,3,admin,To Do
+Story,Admin member account statement,"Member search, period selector, statement table, Send to Member, Download PDF",High,Admin — Ledger & Statements,3,admin,To Do
+Story,Admin payout records — read-only,"Payout table with filters, Download Certificate, export — no approval actions",Medium,Admin — Payout Records,2,admin,To Do
+Story,Admin reports dashboard,"4 category cards: Collections, Member Activity, Payouts, AI Usage — Run/Schedule CTAs",Medium,Admin — Reports & Exports,2,admin,To Do
+Story,Admin report builder,"Type + filters + column selector + preview + export + schedule",Medium,Admin — Reports & Exports,5,admin,To Do
+Story,Admin audit log,"Chronological log with before/after diff, filters, export-only",Medium,Admin — Reports & Exports,3,admin,To Do
+Story,Admin AI collection summary,"Generate Summary button, narrative output card, confidence score, Copy/Export/Add to Report",Medium,Admin — AI Tools,3,admin;ai,To Do
+Story,Admin natural-language reporting,"Text input, AI-generated SQL display, result table, Save as Custom Report",Medium,Admin — AI Tools,5,admin;ai,To Do
+Story,Admin RBAC — 4 roles,"Super Admin / Finance Manager / Support Agent / Auditor — permission matrix per module",High,Admin — Settings & RBAC,3,admin,To Do
+Story,Admin user management,"Admin users table, Invite, Deactivate, Reset Password, View Activity",High,Admin — Settings & RBAC,3,admin,To Do
+Story,Database migrations — initial schema,"Alembic initial migration: members, chit_groups, memberships, installment_schedules, payments, ledger, bank_accounts, nominees, payouts, + deferred tables (kyc_documents, auctions, bids)",Highest,Backend — Core API,5,backend,To Do
+Story,PostgreSQL Docker setup,"docker-compose.yml with postgres:16, pgvector extension, initial DB creation",High,Infrastructure,2,devops,To Do
+Story,CI/CD pipeline setup,"GitHub Actions: lint, test, build (Android + backend + admin) on PR",High,Infrastructure,5,devops,To Do

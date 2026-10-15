@@ -21,33 +21,75 @@ Before starting the transfer:
 
 ## 2. Transferring Designs from Google Stitch to Figma
 
-### Option A — Stitch → Figma direct export (if supported)
+There are two working methods in 2026, depending on which Stitch agent you used to generate. Try Method A first; fall back to Method B if the button is unavailable.
 
-1. In Google Stitch, open the generated design collection.
-2. Select all frames for the completed batch.
-3. Use **Export → Figma (.fig or copy link)** if Stitch provides this option.
-4. In Figma, use **File → Import** or paste the Figma link into your drafts.
-5. Move imported frames to the correct Figma page (see Section 4).
+---
 
-### Option B — PNG/SVG export and manual recreation
+### Method A — Native "Copy to Figma" (Rapid Mode / Fast / Gemini 2.5 Flash)
 
-If Stitch does not provide a direct Figma export:
+This is the fastest path. It works when you generated using **Rapid Mode**, **Fast**, or **Gemini 2.5 Flash**. It does NOT work with Gemini 3 Pro (use Method B in that case).
 
-1. In Google Stitch, export all frames as PNG at 2× resolution (or SVG where available).
-2. Import PNGs into Figma as reference layers:
-   - Create a page called `_Stitch Reference`.
-   - Paste PNGs there, locked, with 50% opacity.
-3. Recreate each screen as editable Figma frames on the working pages, using the reference images as a guide.
-4. Apply the design tokens from the design system (colours, type styles, effects) while recreating.
+1. In Google Stitch, open the generated screen.
+2. Check the mode toggle (top-right of the Stitch canvas) — confirm it says **Rapid** or **Fast**.
+3. Look for the **"Copy to Figma"** button in the top toolbar. If it is active (not greyed out), click it.
+4. Stitch copies a specialised JSON payload to your clipboard that Figma recognises as native layers.
+5. Switch to Figma, navigate to the correct page (e.g. `📱 App — Batch A`), and press **Ctrl+V** (Windows) or **Cmd+V** (Mac).
+6. Figma pastes the frame with Auto Layout structures intact.
+7. Rename the pasted frame to match the naming convention (see Section 4).
+8. Repeat for each screen in the batch.
 
-### Option C — Screenshot and annotate
+**If "Copy to Figma" is greyed out** while in Rapid Mode:
+- Click the **code icon** (`< >`) in the right panel to load the code view.
+- Once the code is loaded, the "Copy to Figma" button in the right pane becomes active.
+- Click it, then paste into Figma as above.
 
-If neither export option is available:
+---
 
-1. Take full-resolution screenshots of every Stitch frame.
-2. Import screenshots into Figma on the `_Stitch Reference` page.
-3. Annotate with Figma comments: screen name, batch, pending implementation notes.
-4. Proceed with manual design in Figma, referencing screenshots.
+### Method B — Download Code + html.to.design plugin (works with all agents including Gemini 3 Pro)
+
+Use this method if you generated with **Gemini 3 Pro** (which gives higher quality output but disables the native Figma button), or if Method A produces unsatisfactory layer structure.
+
+**Step 1 — Download the code from Stitch**
+
+1. In Google Stitch, open the generated screen.
+2. Click the **More options menu** (three dots or hamburger icon, top-left of your Stitch dashboard).
+3. Select **Download** — this downloads a `.zip` file containing the HTML and CSS for that screen.
+4. Save the zip with a descriptive name: `batch-a-login.zip`, `batch-a-home-dashboard.zip`, etc.
+
+**Step 2 — Install html.to.design in Figma**
+
+1. In Figma, open the **Plugins** menu → **Browse plugins**.
+2. Search for **html.to.design** (by DesignCode).
+3. Click **Install**.
+4. This only needs to be done once.
+
+**Step 3 — Import into Figma**
+
+1. In Figma, navigate to the correct page (e.g. `📱 App — Batch A`).
+2. Open **Plugins → html.to.design**.
+3. Go to the **File** tab inside the plugin.
+4. Drag and drop the `.zip` file downloaded from Stitch, or click to upload it.
+5. Adjust settings if prompted (scale, units).
+6. Click **Import**.
+7. The screen appears as an editable Figma frame with a natural layer structure.
+8. Rename the frame to match the naming convention (see Section 4).
+
+**Why Method B often produces better results:**
+- Preserves higher fidelity than the native clipboard transfer.
+- Generates cleaner, more natural Figma layer structure.
+- Works regardless of which Stitch agent was used.
+
+---
+
+### Method C — Screenshot reference (last resort)
+
+Use only if both Method A and B fail (e.g. tool outage or access issue).
+
+1. Take full-resolution browser screenshots of every Stitch screen.
+2. In Figma, create a `_Stitch Reference` page.
+3. Paste screenshots there, lock them (right-click → Lock), set opacity to 60%.
+4. Manually recreate each screen as an editable Figma frame on the working page, tracing the screenshot as a guide and applying design tokens from the design system.
+5. Mark the frame annotation: `Transfer Method: Screenshot Reference`.
 
 ---
 

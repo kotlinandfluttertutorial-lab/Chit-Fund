@@ -5,19 +5,21 @@ Auction-related fields exist in the schema (next_auction_date on ChitGroup)
 but are informational only — no auction API endpoints are registered in this
 release. See docs/scope-decisions.md Decision 3.
 """
+
 import enum
-from decimal import Decimal
-from sqlalchemy import Column, String, Integer, Numeric, Date, Boolean, Enum, ForeignKey, Text
+
+from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from app.models.base import Base, UUIDMixin, TimestampMixin
+
+from app.models.base import Base, TimestampMixin, UUIDMixin
 
 
 class ChitGroupStatus(str, enum.Enum):
-    PENDING = "PENDING"       # created, not yet open for enrollment
-    ACTIVE = "ACTIVE"         # open and running
-    COMPLETED = "COMPLETED"   # all cycles done
-    CLOSED = "CLOSED"         # manually closed
+    PENDING = "PENDING"  # created, not yet open for enrollment
+    ACTIVE = "ACTIVE"  # open and running
+    COMPLETED = "COMPLETED"  # all cycles done
+    CLOSED = "CLOSED"  # manually closed
 
 
 class MembershipStatus(str, enum.Enum):
@@ -31,9 +33,9 @@ class ChitGroup(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "chit_groups"
 
     name = Column(String(255), nullable=False, unique=True)
-    chit_value = Column(Numeric(12, 2), nullable=False)       # e.g. 50000.00
+    chit_value = Column(Numeric(12, 2), nullable=False)  # e.g. 50000.00
     monthly_installment = Column(Numeric(12, 2), nullable=False)
-    duration_months = Column(Integer, nullable=False)          # e.g. 24
+    duration_months = Column(Integer, nullable=False)  # e.g. 24
     max_members = Column(Integer, nullable=False)
     foreman_commission_pct = Column(Numeric(5, 2), nullable=False)  # e.g. 5.00
     start_date = Column(Date, nullable=False)
@@ -55,7 +57,7 @@ class ChitMembership(Base, UUIDMixin, TimestampMixin):
 
     member_id = Column(UUID(as_uuid=True), ForeignKey("members.id"), nullable=False)
     chit_group_id = Column(UUID(as_uuid=True), ForeignKey("chit_groups.id"), nullable=False)
-    member_number = Column(Integer, nullable=False)   # member's number within the group
+    member_number = Column(Integer, nullable=False)  # member's number within the group
     enrollment_date = Column(Date, nullable=False)
     status = Column(Enum(MembershipStatus), default=MembershipStatus.ACTIVE, nullable=False)
 

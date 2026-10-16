@@ -261,13 +261,14 @@ Once the Figma file is created, record its details here and in `docs/design/figm
 
 | Field | Value |
 |---|---|
-| Figma File Name | Untitled (rename to "ChitSmart — GenAI Chit Fund Platform") |
-| Figma File URL | https://www.figma.com/design/H3sDKKBcj9dveyJdgs7Jn5/Untitled |
-| Figma File Key | H3sDKKBcj9dveyJdgs7Jn5 |
+| Figma File Name | Untitled (ChitSmart designs) |
+| Figma File URL | https://www.figma.com/design/lLqFOeduJnNpINYH7fQth7/Untitled |
+| Figma File Key | lLqFOeduJnNpINYH7fQth7 |
+| Previous file key (rate-limited) | H3sDKKBcj9dveyJdgs7Jn5 |
 | Owner | Project owner |
 | Created | 15/10/2026 |
 | Last Updated | 15/10/2026 |
-| MCP Connection Status | Rate-limited (Starter plan) — retry when limit resets |
+| MCP Connection Status | ✅ Connected — full read access confirmed |
 
 ## Node ID Registry — Batch A + B (transferred 15/10/2026)
 

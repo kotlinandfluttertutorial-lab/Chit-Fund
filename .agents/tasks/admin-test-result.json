@@ -1,0 +1,17 @@
+{
+  "module": "Admin Dashboard",
+  "typeCheck": "PASS",
+  "typeErrorCount": 0,
+  "lint": "PASS",
+  "lintErrorCount": 0,
+  "lintWarnCount": 0,
+  "tests": "PASS",
+  "testsPassed": 7,
+  "testsFailed": 0,
+  "testsSkipped": 0,
+  "build": "PASS",
+  "buildSizeKB": 930,
+  "notes": "All checks passed. 2 test files (apiClient.test.ts: 5 tests, types.test.ts: 2 tests). Build produced a single JS chunk of ~901 KB (gzip ~244 KB) with a Vite chunk-size warning (not an error). No TypeScript errors, no ESLint errors or warnings.",
+  "failures": [],
+  "rawOutput": "--- type-check ---\n> tsc --noEmit\nExit Code: 0\n\n--- lint ---\n> eslint src\nExit Code: 0\n\n--- test ---\n> vitest run\n ✓ src/__tests__/types.test.ts (2 tests) 10ms\n ✓ src/__tests__/apiClient.test.ts (5 tests) 12ms\n Test Files  2 passed (2)\n      Tests  7 passed (7)\n   Duration  4.41s\nExit Code: 0\n\n--- build ---\n> tsc && vite build\n✓ 2265 modules transformed.\ndist/index.html                   0.74 kB │ gzip:   0.40 kB\ndist/assets/index-DD0HdVm9.css   29.25 kB │ gzip:   6.33 kB\ndist/assets/index-CEKN6x-Q.js   922.41 kB │ gzip: 243.53 kB\n(!) Some chunks are larger than 500 kB after minification. Consider using dynamic import() to code-split.\n✓ built in 56.27s\nExit Code: 0"
+}

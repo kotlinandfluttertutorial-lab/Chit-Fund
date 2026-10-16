@@ -1,0 +1,15 @@
+{
+  "module": "Python Backend",
+  "lint": "SKIPPED",
+  "lintIssueCount": -1,
+  "typeCheck": "SKIPPED",
+  "typeErrorCount": -1,
+  "tests": "PASS",
+  "testsPassed": 5,
+  "testsFailed": 0,
+  "testsSkipped": 0,
+  "dbTestsSkipped": false,
+  "notes": "All 5 pytest tests passed (health endpoint checks, no DB required). ruff and mypy are not installed in the venv or globally — lint and type-check steps were skipped. pyproject.toml has ruff and mypy config ready; install them with: .venv\\Scripts\\pip.exe install ruff mypy",
+  "failures": [],
+  "rawOutput": "============================= test session starts =============================\nplatform win32 -- Python 3.12.10, pytest-8.3.4, pluggy-1.7.0\nrootdir: J:\\Android\\AndroidStudioProjects\\Kiro\\Chit-Fund\\backend\nconfigfile: pyproject.toml\nplugins: anyio-4.15.1, Faker-40.43.0, asyncio-0.24.0\nasyncio: mode=Mode.AUTO\ncollected 5 items\ntests/test_health.py::test_health_endpoint_returns_200 PASSED            [ 20%]\ntests/test_health.py::test_health_endpoint_returns_json PASSED           [ 40%]\ntests/test_health.py::test_health_endpoint_includes_version PASSED       [ 60%]\ntests/test_health.py::test_health_content_type_is_json PASSED            [ 80%]\ntests/test_health.py::test_app_is_fastapi_instance PASSED                [100%]\n======================== 5 passed, 2 warnings in 3.25s ========================\nWARNINGS: asyncio_default_fixture_loop_scope unset (pytest-asyncio); PydanticDeprecatedSince20 class-based config (starlette testclient dep). Neither warning is a test failure.\nLINT: ruff not installed in venv or globally — skipped.\nTYPE CHECK: mypy not installed in venv or globally — skipped."
+}

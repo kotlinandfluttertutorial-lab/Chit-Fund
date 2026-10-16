@@ -4,6 +4,7 @@ Payment Pydantic schemas — request/response models for CHIT-39.
 Uses Pydantic v2 model_config = ConfigDict(from_attributes=True) for
 ORM-to-schema mapping.
 """
+
 from __future__ import annotations
 
 import uuid
@@ -18,15 +19,18 @@ from app.models.payment import PaymentMethod, PaymentStatus
 
 # ── Payment schemas ────────────────────────────────────────────────────────────
 
+
 class PaymentCreateRequest(BaseModel):
     """Request body for POST /payments."""
+
     installment_schedule_id: uuid.UUID
     payment_method: PaymentMethod
-    upi_vpa: Optional[str] = None   # required when payment_method == UPI
+    upi_vpa: Optional[str] = None  # required when payment_method == UPI
 
 
 class PaymentResponse(BaseModel):
     """Single payment record returned to the client."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
@@ -45,6 +49,7 @@ class PaymentResponse(BaseModel):
 
 class PaymentListResponse(BaseModel):
     """Paginated list of payment records."""
+
     items: List[PaymentResponse]
     total: int
     page: int
@@ -53,8 +58,10 @@ class PaymentListResponse(BaseModel):
 
 # ── Receipt schema ─────────────────────────────────────────────────────────────
 
+
 class ReceiptResponse(BaseModel):
     """Digital receipt returned by GET /payments/{id}/receipt."""
+
     receipt_number: str
     payment_id: uuid.UUID
     member_name: str
@@ -70,8 +77,10 @@ class ReceiptResponse(BaseModel):
 
 # ── Payout schemas ─────────────────────────────────────────────────────────────
 
+
 class PayoutResponse(BaseModel):
     """Single payout record — read-only in this release."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
@@ -89,6 +98,7 @@ class PayoutResponse(BaseModel):
 
 class PayoutListResponse(BaseModel):
     """Paginated list of payout records."""
+
     items: List[PayoutResponse]
     total: int
     page: int
@@ -97,8 +107,10 @@ class PayoutListResponse(BaseModel):
 
 # ── Webhook schema ─────────────────────────────────────────────────────────────
 
+
 class WebhookPayload(BaseModel):
     """Razorpay payment.captured webhook payload (key fields only)."""
+
     razorpay_order_id: str
     razorpay_payment_id: str
     razorpay_signature: str

@@ -1,6 +1,7 @@
 """
 SMS service abstraction — Twilio / MSG91 / AWS SNS / console (DEBUG).
 """
+
 import logging
 
 from app.core.config import settings
@@ -44,7 +45,6 @@ async def _send_twilio(mobile_number: str, otp: str) -> None:
 
 async def _send_msg91(mobile_number: str, otp: str) -> None:
     """Send OTP via MSG91 API (popular in India)."""
-    import httpx
     # MSG91 flow-based OTP
     # https://docs.msg91.com/reference/send-otp
     logger.info(f"[MSG91 stub] OTP {otp} to {mobile_number}")

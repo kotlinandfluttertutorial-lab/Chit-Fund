@@ -5,6 +5,7 @@ receipt generation, and ledger double-entry.
 Uses httpx to call the Razorpay REST API directly (no razorpay SDK).
 Financial records are NEVER deleted — use status=VOIDED with a reason.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -221,15 +222,11 @@ class PaymentService:
             )
 
         # Load related chit group and schedule
-        group_result = await db.execute(
-            select(ChitGroup).where(ChitGroup.id == payment.chit_group_id)
-        )
+        group_result = await db.execute(select(ChitGroup).where(ChitGroup.id == payment.chit_group_id))
         group = group_result.scalar_one_or_none()
 
         schedule_result = await db.execute(
-            select(InstallmentSchedule).where(
-                InstallmentSchedule.id == payment.installment_schedule_id
-            )
+            select(InstallmentSchedule).where(InstallmentSchedule.id == payment.installment_schedule_id)
         )
         schedule = schedule_result.scalar_one_or_none()
 

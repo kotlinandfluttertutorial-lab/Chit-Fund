@@ -6,6 +6,7 @@ GET /payouts    Paginated list of payouts for the authenticated member.
 Approval workflow (POST /payouts, PATCH /payouts/{id}/approve) is deferred
 with the auction infrastructure. See docs/scope-decisions.md.
 """
+
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
@@ -34,11 +35,7 @@ async def list_payouts(
     """
     size = min(size, 100)
 
-    stmt = (
-        select(Payout)
-        .where(Payout.member_id == current_member.id)
-        .order_by(Payout.created_at.desc())
-    )
+    stmt = select(Payout).where(Payout.member_id == current_member.id).order_by(Payout.created_at.desc())
 
     count_stmt = select(func.count()).select_from(stmt.subquery())
     total = (await db.execute(count_stmt)).scalar_one()

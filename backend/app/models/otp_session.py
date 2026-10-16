@@ -2,6 +2,7 @@
 OTP session model — stores OTP hashes for mobile verification.
 Records are never deleted; expired/used records are kept for audit.
 """
+
 import uuid
 from datetime import datetime, timezone
 
@@ -21,7 +22,7 @@ class OtpSession(Base):
         nullable=False,
     )
     mobile_number = Column(String(15), nullable=False, index=True)
-    otp_hash = Column(String(64), nullable=False)   # SHA-256 hex digest (64 chars)
+    otp_hash = Column(String(64), nullable=False)  # SHA-256 hex digest (64 chars)
     expires_at = Column(DateTime(timezone=True), nullable=False)
     is_used = Column(Boolean, default=False, nullable=False)
     attempt_count = Column(Integer, default=0, nullable=False)

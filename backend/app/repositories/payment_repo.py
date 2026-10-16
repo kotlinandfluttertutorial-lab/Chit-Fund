@@ -3,6 +3,7 @@ Payment repository — all DB queries for payments and ledger entries.
 
 Financial records are NEVER hard-deleted. Use status=VOIDED with reason.
 """
+
 from __future__ import annotations
 
 import uuid
@@ -68,9 +69,7 @@ class PaymentRepository:
         return result.scalar_one_or_none()
 
     async def get_by_gateway_reference(self, gateway_reference: str) -> Optional[Payment]:
-        result = await self.db.execute(
-            select(Payment).where(Payment.gateway_reference == gateway_reference)
-        )
+        result = await self.db.execute(select(Payment).where(Payment.gateway_reference == gateway_reference))
         return result.scalar_one_or_none()
 
     async def list_by_member(

@@ -3,6 +3,7 @@ Basic health-check smoke test — no database required.
 
 Tests real behaviour of the /health endpoint exposed by app/main.py.
 """
+
 from starlette.testclient import TestClient
 
 

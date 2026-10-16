@@ -5,6 +5,7 @@ The TestClient from starlette wraps the FastAPI app synchronously so tests
 run without a real database or event loop by default. The health endpoint and
 app structure tests do not touch the database at all.
 """
+
 import os
 
 import pytest

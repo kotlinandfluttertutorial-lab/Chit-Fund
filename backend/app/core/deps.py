@@ -4,6 +4,7 @@ FastAPI dependencies — authentication and authorization.
 get_current_member: validates JWT Bearer token and returns the authenticated Member.
 get_current_admin:  same as above but additionally checks the admin_users table.
 """
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select

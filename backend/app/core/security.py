@@ -1,6 +1,7 @@
 """
 JWT token creation and verification, refresh token hashing.
 """
+
 import hashlib
 from datetime import datetime, timedelta, timezone
 from typing import Any
@@ -28,6 +29,7 @@ def create_access_token(subject: str, extra_claims: dict[str, Any] | None = None
 def create_refresh_token(subject: str) -> str:
     """Create a signed JWT refresh token (30-day expiry)."""
     import secrets
+
     # Refresh tokens are random opaque strings — their hash is stored in DB
     return secrets.token_urlsafe(64)
 

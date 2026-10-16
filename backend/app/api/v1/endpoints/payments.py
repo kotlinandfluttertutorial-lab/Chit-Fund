@@ -6,6 +6,7 @@ POST /payments/webhook      Razorpay webhook (NO auth — server-to-server)
 GET  /payments              List payments with pagination + filters (requires auth)
 GET  /payments/{id}/receipt Digital receipt (requires auth)
 """
+
 from __future__ import annotations
 
 import uuid
@@ -34,6 +35,7 @@ router = APIRouter()
 
 # ── Dependency factory ────────────────────────────────────────────────────────
 
+
 def _get_payment_service(db: AsyncSession = Depends(get_db)) -> PaymentService:
     return PaymentService(
         payment_repo=PaymentRepository(db),
@@ -42,6 +44,7 @@ def _get_payment_service(db: AsyncSession = Depends(get_db)) -> PaymentService:
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
+
 
 @router.post("", response_model=PaymentResponse, status_code=status.HTTP_201_CREATED)
 async def create_payment(
@@ -79,6 +82,7 @@ async def razorpay_webhook(
 
     # Parse JSON to extract order/payment ids
     import json
+
     try:
         payload = json.loads(payload_bytes)
     except json.JSONDecodeError:

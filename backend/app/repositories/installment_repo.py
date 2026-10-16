@@ -1,6 +1,7 @@
 """
 Installment repository — DB queries for installment schedules.
 """
+
 from __future__ import annotations
 
 import uuid
@@ -18,9 +19,7 @@ class InstallmentRepository:
         self.db = db
 
     async def get_by_id(self, schedule_id: uuid.UUID) -> Optional[InstallmentSchedule]:
-        result = await self.db.execute(
-            select(InstallmentSchedule).where(InstallmentSchedule.id == schedule_id)
-        )
+        result = await self.db.execute(select(InstallmentSchedule).where(InstallmentSchedule.id == schedule_id))
         return result.scalar_one_or_none()
 
     async def list_by_group(

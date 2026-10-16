@@ -4,6 +4,7 @@ Auth endpoints — send OTP, verify OTP, register, refresh token, logout.
 All endpoints are unauthenticated except /register, /refresh, /logout.
 See docs/jira/kiro-prompts/auth/ for detailed specs.
 """
+
 import hashlib
 import secrets
 from datetime import datetime, timedelta, timezone
@@ -26,6 +27,7 @@ router = APIRouter()
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
 
+
 class SendOtpRequest(BaseModel):
     mobile_number: str
 
@@ -33,10 +35,9 @@ class SendOtpRequest(BaseModel):
     @classmethod
     def validate_mobile(cls, v: str) -> str:
         import re
+
         if not re.match(r"^\+91[6-9]\d{9}$", v):
-            raise ValueError(
-                "Invalid Indian mobile number. Must be +91 followed by 10 digits starting 6-9."
-            )
+            raise ValueError("Invalid Indian mobile number. Must be +91 followed by 10 digits starting 6-9.")
         return v
 
 
@@ -82,14 +83,14 @@ class TokenResponse(BaseModel):
 
 # ── Rate limiting helper (simple DB-based, no Redis dependency) ───────────────
 
+
 async def check_otp_rate_limit(mobile_number: str, db: AsyncSession) -> None:
     """Raise 429 if more than 3 OTP requests in the last 60 minutes."""
     from app.models.otp_session import OtpSession
+
     one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
     result = await db.execute(
-        select(OtpSession)
-        .where(OtpSession.mobile_number == mobile_number)
-        .where(OtpSession.created_at >= one_hour_ago)
+        select(OtpSession).where(OtpSession.mobile_number == mobile_number).where(OtpSession.created_at >= one_hour_ago)
     )
     recent_count = len(result.scalars().all())
     if recent_count >= 3:
@@ -100,6 +101,7 @@ async def check_otp_rate_limit(mobile_number: str, db: AsyncSession) -> None:
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
+
 
 @router.post("/send-otp", response_model=SendOtpResponse)
 async def send_otp(
@@ -178,9 +180,7 @@ async def verify_otp(
     await db.commit()
 
     # Find or create member
-    member_result = await db.execute(
-        select(Member).where(Member.mobile_number == request.mobile_number)
-    )
+    member_result = await db.execute(select(Member).where(Member.mobile_number == request.mobile_number))
     member = member_result.scalar_one_or_none()
     is_new_user = member is None
 
@@ -308,9 +308,7 @@ async def logout(
     from app.models.member_session import MemberSession
 
     refresh_hash = hash_refresh_token(request.refresh_token)
-    result = await db.execute(
-        select(MemberSession).where(MemberSession.refresh_token_hash == refresh_hash)
-    )
+    result = await db.execute(select(MemberSession).where(MemberSession.refresh_token_hash == refresh_hash))
     session = result.scalar_one_or_none()
 
     if session:

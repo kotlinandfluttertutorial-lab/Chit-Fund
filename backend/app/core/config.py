@@ -2,8 +2,10 @@
 Application configuration — reads from environment variables.
 Copy .env.example to .env and fill in values before running.
 """
-from pydantic_settings import BaseSettings
+
 from typing import Optional
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):

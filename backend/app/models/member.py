@@ -5,6 +5,7 @@ KYC fields (aadhaar_number, pan_number, kyc_status, kyc_documents) are
 included in the schema for future use but NOT exposed via the customer API
 in this release. See docs/scope-decisions.md Decision 2.
 """
+
 import enum
 
 from sqlalchemy import Boolean, Column, Date, Enum, String
@@ -14,7 +15,7 @@ from app.models.base import Base, TimestampMixin, UUIDMixin
 
 
 class KYCStatus(str, enum.Enum):
-    NOT_REQUIRED = "NOT_REQUIRED"   # default for this release
+    NOT_REQUIRED = "NOT_REQUIRED"  # default for this release
     PENDING = "PENDING"
     UNDER_REVIEW = "UNDER_REVIEW"
     VERIFIED = "VERIFIED"

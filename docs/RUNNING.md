@@ -1,5 +1,7 @@
 # ChitSmart — How to Run the Platform
 
+> **Updated:** After full implementation — 27 Android screens, 24 admin pages, 40 backend files.
+
 This document covers running all three applications locally:
 1. **Backend API** (Python / FastAPI)
 2. **Admin Dashboard** (React / Vite)
@@ -51,12 +53,13 @@ copy .env.example .env          # Windows
 # cp .env.example .env          # macOS/Linux
 ```
 
-Open `.env` and set at minimum:
+Open `.env` and fill in at minimum:
 
 ```env
 DATABASE_URL=postgresql+asyncpg://chitsmart:password@localhost:5432/chitsmart_dev
 SECRET_KEY=your-random-secret-key-here
 DEBUG=true
+OPENAI_API_KEY=sk-...           # required for AI assistant
 ```
 
 Generate a secret key:
@@ -87,10 +90,12 @@ pip install -r requirements.txt
 alembic upgrade head
 ```
 
-Expected output:
+Expected output (last line):
 ```
 INFO  [alembic.runtime.migration] Running upgrade  -> 001_initial_schema, Initial schema...
 ```
+
+This creates all 16 tables including deferred schema (kyc_documents, auctions, bids).
 
 ### Step 5 — Start the API server
 
@@ -98,10 +103,8 @@ INFO  [alembic.runtime.migration] Running upgrade  -> 001_initial_schema, Initia
 uvicorn app.main:app --reload --port 8000
 ```
 
-**API is running at:** http://localhost:8000
-
-**Swagger docs:** http://localhost:8000/docs  
-*(only available when `DEBUG=true`)*
+**API is running at:** http://localhost:8000  
+**Swagger docs:** http://localhost:8000/docs *(DEBUG=true only)*
 
 ### Verify it works
 
@@ -110,17 +113,37 @@ curl http://localhost:8000/health
 # {"status":"ok","version":"0.1.0"}
 ```
 
-### Test OTP flow (DEBUG mode — no real SMS)
+### Test OTP flow (DEBUG mode — OTP appears in terminal, no real SMS)
 
 ```bash
-# Send OTP (check terminal for the 6-digit code)
+# Request OTP
 curl -X POST http://localhost:8000/api/v1/auth/send-otp \
   -H "Content-Type: application/json" \
   -d '{"mobile_number": "+919876543210"}'
 
-# Look in the API terminal for:
+# Watch the API terminal for:
 # [DEV OTP] +919876543210 → 123456
+
+# Verify OTP
+curl -X POST http://localhost:8000/api/v1/auth/verify-otp \
+  -H "Content-Type: application/json" \
+  -d '{"mobile_number": "+919876543210", "otp": "123456"}'
+# Returns: {"is_new_user": true, "access_token": "...", "refresh_token": "..."}
 ```
+
+### Ingest policy documents for AI assistant (optional)
+
+The AI assistant uses RAG over approved policy documents. To enable policy search:
+
+```bash
+# Place PDF files in backend/data/approved_policies/
+# Then run the ingestion script:
+python -m app.ai.document_ingestion \
+  --pdf data/approved_policies/chit_funds_act_1982.pdf \
+  --name "Chit Funds Act, 1982"
+```
+
+Without ingestion, the assistant still works but returns generic responses without policy citations.
 
 ---
 
@@ -149,28 +172,47 @@ npm run dev
 
 **Admin dashboard is running at:** http://localhost:5173
 
-### What you'll see
-
-| URL | Page |
-|---|---|
-| http://localhost:5173/dashboard | Executive Dashboard — KPIs, collection chart, group table |
-| http://localhost:5173/members | Member Search — searchable table with filters |
-| http://localhost:5173/members/member-1 | Member Details — 4-tab view |
-| http://localhost:5173/chit-groups | Chit Groups List |
-| http://localhost:5173/payments | Payment Transactions |
-| http://localhost:5173/ai-tools | AI Collection Summary + Natural-Language Reporting |
-
-### Build for production
+### Step 4 — TypeScript check and production build
 
 ```bash
+# Type check (should show 0 errors)
+npx tsc --noEmit
+
+# Production build (outputs to admin/dist/)
 npm run build
-# Output: admin/dist/
 ```
 
-TypeScript check (should show 0 errors):
-```bash
-npm run type-check
-```
+### Complete page directory
+
+| URL | Page | Status |
+|---|---|---|
+| /dashboard | Executive Dashboard — 5 KPI cards, Recharts collection chart, group table | ✅ Full |
+| /members | Member Search — searchable + filterable table, pagination | ✅ Full |
+| /members/:id | Member Details — 4 tabs: Overview/Memberships/Payments/Activity | ✅ Full |
+| /members/new | Member Create/Edit — 4-step form (Personal/Contact/Bank/Nominees) | ✅ Full |
+| /chit-groups | Chit Groups List — table + search | ✅ Full |
+| /chit-groups/new | Create/Edit Chit Group — Group Details + Installment Config + Terms | ✅ Full |
+| /chit-groups/:id | Chit Group Detail — 4 tabs: Overview/Members/Installments/Financials | ✅ Full |
+| /installments | Installment Schedule — group selector + monthly schedule table | ✅ Full |
+| /installments/collection | Installment Collection — month picker + member table + bulk actions | ✅ Full |
+| /payments | Payment Transactions — master table + filters + receipt action | ✅ Full |
+| /payments/reconciliation | Reconciliation — 3-column comparison, unmatched list | ✅ Full |
+| /payments/refunds | Refunds & Disputes — disputes table + detail panel | ✅ Full |
+| /ledger | Ledger View — double-entry table + running balance | ✅ Full |
+| /ledger/statement | Member Account Statement — member search + statement table | ✅ Full |
+| /payouts | Payout Records — read-only table (approval workflow deferred) | ✅ Full |
+| /reports | Reports Dashboard — 4 category cards + Quick Reports + history | ✅ Full |
+| /reports/builder | Report Builder — 4-step wizard: type/filters/columns/preview + schedule | ✅ Full |
+| /audit | Audit Log — chronological log + filters, no delete actions | ✅ Full |
+| /ai-tools | AI Tools — collection summary + natural-language reporting | ✅ Full |
+| /settings | Settings Hub — links to RBAC and Admin Users | ✅ Full |
+| /settings/rbac | RBAC — 4 roles × 9 modules permission matrix | ✅ Full |
+| /settings/users | Admin User Management — invite + deactivate + role edit | ✅ Full |
+
+**Not included** (deferred per scope-decisions.md):
+- KYC sidebar item and review screens
+- Auctions management screens
+- Payout approval workflow (payout records are read-only)
 
 ---
 
@@ -179,72 +221,80 @@ npm run type-check
 ### Prerequisites
 
 1. Open **Android Studio**
-2. Make sure you have:
-   - **Android SDK** platform 35 installed
-   - An **AVD (emulator)** created — recommended: Pixel 6 API 34 (1080×2400, 390dp width)
+2. Make sure you have **Android SDK** platform 35 installed
+3. Create an **AVD** — recommended: Pixel 6, API 34, 1080×2400 px (390dp width)
 
 ### Step 1 — Open the project
 
-In Android Studio: **File → Open** → select the `Chit-Fund` folder (the repository root).
+In Android Studio: **File → Open** → select the `Chit-Fund` folder (repository root).
 
-Android Studio will detect the `app/` module and sync Gradle automatically.
+Android Studio detects the `app/` module and syncs Gradle automatically.
 
 ### Step 2 — Add Inter font files
 
 The app uses Inter font. Add these files to `app/src/main/res/font/`:
 
 1. Download Inter from https://fonts.google.com/specimen/Inter
-2. Copy these files into `app/src/main/res/font/`:
-   - `inter_regular.ttf`
-   - `inter_medium.ttf`
-   - `inter_semibold.ttf` (rename `Inter-SemiBold.ttf`)
-   - `inter_bold.ttf`
+2. Rename and copy into `app/src/main/res/font/`:
 
-> If you skip this step, Android Studio will show a compile error in `Type.kt`. You can temporarily change the font to the system default by removing the `FontFamily` references in `Type.kt`.
+| Download name | Rename to |
+|---|---|
+| `Inter-Regular.ttf` | `inter_regular.ttf` |
+| `Inter-Medium.ttf` | `inter_medium.ttf` |
+| `Inter-SemiBold.ttf` | `inter_semibold.ttf` |
+| `Inter-Bold.ttf` | `inter_bold.ttf` |
 
-### Step 3 — Configure the API URL
+> If you skip this step, the build fails with "Cannot find font resource". Temporarily comment out the `FontFamily` block in `Type.kt` to build without custom fonts.
 
-The app points to `http://10.0.2.2:8000` by default (Android emulator loopback to host machine).
+### Step 3 — Configure API URL
 
-If using a physical device, update `BuildConfig.API_BASE_URL` in `app/build.gradle.kts`:
+The app uses `http://10.0.2.2:8000` by default (Android emulator loopback → host machine).
+
+For a physical device, update `app/build.gradle.kts`:
 ```kotlin
 buildConfigField("String", "API_BASE_URL", "\"http://YOUR_PC_IP:8000/api/v1/\"")
 ```
 
 ### Step 4 — Run on emulator
 
-1. Select your AVD in the device dropdown (top toolbar)
-2. Click ▶ **Run** (or `Shift+F10`)
-3. The app will build and install — takes ~2 minutes on first build
+1. Select your AVD in the device toolbar
+2. Click ▶ **Run** (Shift+F10)
+3. First build takes ~2 minutes; subsequent builds are faster
 
-### What you'll see
+### Complete screen directory (27 screens)
 
-The app launches to the **Splash Screen** → **Onboarding** (first launch) → **Login**.
+| Entry point | Path to reach | Screen |
+|---|---|---|
+| App launch | — | Splash Screen |
+| First launch | After splash | Onboarding Carousel (3 slides) |
+| Returning user | After splash | Login Screen |
+| Login → | Enter mobile + Send OTP | OTP Verification |
+| OTP → new user | — | Registration |
+| After auth | — | **Home Dashboard** |
+| Home → bell | — | Notifications |
+| Bottom nav: My Chits | — | Active Memberships |
+| My Chits → Browse | — | Browse Chit Groups |
+| Browse → Know More | — | Group Details (4 tabs) |
+| Browse → Enroll Now | — | Enrollment Flow (4 steps) |
+| My Chits → tap card | — | Group Member View |
+| Bottom nav: Payments | — | Payments Home |
+| Payments → Pay | — | Payment Flow (Summary → Method → Processing → Success/Failure) |
+| Success → Download | — | Digital Receipt |
+| Payments → History | — | Payment History |
+| Payments → Payouts | — | Payout History |
+| Bottom nav: Assistant | — | AI Assistant Home |
+| Assistant → chat | — | AI Chat (with policy reference modal) |
+| AI Chat → Support | — | Human Support |
+| Bottom nav: Profile | — | Profile |
+| Profile → Personal Info | — | Personal Information Edit |
+| Profile → Bank Accounts | — | Bank Accounts |
+| Profile → Security | — | Security Settings |
+| Profile → Help | — | Help Centre |
+| Profile → Language | — | Language & Preferences |
 
-All 18 screens are navigable:
+### Note on API connectivity
 
-| Screen | How to reach |
-|---|---|
-| Splash → Onboarding | App launch (first time) |
-| Login | After onboarding |
-| OTP Verification | Enter mobile + Send OTP |
-| Home Dashboard | After login |
-| My Chits | Bottom nav tab |
-| Browse Groups | My Chits → Browse |
-| Group Details | Browse → Know More |
-| Enrollment | Browse → Enroll Now |
-| Active Memberships | My Chits tab |
-| Group Member View | Active Memberships → tap a card |
-| Payments Home | Bottom nav tab |
-| Payment Flow (5 steps) | Payments Home → Pay |
-| Payment History | Payments Home → View History |
-| Payout History | Payments Home → View Payouts |
-| AI Chat | Assistant tab |
-| Profile | Profile tab |
-| Notifications | Home → bell icon |
-| Registration | Login → Register link |
-
-> **Note:** API calls will fail with connection errors until the backend is running. The UI still renders — you'll see loading states and empty states instead of real data.
+API calls fail with connection errors unless the backend is running. The UI renders correctly — loading states and empty states appear. To test with real data, start the backend first.
 
 ---
 
@@ -270,39 +320,47 @@ cd admin
 npm run dev
 ```
 
-**Android Studio:** Run the app on the emulator.
+**Android Studio:** Run the app on the Pixel 6 emulator.
 
 ---
 
 ## Common issues
 
-### `alembic upgrade head` fails — "relation already exists"
+### `alembic upgrade head` fails with "relation already exists"
 
-The database already has tables. Reset:
+The database has tables from a previous run. Reset:
 ```bash
-docker-compose down -v       # removes the pgdata volume
+docker-compose down -v       # removes the pgdata volume entirely
 docker-compose up -d db
 alembic upgrade head
 ```
 
-### Android build fails — "Cannot find font resource"
+### Android build fails with "Cannot find font resource"
 
-The Inter font files are missing from `res/font/`. See Step 2 above.
+Inter font files are missing from `res/font/`. See Step 2 above. Quick workaround: comment out `FontFamily(...)` in `Type.kt` and replace with the system default.
 
-### Admin dashboard — blank page / routing errors
+### Admin dashboard blank page
 
-Make sure the Vite dev server is running (`npm run dev`) and you're visiting `http://localhost:5173` (not 5174 or another port).
+Make sure Vite dev server is running (`npm run dev`) and you're visiting `http://localhost:5173` not `localhost:5174` or another port.
 
 ### OTP not received on phone
 
-In `DEBUG=true` mode, the OTP is logged to the API terminal console — no real SMS is sent. Look for the line:
+In `DEBUG=true`, the OTP is logged to the API terminal, not sent via SMS. Look for:
 ```
 [DEV OTP] +91XXXXXXXXXX → 123456
 ```
 
-### API returns 500 — "no such table"
+### API returns 500 "no such table"
 
-Migrations haven't run. Run `alembic upgrade head` from the `backend/` directory with the virtualenv activated.
+Migrations haven't run. Activate the virtualenv and run `alembic upgrade head` from the `backend/` directory.
+
+### AI assistant returns "I don't know" for everything
+
+No policy documents have been ingested into `policy_chunks`. Run the document ingestion script (see Step 5 in the backend section above). The assistant still works for account queries (outstanding balance, next installment) without policy documents.
+
+### `npx tsc --noEmit` fails after pulling changes
+
+Run `npm install` first — new dependencies may have been added. Then re-run the type check.
 
 ---
 
@@ -311,19 +369,24 @@ Migrations haven't run. Run `alembic upgrade head` from the `backend/` directory
 | Service | URL | Default credentials |
 |---|---|---|
 | Backend API | http://localhost:8000 | — |
-| API Swagger | http://localhost:8000/docs | — |
+| API Swagger docs | http://localhost:8000/docs | — (DEBUG only) |
 | Admin Dashboard | http://localhost:5173 | — |
 | PostgreSQL | localhost:5432 | user: `chitsmart` / pass: `password` / db: `chitsmart_dev` |
-| Android emulator | localhost:5554 (AVD) | — |
+| Android emulator | localhost:5554 | — |
 
 ---
 
 ## Scope reminders
 
-The following features are **not implemented** in this release and have no working UI or API:
+The following are **intentionally not implemented** in this release:
 
-- **KYC** — Aadhaar/PAN collection, document upload, admin review
-- **Auctions / Bidding** — Auction scheduling, bid submission, live monitoring
-- **Payout approval** — Payout records are read-only; approval workflow not built
+| Feature | Status | Why |
+|---|---|---|
+| KYC document upload | Deferred | UIDAI API, PMLA, DPDPA compliance prerequisites not met |
+| Aadhaar/PAN collection | Deferred | With KYC |
+| Admin KYC review | Deferred | With KYC |
+| Auction scheduling | Deferred | WebSocket real-time infrastructure not built |
+| Bid submission | Deferred | With auctions |
+| Payout approval workflow | Deferred | With auctions |
 
-See `docs/scope-decisions.md` for full rationale.
+Database tables for all deferred features exist (schema created in migration `001_initial_schema`) but have no API endpoints registered. See `docs/scope-decisions.md` for full rationale.

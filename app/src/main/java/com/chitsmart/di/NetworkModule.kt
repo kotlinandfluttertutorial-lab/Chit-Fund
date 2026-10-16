@@ -2,7 +2,7 @@ package com.chitsmart.di
 
 import com.chitsmart.BuildConfig
 import com.chitsmart.data.api.AuthApiService
-import com.chitsmart.data.local.TokenStore
+import com.chitsmart.data.local.TokenStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,7 +39,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(tokenStore: TokenStore): OkHttpClient {
+    fun provideOkHttpClient(tokenStore: TokenStorage): OkHttpClient {
         val logging =
             HttpLoggingInterceptor().apply {
                 level =

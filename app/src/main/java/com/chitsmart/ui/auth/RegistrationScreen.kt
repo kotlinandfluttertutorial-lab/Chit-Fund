@@ -53,6 +53,7 @@ private val LockedBg = Color(0xFFF1F3FF)
 @OptIn(ExperimentalMaterial3Api::class)
 fun RegistrationScreen(
     mobileNumber: String = "98765 43210",
+    viewModel: RegistrationViewModel = hiltViewModel(),
     onRegister: (fullName: String, email: String?, dob: String?, gender: String?) -> Unit = { _, _, _, _ -> },
     onBack: () -> Unit = {},
 ) {
@@ -62,9 +63,18 @@ fun RegistrationScreen(
     var gender by remember { mutableStateOf("") }
     var consentChecked by remember { mutableStateOf(false) }
     var showGenderMenu by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
 
     var nameError by remember { mutableStateOf<String?>(null) }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLoading = uiState is RegistrationUiState.Loading
+
+    // Navigate on success
+    LaunchedEffect(uiState) {
+        if (uiState is RegistrationUiState.Success) {
+            onRegister(fullName, email.ifBlank { null }, dob.ifBlank { null }, gender.ifBlank { null })
+        }
+    }
 
     val genderOptions = listOf("Male", "Female", "Other", "Prefer not to say")
     val isFormValid = fullName.isNotBlank() && consentChecked
@@ -303,8 +313,7 @@ fun RegistrationScreen(
                         nameError = "Full name is required"
                         return@Button
                     }
-                    isLoading = true
-                    onRegister(fullName, email.ifBlank { null }, dob.ifBlank { null }, gender.ifBlank { null })
+                    viewModel.register(fullName, email.ifBlank { null }, dob.ifBlank { null }, gender.ifBlank { null })
                 },
                 enabled = isFormValid && !isLoading,
                 modifier = Modifier.fillMaxWidth().height(48.dp),
@@ -319,6 +328,16 @@ fun RegistrationScreen(
                     Spacer(Modifier.width(8.dp))
                     Icon(Icons.Outlined.ArrowForward, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
                 }
+            }
+            // Show error from ViewModel
+            val errorState = uiState as? RegistrationUiState.Error
+            if (errorState != null) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = errorState.message,
+                    fontSize = 13.sp,
+                    color = ErrorRed,
+                )
             }
         }
     }

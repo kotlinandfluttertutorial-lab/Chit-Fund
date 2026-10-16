@@ -6,7 +6,7 @@ import com.chitsmart.data.api.RefreshRequest
 import com.chitsmart.data.api.RegisterRequest
 import com.chitsmart.data.api.SendOtpRequest
 import com.chitsmart.data.api.VerifyOtpRequest
-import com.chitsmart.data.local.TokenStore
+import com.chitsmart.data.local.TokenStorage
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -21,7 +21,7 @@ class AuthRepository
     @Inject
     constructor(
         private val api: AuthApiService,
-        private val tokenStore: TokenStore,
+        private val tokenStore: TokenStorage,
     ) {
         /**
          * Request an OTP to be sent to [mobile].

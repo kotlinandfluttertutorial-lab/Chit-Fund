@@ -1,8 +1,10 @@
 package com.chitsmart.di
 
 import com.chitsmart.data.api.AuthApiService
+import com.chitsmart.data.local.TokenStorage
 import com.chitsmart.data.local.TokenStore
 import com.chitsmart.data.repository.AuthRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,15 +12,23 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * Hilt module — provides [AuthRepository] as a singleton.
+ * Hilt module — binds [TokenStore] to [TokenStorage] and provides [AuthRepository].
  */
 @Module
 @InstallIn(SingletonComponent::class)
-object AuthModule {
-    @Provides
+abstract class AuthModule {
+
+    /** Binds the concrete [TokenStore] to the [TokenStorage] interface. */
+    @Binds
     @Singleton
-    fun provideAuthRepository(
-        api: AuthApiService,
-        tokenStore: TokenStore,
-    ): AuthRepository = AuthRepository(api, tokenStore)
+    abstract fun bindTokenStorage(tokenStore: TokenStore): TokenStorage
+
+    companion object {
+        @Provides
+        @Singleton
+        fun provideAuthRepository(
+            api: AuthApiService,
+            tokenStorage: TokenStorage,
+        ): AuthRepository = AuthRepository(api, tokenStorage)
+    }
 }

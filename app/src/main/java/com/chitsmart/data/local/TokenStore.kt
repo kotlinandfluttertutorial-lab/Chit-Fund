@@ -16,7 +16,7 @@ class TokenStore
     @Inject
     constructor(
         @ApplicationContext private val context: Context,
-    ) {
+    ) : TokenStorage {
         private val masterKey =
             MasterKey.Builder(context)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -31,19 +31,19 @@ class TokenStore
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
             )
 
-        fun saveAccessToken(token: String) {
+        override fun saveAccessToken(token: String) {
             prefs.edit().putString(KEY_ACCESS_TOKEN, token).apply()
         }
 
-        fun saveRefreshToken(token: String) {
+        override fun saveRefreshToken(token: String) {
             prefs.edit().putString(KEY_REFRESH_TOKEN, token).apply()
         }
 
-        fun getAccessToken(): String? = prefs.getString(KEY_ACCESS_TOKEN, null)
+        override fun getAccessToken(): String? = prefs.getString(KEY_ACCESS_TOKEN, null)
 
-        fun getRefreshToken(): String? = prefs.getString(KEY_REFRESH_TOKEN, null)
+        override fun getRefreshToken(): String? = prefs.getString(KEY_REFRESH_TOKEN, null)
 
-        fun clearTokens() {
+        override fun clearTokens() {
             prefs.edit().remove(KEY_ACCESS_TOKEN).remove(KEY_REFRESH_TOKEN).apply()
         }
 

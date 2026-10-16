@@ -12,6 +12,8 @@ import {
   Bell,
   ChevronRight,
   LogOut,
+  Wallet,
+  FileText,
 } from "lucide-react";
 
 // Current release sidebar nav — NO KYC, NO Auctions
@@ -22,9 +24,11 @@ const navItems = [
   { path: "/installments", label: "Installments", icon: Calendar },
   { path: "/payments", label: "Payments", icon: CreditCard },
   { path: "/ledger", label: "Ledger", icon: BookOpen },
+  { path: "/payouts", label: "Payout Records", icon: Wallet },
   { path: "/reports", label: "Reports", icon: BarChart3 },
   { path: "/ai-tools", label: "AI Tools", icon: Bot },
   { path: "/settings", label: "Settings", icon: Settings },
+  { path: "/audit", label: "Audit Log", icon: FileText },
 ];
 
 export default function AdminLayout() {
@@ -122,10 +126,20 @@ function PageTitle({ pathname }: { pathname: string }) {
     "/installments": "Installments",
     "/payments": "Payments",
     "/ledger": "Ledger",
+    "/payouts": "Payout Records",
     "/reports": "Reports",
     "/ai-tools": "AI Tools",
     "/settings": "Settings",
+    "/audit": "Audit Log",
+    "/settings/rbac": "Role-Based Access Control",
+    "/settings/users": "Admin Users",
+    "/reports/builder": "Report Builder",
   };
-  const key = Object.keys(titles).find((k) => pathname === k || (k !== "/dashboard" && pathname.startsWith(k)));
-  return <h1 className="text-lg font-semibold text-[#041B3C]">{key ? titles[key] : "ChitSmart Admin"}</h1>;
+  // Prefer exact match, then longest-prefix match so /settings/rbac wins over /settings
+  const exact = titles[pathname];
+  if (exact) return <h1 className="text-lg font-semibold text-[#041B3C]">{exact}</h1>;
+  const prefix = Object.keys(titles)
+    .filter((k) => k !== "/dashboard" && pathname.startsWith(k))
+    .sort((a, b) => b.length - a.length)[0];
+  return <h1 className="text-lg font-semibold text-[#041B3C]">{prefix ? titles[prefix] : "ChitSmart Admin"}</h1>;
 }

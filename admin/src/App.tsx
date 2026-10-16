@@ -19,6 +19,11 @@ import ReportsPage from "./pages/Reports";
 import AIToolsPage from "./pages/AITools";
 import SettingsPage from "./pages/Settings";
 import LoginPage from "./pages/Login";
+import RBACPage from "./pages/RBAC";
+import AdminUsersPage from "./pages/AdminUsers";
+import AuditLogPage from "./pages/AuditLog";
+import ReportBuilderPage from "./pages/ReportBuilder";
+import PayoutRecordsPage from "./pages/PayoutRecords";
 
 export default function App() {
   return (
@@ -53,13 +58,24 @@ export default function App() {
         <Route path="ledger" element={<LedgerPage />} />
         <Route path="ledger/account-statements" element={<AccountStatementPage />} />
 
+        {/* Payout Records (read-only) */}
+        <Route path="payouts" element={<PayoutRecordsPage />} />
+
         {/* Reports */}
         <Route path="reports" element={<ReportsPage />} />
         <Route path="reports/analytics" element={<CollectionAnalyticsPage />} />
+        <Route path="reports/builder" element={<ReportBuilderPage />} />
 
         {/* Other */}
         <Route path="ai-tools" element={<AIToolsPage />} />
         <Route path="settings" element={<SettingsPage />} />
+
+        {/* Settings sub-pages */}
+        <Route path="settings/rbac" element={<RBACPage />} />
+        <Route path="settings/users" element={<AdminUsersPage />} />
+
+        {/* Audit Log */}
+        <Route path="audit" element={<AuditLogPage />} />
 
         {/* KYC and Auctions routes are DEFERRED — do not add here */}
       </Route>

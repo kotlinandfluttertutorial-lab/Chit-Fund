@@ -19,27 +19,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
-private val PageBg      = Color(0xFFF9F9FF)
-private val NavyDeep    = Color(0xFF041B3C)
-private val NavyMid     = Color(0xFF002141)
-private val TealAccent  = Color(0xFF00B3A1)
-private val BlueAccent  = Color(0xFF0261A2)
-private val SlateBody   = Color(0xFF43474F)
-private val SlateHint   = Color(0xFF737780)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyMid = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val BlueAccent = Color(0xFF0261A2)
+private val SlateBody = Color(0xFF43474F)
+private val SlateHint = Color(0xFF737780)
 private val SurfaceBlue = Color(0xFFF1F3FF)
 
 // ── Language data ─────────────────────────────────────────────────────────────
 
 private data class Language(val code: String, val label: String, val nativeName: String)
 
-private val supportedLanguages = listOf(
-    Language("en", "English", "English"),
-    Language("hi", "Hindi", "हिंदी"),
-    Language("ta", "Tamil", "தமிழ்"),
-    Language("te", "Telugu", "తెలుగు"),
-    Language("kn", "Kannada", "ಕನ್ನಡ"),
-    Language("ml", "Malayalam", "മലയാളം"),
-)
+private val supportedLanguages =
+    listOf(
+        Language("en", "English", "English"),
+        Language("hi", "Hindi", "हिंदी"),
+        Language("ta", "Tamil", "தமிழ்"),
+        Language("te", "Telugu", "తెలుగు"),
+        Language("kn", "Kannada", "ಕನ್ನಡ"),
+        Language("ml", "Malayalam", "മലയാളം"),
+    )
 
 // ── Notification data ─────────────────────────────────────────────────────────
 
@@ -65,14 +66,15 @@ fun PreferencesScreen(
 ) {
     var selectedLanguage by remember { mutableStateOf(initialLanguage) }
     var statementFormat by remember { mutableStateOf(StatementFormat.PDF) }
-    val notifications = remember {
-        mutableStateListOf(
-            NotificationCategory("Payment Due", smsEnabled = true, pushEnabled = true, emailEnabled = true),
-            NotificationCategory("Payment Received", smsEnabled = true, pushEnabled = true, emailEnabled = false),
-            NotificationCategory("Payout Credit", smsEnabled = true, pushEnabled = true, emailEnabled = true),
-            NotificationCategory("Account Updates", smsEnabled = false, pushEnabled = true, emailEnabled = false),
-        )
-    }
+    val notifications =
+        remember {
+            mutableStateListOf(
+                NotificationCategory("Payment Due", smsEnabled = true, pushEnabled = true, emailEnabled = true),
+                NotificationCategory("Payment Received", smsEnabled = true, pushEnabled = true, emailEnabled = false),
+                NotificationCategory("Payout Credit", smsEnabled = true, pushEnabled = true, emailEnabled = true),
+                NotificationCategory("Account Updates", smsEnabled = false, pushEnabled = true, emailEnabled = false),
+            )
+        }
 
     val hasChanges = selectedLanguage != initialLanguage
 
@@ -116,11 +118,14 @@ fun PreferencesScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp),
         ) {
-
             // ── Language selector ────────────────────────────────────────────
             item {
                 Column(
-                    modifier = Modifier.fillMaxWidth().shadow(1.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
+                    modifier =
+                        Modifier.fillMaxWidth().shadow(
+                            1.dp,
+                            RoundedCornerShape(12.dp),
+                        ).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -139,21 +144,31 @@ fun PreferencesScreen(
                                         onClick = { selectedLanguage = lang.code },
                                         label = {
                                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                                Text(lang.nativeName, fontSize = 13.sp, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal)
-                                                Text(lang.label, fontSize = 10.sp, color = if (selected) Color.White.copy(0.8f) else SlateHint)
+                                                Text(
+                                                    lang.nativeName,
+                                                    fontSize = 13.sp,
+                                                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                                                )
+                                                Text(
+                                                    lang.label,
+                                                    fontSize = 10.sp,
+                                                    color = if (selected) Color.White.copy(0.8f) else SlateHint,
+                                                )
                                             }
                                         },
                                         modifier = Modifier.weight(1f),
-                                        colors = FilterChipDefaults.filterChipColors(
-                                            selectedContainerColor = TealAccent,
-                                            selectedLabelColor = Color.White,
-                                        ),
-                                        border = FilterChipDefaults.filterChipBorder(
-                                            enabled = true,
-                                            selected = selected,
-                                            borderColor = Color(0xFFE2E8F0),
-                                            selectedBorderColor = TealAccent,
-                                        ),
+                                        colors =
+                                            FilterChipDefaults.filterChipColors(
+                                                selectedContainerColor = TealAccent,
+                                                selectedLabelColor = Color.White,
+                                            ),
+                                        border =
+                                            FilterChipDefaults.filterChipBorder(
+                                                enabled = true,
+                                                selected = selected,
+                                                borderColor = Color(0xFFE2E8F0),
+                                                selectedBorderColor = TealAccent,
+                                            ),
                                     )
                                 }
                             }
@@ -165,7 +180,11 @@ fun PreferencesScreen(
             // ── Notification preferences ─────────────────────────────────────
             item {
                 Column(
-                    modifier = Modifier.fillMaxWidth().shadow(1.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
+                    modifier =
+                        Modifier.fillMaxWidth().shadow(
+                            1.dp,
+                            RoundedCornerShape(12.dp),
+                        ).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -175,9 +194,22 @@ fun PreferencesScreen(
 
                     // Header row
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Category", modifier = Modifier.weight(1f), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = SlateHint)
+                        Text(
+                            "Category",
+                            modifier = Modifier.weight(1f),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = SlateHint,
+                        )
                         listOf("SMS", "Push", "Email").forEach { channel ->
-                            Text(channel, modifier = Modifier.width(48.dp), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = SlateHint, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                            Text(
+                                channel,
+                                modifier = Modifier.width(48.dp),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = SlateHint,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            )
                         }
                     }
 
@@ -222,7 +254,11 @@ fun PreferencesScreen(
             // ── Statement format ─────────────────────────────────────────────
             item {
                 Column(
-                    modifier = Modifier.fillMaxWidth().shadow(1.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
+                    modifier =
+                        Modifier.fillMaxWidth().shadow(
+                            1.dp,
+                            RoundedCornerShape(12.dp),
+                        ).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -245,7 +281,11 @@ fun PreferencesScreen(
                         }
                     }
                     Text(
-                        if (statementFormat == StatementFormat.PDF) "PDF statements are formatted for printing and archiving." else "Excel statements are ideal for data analysis and accounting software.",
+                        if (statementFormat == StatementFormat.PDF) {
+                            "PDF statements are formatted for printing and archiving."
+                        } else {
+                            "Excel statements are ideal for data analysis and accounting software."
+                        },
                         fontSize = 12.sp,
                         color = SlateBody,
                     )
@@ -259,4 +299,6 @@ fun PreferencesScreen(
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "Preferences")
 @Composable
-fun PreferencesScreenPreview() { MaterialTheme { PreferencesScreen() } }
+fun PreferencesScreenPreview() {
+    MaterialTheme { PreferencesScreen() }
+}

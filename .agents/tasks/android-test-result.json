@@ -1,0 +1,23 @@
+{
+  "module": "Android",
+  "compile": "PASS",
+  "lint": "FAIL",
+  "lintIssueCount": 63,
+  "tests": "SKIPPED",
+  "testsPassed": 0,
+  "testsFailed": 0,
+  "notes": "Kotlin compilation succeeded (all 17 tasks up-to-date). Lint found 2 errors and 61 warnings — build aborted on errors. No JUnit test files exist under app/src/test/ (empty package directories only), so unit test task was skipped.",
+  "failures": [
+    {
+      "file": "app/src/main/AndroidManifest.xml",
+      "line": "45",
+      "error": "[AppLinkUrlError] Missing required elements/attributes for Android App Links — <intent-filter android:autoVerify=\"true\"> is incomplete."
+    },
+    {
+      "file": "app/src/main/AndroidManifest.xml",
+      "line": "38",
+      "error": "[LockedOrientationActivity] / [DiscouragedApi] Activity locked to portrait orientation; should use unspecified or fullSensor for multi-window/Chrome OS compatibility."
+    }
+  ],
+  "rawOutput": "=== COMPILE (:app:compileDebugKotlin) ===\nBUILD SUCCESSFUL in 1m 37s\n17 actionable tasks: 17 up-to-date\n\n=== LINT (:app:lintDebug) ===\nBUILD FAILED in 2m 23s\nLint found 2 errors, 61 warnings.\n\nERROR 1: app/src/main/AndroidManifest.xml:45 [AppLinkUrlError]\n  <intent-filter android:autoVerify=\"true\"> is missing required deep-link elements.\n\nERROR 2 (implied): app/src/main/AndroidManifest.xml:38 [LockedOrientationActivity / DiscouragedApi]\n  android:screenOrientation=\"portrait\" should be unspecified or fullSensor.\n\nWARNINGS SUMMARY (61 total):\n- [ObsoleteLintCustomCheck] x3 — androidx.navigation lint checks compiled against Lint API 14, running API 16; navigation checks skipped.\n- [AndroidGradlePluginVersion] x3 — AGP 8.7.2 in use; 9.4.1 available (also 8.7.3).\n- [GradleDependency] x33 — multiple dependencies have newer stable versions available:\n    core-ktx 1.15.0 -> 1.19.1, lifecycle* 2.8.7 -> 2.11.0, activity-compose 1.9.3 -> 1.13.0,\n    compose-bom 2024.11.00 -> 2026.09.00, navigation-compose 2.8.4 -> 2.10.2,\n    hilt-navigation-compose 1.2.0 -> 1.4.0, datastore-preferences 1.1.1 -> 1.2.1,\n    security-crypto 1.1.0-alpha06 -> 1.1.0, room 2.6.1 -> 2.8.5,\n    junit-ext 1.2.1 -> 1.3.0, espresso 3.6.1 -> 3.7.0.\n- [DefaultLocale] x4 — ReceiptScreen.kt lines 195, 211, 213, 215: String.format without explicit Locale.\n- [LockedOrientationActivity] x1 — AndroidManifest.xml:38 portrait lock.\n- [DiscouragedApi] x1 — AndroidManifest.xml:38 orientation restriction.\n\nFull lint report: app/build/reports/lint-results-debug.html\n\n=== UNIT TESTS ===\nSKIPPED — no .kt test files found under app/src/test/ (only empty package directories)."
+}

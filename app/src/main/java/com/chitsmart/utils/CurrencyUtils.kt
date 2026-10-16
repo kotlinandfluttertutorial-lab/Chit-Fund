@@ -7,16 +7,17 @@ package com.chitsmart.utils
  * supporting units up to crores.
  */
 object CurrencyUtils {
+    private val ones =
+        listOf(
+            "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+            "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+            "Seventeen", "Eighteen", "Nineteen",
+        )
 
-    private val ones = listOf(
-        "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
-        "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
-        "Seventeen", "Eighteen", "Nineteen",
-    )
-
-    private val tens = listOf(
-        "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety",
-    )
+    private val tens =
+        listOf(
+            "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety",
+        )
 
     /**
      * Converts a non-negative integer amount (in rupees) to Indian words.
@@ -71,20 +72,51 @@ object CurrencyUtils {
      */
     fun formatIndianCurrency(amount: Double): String {
         val longAmount = amount.toLong()
-        val formatted = buildString {
-            val str = longAmount.toString()
-            val len = str.length
-            when {
-                len <= 3 -> append(str)
-                len == 4 -> { append(str[0]); append(','); append(str.substring(1)) }
-                len == 5 -> { append(str.substring(0, 2)); append(','); append(str.substring(2)) }
-                len == 6 -> { append(str.substring(0, 3)); append(','); append(str.substring(3)) }
-                len == 7 -> { append(str[0]); append(','); append(str.substring(1, 3)); append(','); append(str.substring(3)) }
-                len == 8 -> { append(str.substring(0, 2)); append(','); append(str.substring(2, 4)); append(','); append(str.substring(4)) }
-                len == 9 -> { append(str.substring(0, 3)); append(','); append(str.substring(3, 5)); append(','); append(str.substring(5)) }
-                else -> append(str) // fallback for very large amounts
+        val formatted =
+            buildString {
+                val str = longAmount.toString()
+                val len = str.length
+                when {
+                    len <= 3 -> append(str)
+                    len == 4 -> {
+                        append(str[0])
+                        append(',')
+                        append(str.substring(1))
+                    }
+                    len == 5 -> {
+                        append(str.substring(0, 2))
+                        append(',')
+                        append(str.substring(2))
+                    }
+                    len == 6 -> {
+                        append(str.substring(0, 3))
+                        append(',')
+                        append(str.substring(3))
+                    }
+                    len == 7 -> {
+                        append(str[0])
+                        append(',')
+                        append(str.substring(1, 3))
+                        append(',')
+                        append(str.substring(3))
+                    }
+                    len == 8 -> {
+                        append(str.substring(0, 2))
+                        append(',')
+                        append(str.substring(2, 4))
+                        append(',')
+                        append(str.substring(4))
+                    }
+                    len == 9 -> {
+                        append(str.substring(0, 3))
+                        append(',')
+                        append(str.substring(3, 5))
+                        append(',')
+                        append(str.substring(5))
+                    }
+                    else -> append(str) // fallback for very large amounts
+                }
             }
-        }
         return "₹$formatted"
     }
 }

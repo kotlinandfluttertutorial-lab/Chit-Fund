@@ -28,15 +28,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // ── Colour tokens from Figma (node 1:2753) ───────────────────────────────────
-private val PageBg       = Color(0xFFF9F9FF)
-private val NavyDeep     = Color(0xFF041B3C)
-private val NavyMid      = Color(0xFF002141)
-private val TealAccent   = Color(0xFF00B3A1)
-private val BlueAccent   = Color(0xFF0261A2)
-private val ErrorRed     = Color(0xFFBA1A1A)
-private val SlateBody    = Color(0xFF43474F)
-private val SlateHint    = Color(0xFF737780)
-private val SurfaceBlue  = Color(0xFFF1F3FF)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyMid = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val BlueAccent = Color(0xFF0261A2)
+private val ErrorRed = Color(0xFFBA1A1A)
+private val SlateBody = Color(0xFF43474F)
+private val SlateHint = Color(0xFF737780)
+private val SurfaceBlue = Color(0xFFF1F3FF)
 
 data class ProfileMenuItem(
     val icon: ImageVector,
@@ -65,23 +65,47 @@ fun ProfileScreen(
 ) {
     var showLogoutDialog by remember { mutableStateOf(false) }
 
-    val sections = listOf(
-        ProfileSection("ACCOUNT & BANKING", listOf(
-            ProfileMenuItem(Icons.Outlined.Person, "Personal Information", "Name, DOB, gender", route = "personal_info"),
-            ProfileMenuItem(Icons.Outlined.AccountBalance, "Bank Accounts", "HDFC Bank ••••4092", badge = "Primary", badgeColor = BlueAccent, route = "bank_accounts"),
-            ProfileMenuItem(Icons.Outlined.People, "Nominees", "Update beneficiary details", route = "nominees"),
-        )),
-        ProfileSection("SECURITY & PREFERENCES", listOf(
-            ProfileMenuItem(Icons.Outlined.Lock, "Security Settings", "MPIN, biometric, sessions", badge = "Active", badgeColor = TealAccent, route = "security_settings"),
-            ProfileMenuItem(Icons.Outlined.Language, "Language & Preferences", "English (EN)", badge = "EN", route = "preferences"),
-            ProfileMenuItem(Icons.Outlined.Notifications, "Notification Preferences", "SMS, Push, Email", route = "preferences"),
-        )),
-        ProfileSection("SUPPORT & REGULATORY", listOf(
-            ProfileMenuItem(Icons.Outlined.HelpOutline, "Help Centre", "FAQs, guides, tutorials", route = "help_centre"),
-            ProfileMenuItem(Icons.Outlined.Gavel, "Legal & Compliance", "Chit Funds Act, 1982 — TN-RO-2024"),
-            ProfileMenuItem(Icons.Outlined.Info, "About ChitSmart", "v2.4.0 (Build 8402)"),
-        )),
-    )
+    val sections =
+        listOf(
+            ProfileSection(
+                "ACCOUNT & BANKING",
+                listOf(
+                    ProfileMenuItem(Icons.Outlined.Person, "Personal Information", "Name, DOB, gender", route = "personal_info"),
+                    ProfileMenuItem(
+                        Icons.Outlined.AccountBalance,
+                        "Bank Accounts",
+                        "HDFC Bank ••••4092",
+                        badge = "Primary",
+                        badgeColor = BlueAccent,
+                        route = "bank_accounts",
+                    ),
+                    ProfileMenuItem(Icons.Outlined.People, "Nominees", "Update beneficiary details", route = "nominees"),
+                ),
+            ),
+            ProfileSection(
+                "SECURITY & PREFERENCES",
+                listOf(
+                    ProfileMenuItem(
+                        Icons.Outlined.Lock,
+                        "Security Settings",
+                        "MPIN, biometric, sessions",
+                        badge = "Active",
+                        badgeColor = TealAccent,
+                        route = "security_settings",
+                    ),
+                    ProfileMenuItem(Icons.Outlined.Language, "Language & Preferences", "English (EN)", badge = "EN", route = "preferences"),
+                    ProfileMenuItem(Icons.Outlined.Notifications, "Notification Preferences", "SMS, Push, Email", route = "preferences"),
+                ),
+            ),
+            ProfileSection(
+                "SUPPORT & REGULATORY",
+                listOf(
+                    ProfileMenuItem(Icons.Outlined.HelpOutline, "Help Centre", "FAQs, guides, tutorials", route = "help_centre"),
+                    ProfileMenuItem(Icons.Outlined.Gavel, "Legal & Compliance", "Chit Funds Act, 1982 — TN-RO-2024"),
+                    ProfileMenuItem(Icons.Outlined.Info, "About ChitSmart", "v2.4.0 (Build 8402)"),
+                ),
+            ),
+        )
 
     Scaffold(
         containerColor = PageBg,
@@ -109,10 +133,20 @@ fun ProfileScreen(
             // ── Menu sections ──
             sections.forEach { section ->
                 item {
-                    Text(section.sectionTitle, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = BlueAccent, letterSpacing = 0.55.sp)
+                    Text(
+                        section.sectionTitle,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = BlueAccent,
+                        letterSpacing = 0.55.sp,
+                    )
                     Spacer(Modifier.height(6.dp))
                     Column(
-                        modifier = Modifier.fillMaxWidth().shadow(1.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Color.White),
+                        modifier =
+                            Modifier.fillMaxWidth().shadow(
+                                1.dp,
+                                RoundedCornerShape(12.dp),
+                            ).clip(RoundedCornerShape(12.dp)).background(Color.White),
                     ) {
                         section.items.forEachIndexed { i, item ->
                             if (i > 0) HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = Color(0xFFF1F3FF))
@@ -126,12 +160,31 @@ fun ProfileScreen(
             // ── Logout ──
             item {
                 Column(
-                    modifier = Modifier.fillMaxWidth().shadow(1.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Color.White).clickable { showLogoutDialog = true }.padding(16.dp),
+                    modifier =
+                        Modifier.fillMaxWidth().shadow(
+                            1.dp,
+                            RoundedCornerShape(12.dp),
+                        ).clip(RoundedCornerShape(12.dp)).background(Color.White).clickable {
+                            showLogoutDialog = true
+                        }.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
-                    Text("Log Out", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = ErrorRed, letterSpacing = 0.14.sp, textAlign = TextAlign.Center)
-                    Text("End current session securely", fontSize = 11.sp, color = SlateHint, letterSpacing = 0.33.sp, textAlign = TextAlign.Center)
+                    Text(
+                        "Log Out",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = ErrorRed,
+                        letterSpacing = 0.14.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                    Text(
+                        "End current session securely",
+                        fontSize = 11.sp,
+                        color = SlateHint,
+                        letterSpacing = 0.33.sp,
+                        textAlign = TextAlign.Center,
+                    )
                 }
                 Spacer(Modifier.height(16.dp))
             }
@@ -145,7 +198,10 @@ fun ProfileScreen(
             title = { Text("Log Out?", fontWeight = FontWeight.SemiBold) },
             text = { Text("Are you sure you want to log out of your ChitSmart account?") },
             confirmButton = {
-                TextButton(onClick = { showLogoutDialog = false; onLogout() }) {
+                TextButton(onClick = {
+                    showLogoutDialog = false
+                    onLogout()
+                }) {
                     Text("Log Out", color = ErrorRed, fontWeight = FontWeight.SemiBold)
                 }
             },
@@ -169,25 +225,34 @@ private fun ProfileShowcaseCard(
     memberSince: String,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().shadow(1.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
+        modifier =
+            Modifier.fillMaxWidth().shadow(
+                1.dp,
+                RoundedCornerShape(12.dp),
+            ).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             // Avatar
             Box(
-                modifier = Modifier.size(64.dp).clip(CircleShape)
-                    .background(Brush.verticalGradient(listOf(Color(0xFF0B3D7A), Color(0xFF1769AA))))
-                    .border(2.dp, Color(0xFFD7E2FF), CircleShape),
+                modifier =
+                    Modifier.size(64.dp).clip(CircleShape)
+                        .background(Brush.verticalGradient(listOf(Color(0xFF0B3D7A), Color(0xFF1769AA))))
+                        .border(2.dp, Color(0xFFD7E2FF), CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(memberName.first().toString(), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(memberName, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep)
-                Text(buildAnnotatedString {
-                    withStyle(SpanStyle(color = SlateBody, fontSize = 12.sp)) { append("Member ID: ") }
-                    withStyle(SpanStyle(color = BlueAccent, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)) { append("#$memberId") }
-                })
+                Text(
+                    buildAnnotatedString {
+                        withStyle(SpanStyle(color = SlateBody, fontSize = 12.sp)) { append("Member ID: ") }
+                        withStyle(
+                            SpanStyle(color = BlueAccent, fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
+                        ) { append("#$memberId") }
+                    },
+                )
                 Text(mobile, fontSize = 12.sp, color = SlateBody)
                 Text(email, fontSize = 12.sp, color = SlateBody, maxLines = 1)
             }
@@ -211,7 +276,10 @@ private fun ProfileShowcaseCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
-                modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(Color(0xFFE6FAF3)).padding(horizontal = 12.dp, vertical = 4.dp),
+                modifier =
+                    Modifier.clip(
+                        RoundedCornerShape(20.dp),
+                    ).background(Color(0xFFE6FAF3)).padding(horizontal = 12.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
@@ -224,15 +292,28 @@ private fun ProfileShowcaseCard(
 }
 
 @Composable
-private fun ProfileStat(label: String, value: String) {
+private fun ProfileStat(
+    label: String,
+    value: String,
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = NavyMid, textAlign = TextAlign.Center)
-        Text(label, fontSize = 11.sp, color = SlateBody, fontWeight = FontWeight.Medium, letterSpacing = 0.33.sp, textAlign = TextAlign.Center)
+        Text(
+            label,
+            fontSize = 11.sp,
+            color = SlateBody,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 0.33.sp,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
 @Composable
-private fun ProfileMenuRow(item: ProfileMenuItem, onTap: () -> Unit) {
+private fun ProfileMenuRow(
+    item: ProfileMenuItem,
+    onTap: () -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxWidth().clickable { onTap() }.padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -243,9 +324,20 @@ private fun ProfileMenuRow(item: ProfileMenuItem, onTap: () -> Unit) {
         }
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(item.title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (item.isDestructive) ErrorRed else NavyDeep, letterSpacing = 0.14.sp)
+                Text(
+                    item.title,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (item.isDestructive) ErrorRed else NavyDeep,
+                    letterSpacing = 0.14.sp,
+                )
                 item.badge?.let { badge ->
-                    Box(modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(item.badgeColor.copy(0.12f)).padding(horizontal = 6.dp, vertical = 2.dp)) {
+                    Box(
+                        modifier =
+                            Modifier.clip(
+                                RoundedCornerShape(20.dp),
+                            ).background(item.badgeColor.copy(0.12f)).padding(horizontal = 6.dp, vertical = 2.dp),
+                    ) {
                         Text(badge, fontSize = 10.sp, fontWeight = FontWeight.Medium, color = item.badgeColor)
                     }
                 }
@@ -274,13 +366,37 @@ private fun ProfileTopBar(onBack: () -> Unit) {
 @Composable
 private fun ProfileBottomNav() {
     NavigationBar(containerColor = Color.White, tonalElevation = 0.dp, modifier = Modifier.shadow(8.dp)) {
-        listOf(Icons.Outlined.Home to "Home", Icons.Outlined.AccountBalance to "My Chits", Icons.Outlined.Payments to "Payments", Icons.Outlined.SmartToy to "Assistant", Icons.Outlined.Person to "Profile").forEachIndexed { index, (icon, label) ->
-            NavigationBarItem(selected = index == 4, onClick = {}, icon = { Icon(icon, contentDescription = label, modifier = Modifier.size(22.dp)) }, label = { Text(label, fontSize = 10.sp) },
-                colors = NavigationBarItemDefaults.colors(selectedIconColor = NavyMid, selectedTextColor = NavyMid, indicatorColor = SurfaceBlue, unselectedIconColor = SlateBody, unselectedTextColor = SlateBody))
+        listOf(
+            Icons.Outlined.Home to "Home",
+            Icons.Outlined.AccountBalance to "My Chits",
+            Icons.Outlined.Payments to "Payments",
+            Icons.Outlined.SmartToy to "Assistant",
+            Icons.Outlined.Person to "Profile",
+        ).forEachIndexed {
+                index,
+                (icon, label),
+            ->
+            NavigationBarItem(
+                selected = index == 4,
+                onClick = {
+                },
+                icon = { Icon(icon, contentDescription = label, modifier = Modifier.size(22.dp)) },
+                label = { Text(label, fontSize = 10.sp) },
+                colors =
+                    NavigationBarItemDefaults.colors(
+                        selectedIconColor = NavyMid,
+                        selectedTextColor = NavyMid,
+                        indicatorColor = SurfaceBlue,
+                        unselectedIconColor = SlateBody,
+                        unselectedTextColor = SlateBody,
+                    ),
+            )
         }
     }
 }
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "Profile")
 @Composable
-fun ProfileScreenPreview() { MaterialTheme { ProfileScreen() } }
+fun ProfileScreenPreview() {
+    MaterialTheme { ProfileScreen() }
+}

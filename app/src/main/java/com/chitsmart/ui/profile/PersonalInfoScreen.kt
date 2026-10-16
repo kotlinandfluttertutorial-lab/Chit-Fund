@@ -24,17 +24,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
-private val PageBg       = Color(0xFFF9F9FF)
-private val NavyDeep     = Color(0xFF041B3C)
-private val NavyMid      = Color(0xFF002141)
-private val TealAccent   = Color(0xFF00B3A1)
-private val BlueAccent   = Color(0xFF0261A2)
-private val ErrorRed     = Color(0xFFBA1A1A)
-private val SlateBody    = Color(0xFF43474F)
-private val SlateHint    = Color(0xFF737780)
-private val SurfaceBlue  = Color(0xFFF1F3FF)
-private val LockedBg     = Color(0xFFF5F5F5)
-private val LockedText   = Color(0xFFB0B0B0)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyMid = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val BlueAccent = Color(0xFF0261A2)
+private val ErrorRed = Color(0xFFBA1A1A)
+private val SlateBody = Color(0xFF43474F)
+private val SlateHint = Color(0xFF737780)
+private val SurfaceBlue = Color(0xFFF1F3FF)
+private val LockedBg = Color(0xFFF5F5F5)
+private val LockedText = Color(0xFFB0B0B0)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,8 +60,18 @@ fun PersonalInfoScreen(
 
     fun validate(): Boolean {
         nameError = if (fullName.isBlank()) "Full name is required" else null
-        emailError = if (email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) "Enter a valid email address" else null
-        altMobileError = if (altMobile.isNotBlank() && !altMobile.matches(Regex("^[6-9]\\d{9}\$"))) "Enter a valid 10-digit mobile number" else null
+        emailError =
+            if (email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                "Enter a valid email address"
+            } else {
+                null
+            }
+        altMobileError =
+            if (altMobile.isNotBlank() && !altMobile.matches(Regex("^[6-9]\\d{9}\$"))) {
+                "Enter a valid 10-digit mobile number"
+            } else {
+                null
+            }
         return nameError == null && emailError == null && altMobileError == null
     }
 
@@ -90,10 +100,11 @@ fun PersonalInfoScreen(
                         onClick = { if (validate()) onSave(fullName, email, altMobile) },
                         enabled = hasChanges,
                         modifier = Modifier.fillMaxWidth().height(50.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = TealAccent,
-                            disabledContainerColor = Color(0xFFCCE9E6),
-                        ),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = TealAccent,
+                                disabledContainerColor = Color(0xFFCCE9E6),
+                            ),
                         shape = RoundedCornerShape(12.dp),
                     ) {
                         Icon(Icons.Outlined.Save, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -105,27 +116,41 @@ fun PersonalInfoScreen(
         },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Spacer(Modifier.height(4.dp))
 
             // Editable fields card
             Column(
-                modifier = Modifier.fillMaxWidth().shadow(1.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
+                modifier =
+                    Modifier.fillMaxWidth().shadow(
+                        1.dp,
+                        RoundedCornerShape(12.dp),
+                    ).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                Text("EDITABLE INFORMATION", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = BlueAccent, letterSpacing = 0.55.sp)
+                Text(
+                    "EDITABLE INFORMATION",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = BlueAccent,
+                    letterSpacing = 0.55.sp,
+                )
 
                 // Full Name
                 EditableField(
                     label = "Full Name",
                     value = fullName,
-                    onValueChange = { fullName = it; nameError = null },
+                    onValueChange = {
+                        fullName = it
+                        nameError = null
+                    },
                     placeholder = "Enter your full name",
                     error = nameError,
                     keyboardType = KeyboardType.Text,
@@ -135,7 +160,10 @@ fun PersonalInfoScreen(
                 EditableField(
                     label = "Email Address",
                     value = email,
-                    onValueChange = { email = it; emailError = null },
+                    onValueChange = {
+                        email = it
+                        emailError = null
+                    },
                     placeholder = "Enter email address",
                     error = emailError,
                     keyboardType = KeyboardType.Email,
@@ -146,7 +174,10 @@ fun PersonalInfoScreen(
                 EditableField(
                     label = "Alternate Mobile Number",
                     value = altMobile,
-                    onValueChange = { altMobile = it; altMobileError = null },
+                    onValueChange = {
+                        altMobile = it
+                        altMobileError = null
+                    },
                     placeholder = "Enter alternate mobile (optional)",
                     error = altMobileError,
                     keyboardType = KeyboardType.Phone,
@@ -156,7 +187,11 @@ fun PersonalInfoScreen(
 
             // Locked fields card
             Column(
-                modifier = Modifier.fillMaxWidth().shadow(1.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
+                modifier =
+                    Modifier.fillMaxWidth().shadow(
+                        1.dp,
+                        RoundedCornerShape(12.dp),
+                    ).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text("LOCKED INFORMATION", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = SlateHint, letterSpacing = 0.55.sp)
@@ -192,13 +227,14 @@ private fun EditableField(
             isError = error != null,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
             shape = RoundedCornerShape(10.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = TealAccent,
-                unfocusedBorderColor = Color(0xFFE2E8F0),
-                errorBorderColor = ErrorRed,
-                focusedTextColor = NavyDeep,
-                unfocusedTextColor = NavyDeep,
-            ),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = TealAccent,
+                    unfocusedBorderColor = Color(0xFFE2E8F0),
+                    errorBorderColor = ErrorRed,
+                    focusedTextColor = NavyDeep,
+                    unfocusedTextColor = NavyDeep,
+                ),
         )
         if (error != null) {
             Text(error, fontSize = 11.sp, color = ErrorRed)
@@ -207,9 +243,15 @@ private fun EditableField(
 }
 
 @Composable
-private fun LockedField(label: String, value: String) {
+private fun LockedField(
+    label: String,
+    value: String,
+) {
     Row(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(LockedBg).border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(10.dp)).padding(horizontal = 12.dp, vertical = 14.dp),
+        modifier =
+            Modifier.fillMaxWidth().clip(
+                RoundedCornerShape(10.dp),
+            ).background(LockedBg).border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(10.dp)).padding(horizontal = 12.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -223,4 +265,6 @@ private fun LockedField(label: String, value: String) {
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "Personal Info")
 @Composable
-fun PersonalInfoScreenPreview() { MaterialTheme { PersonalInfoScreen() } }
+fun PersonalInfoScreenPreview() {
+    MaterialTheme { PersonalInfoScreen() }
+}

@@ -17,7 +17,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -27,13 +26,13 @@ import androidx.compose.ui.unit.sp
 import com.chitsmart.utils.CurrencyUtils
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
-private val PageBg      = Color(0xFFF9F9FF)
-private val NavyDeep    = Color(0xFF041B3C)
-private val NavyMid     = Color(0xFF002141)
-private val TealAccent  = Color(0xFF00B3A1)
-private val BlueAccent  = Color(0xFF0261A2)
-private val SlateBody   = Color(0xFF43474F)
-private val SlateHint   = Color(0xFF737780)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyMid = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val BlueAccent = Color(0xFF0261A2)
+private val SlateBody = Color(0xFF43474F)
+private val SlateHint = Color(0xFF737780)
 private val SurfaceBlue = Color(0xFFF1F3FF)
 private val SuccessGreen = Color(0xFF22C55E)
 
@@ -134,9 +133,18 @@ fun ReceiptScreen(
     if (showShareSheet) {
         ReceiptShareBottomSheet(
             onDismiss = { showShareSheet = false },
-            onDownloadPDF = { showShareSheet = false; onDownloadPDF() },
-            onShareWhatsApp = { showShareSheet = false; onShareWhatsApp() },
-            onShareEmail = { showShareSheet = false; onShareEmail() },
+            onDownloadPDF = {
+                showShareSheet = false
+                onDownloadPDF()
+            },
+            onShareWhatsApp = {
+                showShareSheet = false
+                onShareWhatsApp()
+            },
+            onShareEmail = {
+                showShareSheet = false
+                onShareEmail()
+            },
         )
     }
 }
@@ -153,25 +161,30 @@ private fun ReceiptCard(receiptData: ReceiptData) {
     ) {
         // Perforated top edge
         Box(
-            modifier = Modifier.fillMaxWidth().height(12.dp).drawBehind {
-                val dashPathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 8f), 0f)
-                drawLine(
-                    color = perforationColor,
-                    start = Offset(0f, size.height / 2f),
-                    end = Offset(size.width, size.height / 2f),
-                    strokeWidth = 2.dp.toPx(),
-                    pathEffect = dashPathEffect,
-                )
-                // Circular notches at the edge
-                val radius = 6.dp.toPx()
-                drawCircle(color = PageBg, radius = radius, center = Offset(0f, size.height / 2f))
-                drawCircle(color = PageBg, radius = radius, center = Offset(size.width, size.height / 2f))
-            },
+            modifier =
+                Modifier.fillMaxWidth().height(12.dp).drawBehind {
+                    val dashPathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 8f), 0f)
+                    drawLine(
+                        color = perforationColor,
+                        start = Offset(0f, size.height / 2f),
+                        end = Offset(size.width, size.height / 2f),
+                        strokeWidth = 2.dp.toPx(),
+                        pathEffect = dashPathEffect,
+                    )
+                    // Circular notches at the edge
+                    val radius = 6.dp.toPx()
+                    drawCircle(color = PageBg, radius = radius, center = Offset(0f, size.height / 2f))
+                    drawCircle(color = PageBg, radius = radius, center = Offset(size.width, size.height / 2f))
+                },
         )
 
         // Receipt body
         Column(
-            modifier = Modifier.fillMaxWidth().shadow(2.dp, RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)).clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)).background(Color.White).padding(24.dp),
+            modifier =
+                Modifier.fillMaxWidth().shadow(
+                    2.dp,
+                    RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp),
+                ).clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)).background(Color.White).padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Status chip + header
@@ -185,7 +198,13 @@ private fun ReceiptCard(receiptData: ReceiptData) {
                 Spacer(Modifier.height(8.dp))
                 Text("Payment Successful", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = NavyDeep)
                 Spacer(Modifier.height(4.dp))
-                Text(receiptData.receiptNumber, fontSize = 12.sp, color = SlateHint, fontFamily = FontFamily.Monospace, letterSpacing = 0.5.sp)
+                Text(
+                    receiptData.receiptNumber,
+                    fontSize = 12.sp,
+                    color = SlateHint,
+                    fontFamily = FontFamily.Monospace,
+                    letterSpacing = 0.5.sp,
+                )
             }
 
             HorizontalDivider(color = Color(0xFFF1F3FF))
@@ -193,7 +212,12 @@ private fun ReceiptCard(receiptData: ReceiptData) {
             // Amount section
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 Text("₹${String.format("%,.0f", receiptData.totalAmount)}", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = NavyMid)
-                Text(CurrencyUtils.amountToIndianWords(receiptData.totalAmount), fontSize = 12.sp, color = SlateBody, textAlign = TextAlign.Center)
+                Text(
+                    CurrencyUtils.amountToIndianWords(receiptData.totalAmount),
+                    fontSize = 12.sp,
+                    color = SlateBody,
+                    textAlign = TextAlign.Center,
+                )
             }
 
             HorizontalDivider(color = Color(0xFFF1F3FF))
@@ -232,9 +256,20 @@ private fun ReceiptCard(receiptData: ReceiptData) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                Text("ChitSmart Financial Services Pvt. Ltd.", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = SlateBody, textAlign = TextAlign.Center)
+                Text(
+                    "ChitSmart Financial Services Pvt. Ltd.",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = SlateBody,
+                    textAlign = TextAlign.Center,
+                )
                 Text("Registered under the Chit Funds Act, 1982", fontSize = 10.sp, color = SlateHint, textAlign = TextAlign.Center)
-                Text("This is a system-generated receipt. No signature required.", fontSize = 10.sp, color = SlateHint, textAlign = TextAlign.Center)
+                Text(
+                    "This is a system-generated receipt. No signature required.",
+                    fontSize = 10.sp,
+                    color = SlateHint,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
     }
@@ -322,11 +357,12 @@ private fun ShareOption(
     onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color(0xFFF9F9FF))
-            .run {
-                this.then(Modifier.padding(0.dp))
-            }
-            .padding(0.dp),
+        modifier =
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color(0xFFF9F9FF))
+                .run {
+                    this.then(Modifier.padding(0.dp))
+                }
+                .padding(0.dp),
     ) {
         Surface(
             onClick = onClick,
@@ -339,7 +375,10 @@ private fun ShareOption(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Box(modifier = Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(iconBg), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(iconBg),
+                    contentAlignment = Alignment.Center,
+                ) {
                     Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(22.dp))
                 }
                 Column(modifier = Modifier.weight(1f)) {
@@ -354,4 +393,6 @@ private fun ShareOption(
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "Receipt")
 @Composable
-fun ReceiptScreenPreview() { MaterialTheme { ReceiptScreen() } }
+fun ReceiptScreenPreview() {
+    MaterialTheme { ReceiptScreen() }
+}

@@ -30,50 +30,64 @@ import androidx.compose.ui.unit.sp
 import com.chitsmart.ui.theme.*
 
 // ── Colour tokens from Figma ──────────────────────────────────────────────────
-private val NavyDeep      = Color(0xFF041B3C)
-private val NavyMid       = Color(0xFF002141)
-private val TealDark      = Color(0xFF003E37)
-private val TealNet       = Color(0xFF00B3A1)
-private val TealBadge     = Color(0x4D71F8E4) // rgba(113,248,228,0.3)
-private val EscrowGreen   = Color(0xFF002621)
-private val BlueAccent    = Color(0xFF0261A2)
-private val SurfaceBlue   = Color(0xFFF1F3FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyMid = Color(0xFF002141)
+private val TealDark = Color(0xFF003E37)
+private val TealNet = Color(0xFF00B3A1)
+private val TealBadge = Color(0x4D71F8E4) // rgba(113,248,228,0.3)
+private val EscrowGreen = Color(0xFF002621)
+private val BlueAccent = Color(0xFF0261A2)
+private val SurfaceBlue = Color(0xFFF1F3FF)
 private val SurfaceBlue60 = Color(0x99F1F3FF)
-private val BorderBlue    = Color(0xFFE0E8FF)
-private val BadgeBlue     = Color(0xFFD3E3FF)
-private val SlateBody     = Color(0xFF43474F)
-private val ErrorRed      = Color(0xFFBA1A1A)
-private val GoldAmber     = Color(0xFFAD8000)
-private val GoldBg        = Color(0xFFFFF8E1)
+private val BorderBlue = Color(0xFFE0E8FF)
+private val BadgeBlue = Color(0xFFD3E3FF)
+private val SlateBody = Color(0xFF43474F)
+private val ErrorRed = Color(0xFFBA1A1A)
+private val GoldAmber = Color(0xFFAD8000)
+private val GoldBg = Color(0xFFFFF8E1)
 private val GreenEligible = Color(0xFF1B6E55)
-private val GreenEligBg   = Color(0xFFE6FAF3)
-private val QueueBlue     = Color(0xFF0261A2)
-private val QueueBg       = Color(0xFFF1F3FF)
-private val GuaranteeBg   = Color(0xFFF0F4FF)
-private val PageBg        = Color(0xFFF9F9FF)
+private val GreenEligBg = Color(0xFFE6FAF3)
+private val QueueBlue = Color(0xFF0261A2)
+private val QueueBg = Color(0xFFF1F3FF)
+private val GuaranteeBg = Color(0xFFF0F4FF)
+private val PageBg = Color(0xFFF9F9FF)
 
 // ── Data models ───────────────────────────────────────────────────────────────
 
 data class ReceivedPayout(
-    val cycleLabel: String,         // e.g. "MATURED CYCLE"
-    val groupName: String,          // e.g. "Monthly Circle 25K"
-    val cycleDetail: String,        // e.g. "Cycle Month 20 of 20 • Final Payout"
-    val status: String,             // "Credited" | "Archived"
-    val creditDate: String?,        // e.g. "18 Aug 2026"
-    val grossValue: String,         // e.g. "₹25,000"
-    val foremanFee: String,         // e.g. "- ₹1,250"
-    val foremanPct: String,         // e.g. "5%"
-    val netAmount: String,          // e.g. "₹23,750"
-    val bankDestination: String,    // e.g. "HDFC Bank (A/c •••• 4092)"
-    val utrReference: String,       // e.g. "UTR:  HDFC202608189872"
-    val disbursedDate: String?,     // for archived rows
-    val disbursedAmount: String?,   // for archived rows
+    // e.g. "MATURED CYCLE"
+    val cycleLabel: String,
+    // e.g. "Monthly Circle 25K"
+    val groupName: String,
+    // e.g. "Cycle Month 20 of 20 • Final Payout"
+    val cycleDetail: String,
+    // "Credited" | "Archived"
+    val status: String,
+    // e.g. "18 Aug 2026"
+    val creditDate: String?,
+    // e.g. "₹25,000"
+    val grossValue: String,
+    // e.g. "- ₹1,250"
+    val foremanFee: String,
+    // e.g. "5%"
+    val foremanPct: String,
+    // e.g. "₹23,750"
+    val netAmount: String,
+    // e.g. "HDFC Bank (A/c •••• 4092)"
+    val bankDestination: String,
+    // e.g. "UTR:  HDFC202608189872"
+    val utrReference: String,
+    // for archived rows
+    val disbursedDate: String?,
+    // for archived rows
+    val disbursedAmount: String?,
 )
 
 data class UpcomingEligibility(
     val groupName: String,
     val cycleDetail: String,
-    val eligibilityStatus: String,  // "Eligible" | "Queue #18"
+    // "Eligible" | "Queue #18"
+    val eligibilityStatus: String,
     val nextDrawInfo: String?,
     val windowSlot: String?,
     val projectedWindow: String?,
@@ -91,42 +105,44 @@ fun PayoutHistoryScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
 
     // Sample data matching the Figma design exactly
-    val receivedPayout = ReceivedPayout(
-        cycleLabel = "MATURED CYCLE",
-        groupName = "Monthly Circle 25K",
-        cycleDetail = "Cycle Month 20 of 20 • Final Payout",
-        status = "Credited",
-        creditDate = "18 Aug 2026",
-        grossValue = "₹25,000",
-        foremanFee = "- ₹1,250",
-        foremanPct = "5%",
-        netAmount = "₹23,750",
-        bankDestination = "HDFC Bank (A/c •••• 4092)",
-        utrReference = "UTR:  HDFC202608189872",
-        disbursedDate = null,
-        disbursedAmount = null,
-    )
+    val receivedPayout =
+        ReceivedPayout(
+            cycleLabel = "MATURED CYCLE",
+            groupName = "Monthly Circle 25K",
+            cycleDetail = "Cycle Month 20 of 20 • Final Payout",
+            status = "Credited",
+            creditDate = "18 Aug 2026",
+            grossValue = "₹25,000",
+            foremanFee = "- ₹1,250",
+            foremanPct = "5%",
+            netAmount = "₹23,750",
+            bankDestination = "HDFC Bank (A/c •••• 4092)",
+            utrReference = "UTR:  HDFC202608189872",
+            disbursedDate = null,
+            disbursedAmount = null,
+        )
 
-    val upcomingEligibilities = listOf(
-        UpcomingEligibility(
-            groupName = "Community Chit 1L",
-            cycleDetail = "Installment 8 of 20 Completed",
-            eligibilityStatus = "Eligible",
-            nextDrawInfo = "Next Expected Cycle Draw",
-            windowSlot = "Window Slot #11",
-            projectedWindow = "November 2026",
-            installmentDetail = "Installment 8 of 20 Completed",
-        ),
-        UpcomingEligibility(
-            groupName = "Family Savings 50K",
-            cycleDetail = "Installment 15 of 24",
-            eligibilityStatus = "Queue #18",
-            nextDrawInfo = null,
-            windowSlot = null,
-            projectedWindow = "February 2027",
-            installmentDetail = "Installment 15 of 24",
-        ),
-    )
+    val upcomingEligibilities =
+        listOf(
+            UpcomingEligibility(
+                groupName = "Community Chit 1L",
+                cycleDetail = "Installment 8 of 20 Completed",
+                eligibilityStatus = "Eligible",
+                nextDrawInfo = "Next Expected Cycle Draw",
+                windowSlot = "Window Slot #11",
+                projectedWindow = "November 2026",
+                installmentDetail = "Installment 8 of 20 Completed",
+            ),
+            UpcomingEligibility(
+                groupName = "Family Savings 50K",
+                cycleDetail = "Installment 15 of 24",
+                eligibilityStatus = "Queue #18",
+                nextDrawInfo = null,
+                windowSlot = null,
+                projectedWindow = "February 2027",
+                installmentDetail = "Installment 15 of 24",
+            ),
+        )
 
     Scaffold(
         containerColor = PageBg,
@@ -138,10 +154,11 @@ fun PayoutHistoryScreen(
         },
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(0.dp),
         ) {
             // ── Hero disbursement card ──
@@ -243,11 +260,12 @@ private fun PayoutHistoryTopBar(
         },
         actions = {
             Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(SurfaceBlue)
-                    .clickable { onDownloadStatement() },
+                modifier =
+                    Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(SurfaceBlue)
+                        .clickable { onDownloadStatement() },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -265,17 +283,21 @@ private fun PayoutHistoryTopBar(
 // ── Hero card ─────────────────────────────────────────────────────────────────
 
 @Composable
-private fun HeroDisbursementCard(totalAmount: String, bankAccount: String) {
+private fun HeroDisbursementCard(
+    totalAmount: String,
+    bankAccount: String,
+) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(Color(0xFF0B3D7A), Color(0xFF1769AA)),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(Color(0xFF0B3D7A), Color(0xFF1769AA)),
+                    ),
                 )
-            )
-            .padding(16.dp),
+                .padding(16.dp),
     ) {
         Column {
             // Verified badge row
@@ -303,10 +325,11 @@ private fun HeroDisbursementCard(totalAmount: String, bankAccount: String) {
                     )
                 }
                 Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(TealBadge)
-                        .padding(horizontal = 8.dp, vertical = 3.dp),
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(TealBadge)
+                            .padding(horizontal = 8.dp, vertical = 3.dp),
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -378,19 +401,21 @@ private fun HeroDisbursementCard(totalAmount: String, bankAccount: String) {
 @Composable
 private fun EscrowVerificationBadge() {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(1.dp, RoundedCornerShape(8.dp))
-            .background(Color.White, RoundedCornerShape(8.dp))
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .shadow(1.dp, RoundedCornerShape(8.dp))
+                .background(Color.White, RoundedCornerShape(8.dp))
+                .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Box(
-            modifier = Modifier
-                .size(28.dp)
-                .clip(CircleShape)
-                .background(EscrowGreen),
+            modifier =
+                Modifier
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(EscrowGreen),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -424,28 +449,36 @@ private fun EscrowVerificationBadge() {
 // ── Segment tabs ──────────────────────────────────────────────────────────────
 
 @Composable
-private fun SegmentTabs(selectedTab: Int, onTabSelected: (Int) -> Unit) {
+private fun SegmentTabs(
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(SurfaceBlue)
-            .padding(4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(SurfaceBlue)
+                .padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         listOf("Received Payouts" to 1, "Upcoming Eligibility" to 2).forEachIndexed { index, (label, count) ->
             val selected = selectedTab == index
             Row(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(if (selected) Color.White else Color.Transparent)
-                    .then(
-                        if (selected) Modifier.shadow(1.dp, RoundedCornerShape(8.dp))
-                        else Modifier
-                    )
-                    .clickable { onTabSelected(index) }
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (selected) Color.White else Color.Transparent)
+                        .then(
+                            if (selected) {
+                                Modifier.shadow(1.dp, RoundedCornerShape(8.dp))
+                            } else {
+                                Modifier
+                            },
+                        )
+                        .clickable { onTabSelected(index) }
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -458,10 +491,11 @@ private fun SegmentTabs(selectedTab: Int, onTabSelected: (Int) -> Unit) {
                 )
                 Spacer(Modifier.width(6.dp))
                 Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .clip(CircleShape)
-                        .background(if (selected) BadgeBlue else BorderBlue),
+                    modifier =
+                        Modifier
+                            .size(20.dp)
+                            .clip(CircleShape)
+                            .background(if (selected) BadgeBlue else BorderBlue),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
@@ -486,11 +520,12 @@ private fun ReceivedPayoutCard(
     onDownloadCertificate: (String) -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(1.dp, RoundedCornerShape(12.dp))
-            .background(Color.White, RoundedCornerShape(12.dp))
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .shadow(1.dp, RoundedCornerShape(12.dp))
+                .background(Color.White, RoundedCornerShape(12.dp))
+                .padding(16.dp),
     ) {
         // Top meta: group name + Credited badge
         Row(
@@ -504,10 +539,11 @@ private fun ReceivedPayoutCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(EscrowGreen),
+                        modifier =
+                            Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(EscrowGreen),
                     )
                     Text(
                         payout.cycleLabel,
@@ -533,10 +569,11 @@ private fun ReceivedPayoutCard(
                 )
             }
             Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(TealBadge)
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(TealBadge)
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -564,10 +601,11 @@ private fun ReceivedPayoutCard(
         // Credit date tag
         payout.creditDate?.let { date ->
             Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(SurfaceBlue)
-                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(SurfaceBlue)
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
@@ -594,11 +632,12 @@ private fun ReceivedPayoutCard(
 
         // Financial ledger breakdown
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(SurfaceBlue60)
-                .padding(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(SurfaceBlue60)
+                    .padding(8.dp),
         ) {
             LedgerRow(label = "Gross Chit Value", value = payout.grossValue, valueColor = NavyDeep)
 
@@ -615,11 +654,12 @@ private fun ReceivedPayoutCard(
 
             // Net credited amount — highlighted row
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(1.dp, RoundedCornerShape(8.dp))
-                    .background(Color.White, RoundedCornerShape(8.dp))
-                    .padding(8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .shadow(1.dp, RoundedCornerShape(8.dp))
+                        .background(Color.White, RoundedCornerShape(8.dp))
+                        .padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -732,14 +772,19 @@ private fun LedgerMetaRow(
 // ── Archived payout row ───────────────────────────────────────────────────────
 
 @Composable
-private fun ArchivedPayoutRow(groupName: String, disbursedDate: String, amount: String) {
+private fun ArchivedPayoutRow(
+    groupName: String,
+    disbursedDate: String,
+    amount: String,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color.White)
-            .border(1.dp, Color(0xFFE8EAED), RoundedCornerShape(8.dp))
-            .padding(12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.White)
+                .border(1.dp, Color(0xFFE8EAED), RoundedCornerShape(8.dp))
+                .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -748,10 +793,11 @@ private fun ArchivedPayoutRow(groupName: String, disbursedDate: String, amount: 
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(SurfaceBlue),
+                modifier =
+                    Modifier
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(SurfaceBlue),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(Icons.Outlined.Archive, contentDescription = null, tint = BlueAccent, modifier = Modifier.size(16.dp))
@@ -764,10 +810,11 @@ private fun ArchivedPayoutRow(groupName: String, disbursedDate: String, amount: 
         Column(horizontalAlignment = Alignment.End) {
             Text(amount, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep)
             Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color(0xFFF5F5F5))
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color(0xFFF5F5F5))
+                        .padding(horizontal = 8.dp, vertical = 2.dp),
             ) {
                 Text("Archived", fontSize = 10.sp, color = SlateBody, fontWeight = FontWeight.Medium)
             }
@@ -791,10 +838,11 @@ private fun ScheduledEligibilityHeader() {
             color = NavyDeep,
         )
         Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(20.dp))
-                .background(SurfaceBlue)
-                .padding(horizontal = 10.dp, vertical = 4.dp),
+            modifier =
+                Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(SurfaceBlue)
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
         ) {
             Text(
                 "Automatic Queue",
@@ -812,12 +860,13 @@ private fun EligibilityCard(eligibility: UpcomingEligibility) {
     val isEligible = eligibility.eligibilityStatus == "Eligible"
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color.White)
-            .border(1.dp, if (isEligible) Color(0xFFB2DFDB) else Color(0xFFE0E8FF), RoundedCornerShape(10.dp))
-            .padding(12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.White)
+                .border(1.dp, if (isEligible) Color(0xFFB2DFDB) else Color(0xFFE0E8FF), RoundedCornerShape(10.dp))
+                .padding(12.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -829,10 +878,11 @@ private fun EligibilityCard(eligibility: UpcomingEligibility) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(if (isEligible) GreenEligBg else QueueBg),
+                    modifier =
+                        Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(if (isEligible) GreenEligBg else QueueBg),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -848,10 +898,11 @@ private fun EligibilityCard(eligibility: UpcomingEligibility) {
                 }
             }
             Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(if (isEligible) GreenEligBg else QueueBg)
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(if (isEligible) GreenEligBg else QueueBg)
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
             ) {
                 Text(
                     eligibility.eligibilityStatus,
@@ -879,10 +930,11 @@ private fun EligibilityCard(eligibility: UpcomingEligibility) {
                 )
                 eligibility.windowSlot?.let { slot ->
                     Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(SurfaceBlue)
-                            .padding(horizontal = 10.dp, vertical = 4.dp),
+                        modifier =
+                            Modifier
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(SurfaceBlue)
+                                .padding(horizontal = 10.dp, vertical = 4.dp),
                     ) {
                         Text(slot, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = BlueAccent)
                     }
@@ -917,7 +969,8 @@ private fun EligibilityNote() {
             modifier = Modifier.size(14.dp).padding(top = 2.dp),
         )
         Text(
-            "Active members who complete regular installments receive payout upon scheduled rotation disbursement under Chit Funds Act, 1982 rules.",
+            "Active members who complete regular installments receive payout upon scheduled rotation " +
+                "disbursement under Chit Funds Act, 1982 rules.",
             fontSize = 11.sp,
             color = SlateBody,
             lineHeight = 16.sp,
@@ -951,11 +1004,12 @@ private fun CircleProgressionRow() {
 @Composable
 private fun StatutoryGuaranteeCard() {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(GuaranteeBg)
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(GuaranteeBg)
+                .padding(16.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -972,7 +1026,8 @@ private fun StatutoryGuaranteeCard() {
         }
         Spacer(Modifier.height(8.dp))
         Text(
-            "All disbursements are routed through statutory state-regulated escrow accounts monitored under Section 20 of Chit Funds Act, 1982.",
+            "All disbursements are routed through statutory state-regulated escrow accounts monitored " +
+                "under Section 20 of Chit Funds Act, 1982.",
             fontSize = 11.sp,
             color = SlateBody,
             lineHeight = 16.sp,
@@ -1002,15 +1057,16 @@ private fun PayoutHistoryBottomNav() {
         tonalElevation = 0.dp,
         modifier = Modifier.shadow(8.dp),
     ) {
-        val items = listOf(
-            Icons.Outlined.Home to "Home",
-            Icons.Outlined.AccountBalance to "My Chits",
-            Icons.Outlined.Payments to "Payments",
-            Icons.Outlined.SmartToy to "Assistant",
-            Icons.Outlined.Person to "Profile",
-        )
+        val items =
+            listOf(
+                Icons.Outlined.Home to "Home",
+                Icons.Outlined.AccountBalance to "My Chits",
+                Icons.Outlined.Payments to "Payments",
+                Icons.Outlined.SmartToy to "Assistant",
+                Icons.Outlined.Person to "Profile",
+            )
         items.forEachIndexed { index, (icon, label) ->
-            val selected = index == 2  // Payments tab is active
+            val selected = index == 2 // Payments tab is active
             NavigationBarItem(
                 selected = selected,
                 onClick = {},
@@ -1022,13 +1078,14 @@ private fun PayoutHistoryBottomNav() {
                     )
                 },
                 label = { Text(label, fontSize = 10.sp) },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = NavyMid,
-                    selectedTextColor = NavyMid,
-                    indicatorColor = SurfaceBlue,
-                    unselectedIconColor = SlateBody,
-                    unselectedTextColor = SlateBody,
-                ),
+                colors =
+                    NavigationBarItemDefaults.colors(
+                        selectedIconColor = NavyMid,
+                        selectedTextColor = NavyMid,
+                        indicatorColor = SurfaceBlue,
+                        unselectedIconColor = SlateBody,
+                        unselectedTextColor = SlateBody,
+                    ),
             )
         }
     }

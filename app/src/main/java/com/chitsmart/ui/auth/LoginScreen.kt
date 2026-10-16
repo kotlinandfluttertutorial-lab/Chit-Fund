@@ -20,7 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -35,18 +34,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 // ── Colour tokens from Figma (node 1:2) ──────────────────────────────────────
-private val PageBg        = Color(0xFFF9F9FF)
-private val NavyDeep      = Color(0xFF041B3C)
-private val NavyButton    = Color(0xFF002141)
-private val TealAccent    = Color(0xFF00B3A1)
-private val BlueAccent    = Color(0xFF0261A2)
-private val SlateBody     = Color(0xFF43474F)
-private val SlateHint     = Color(0xFF737780)
-private val SurfaceBlue   = Color(0xFFF1F3FF)
-private val InputPill     = Color(0xFFE8EDFF)
-private val BadgeBlue     = Color(0xFFE0E8FF)
-private val CardWhite     = Color.White
-private val BorderColor   = Color(0xFFE0E8FF)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyButton = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val BlueAccent = Color(0xFF0261A2)
+private val SlateBody = Color(0xFF43474F)
+private val SlateHint = Color(0xFF737780)
+private val SurfaceBlue = Color(0xFFF1F3FF)
+private val InputPill = Color(0xFFE8EDFF)
+private val BadgeBlue = Color(0xFFE0E8FF)
+private val CardWhite = Color.White
+private val BorderColor = Color(0xFFE0E8FF)
 
 @Composable
 fun LoginScreen(
@@ -66,30 +65,34 @@ fun LoginScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(PageBg)
-            .systemBarsPadding(),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(PageBg)
+                .systemBarsPadding(),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
         ) {
             // ── Top bar: Logo + Language toggle ──────────────────────────────
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 // ChitSmart logo placeholder (36dp circle)
                 Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(SurfaceBlue),
+                    modifier =
+                        Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(SurfaceBlue),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text("CS", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = BlueAccent)
@@ -97,20 +100,22 @@ fun LoginScreen(
 
                 // Language toggle pill
                 Row(
-                    modifier = Modifier
-                        .shadow(1.dp, RoundedCornerShape(100.dp))
-                        .clip(RoundedCornerShape(100.dp))
-                        .background(InputPill)
-                        .padding(4.dp),
+                    modifier =
+                        Modifier
+                            .shadow(1.dp, RoundedCornerShape(100.dp))
+                            .clip(RoundedCornerShape(100.dp))
+                            .background(InputPill)
+                            .padding(4.dp),
                 ) {
                     listOf("EN", "हिंदी").forEach { lang ->
                         val selected = language == lang
                         Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(100.dp))
-                                .background(if (selected) NavyButton else Color.Transparent)
-                                .clickable { language = lang }
-                                .padding(horizontal = 12.dp, vertical = 4.dp),
+                            modifier =
+                                Modifier
+                                    .clip(RoundedCornerShape(100.dp))
+                                    .background(if (selected) NavyButton else Color.Transparent)
+                                    .clickable { language = lang }
+                                    .padding(horizontal = 12.dp, vertical = 4.dp),
                         ) {
                             Text(
                                 lang,
@@ -126,22 +131,24 @@ fun LoginScreen(
 
             // ── Community wealth circle banner ────────────────────────────────
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .shadow(1.dp, RoundedCornerShape(12.dp))
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(SurfaceBlue)
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .shadow(1.dp, RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(SurfaceBlue)
+                        .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .shadow(1.dp, RoundedCornerShape(12.dp))
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(BadgeBlue),
+                    modifier =
+                        Modifier
+                            .size(48.dp)
+                            .shadow(1.dp, RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(BadgeBlue),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -194,13 +201,14 @@ fun LoginScreen(
 
             // ── Phone input card ──────────────────────────────────────────────
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .shadow(1.dp, RoundedCornerShape(12.dp))
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(CardWhite)
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .shadow(1.dp, RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(CardWhite)
+                        .padding(16.dp),
             ) {
                 // Field label row
                 Row(
@@ -237,17 +245,19 @@ fun LoginScreen(
 
                 // Input row: +91 pill + number field
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(1.dp, BorderColor, RoundedCornerShape(8.dp)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .border(1.dp, BorderColor, RoundedCornerShape(8.dp)),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     // +91 prefix
                     Row(
-                        modifier = Modifier
-                            .background(InputPill)
-                            .padding(horizontal = 12.dp, vertical = 12.dp),
+                        modifier =
+                            Modifier
+                                .background(InputPill)
+                                .padding(horizontal = 12.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
@@ -269,24 +279,27 @@ fun LoginScreen(
 
                     // Divider
                     Box(
-                        modifier = Modifier
-                            .width(1.dp)
-                            .height(24.dp)
-                            .background(InputPill),
+                        modifier =
+                            Modifier
+                                .width(1.dp)
+                                .height(24.dp)
+                                .background(InputPill),
                     )
 
                     // Number input
                     BasicTextField(
                         value = mobile,
                         onValueChange = { if (it.length <= 10 && it.all { c -> c.isDigit() }) mobile = it },
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 12.dp, vertical = 14.dp),
-                        textStyle = androidx.compose.ui.text.TextStyle(
-                            fontSize = 16.sp,
-                            color = NavyDeep,
-                            letterSpacing = 0.4.sp,
-                        ),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .padding(horizontal = 12.dp, vertical = 14.dp),
+                        textStyle =
+                            androidx.compose.ui.text.TextStyle(
+                                fontSize = 16.sp,
+                                color = NavyDeep,
+                                letterSpacing = 0.4.sp,
+                            ),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         cursorBrush = SolidColor(TealAccent),
                         singleLine = true,
@@ -329,14 +342,16 @@ fun LoginScreen(
                 Button(
                     onClick = { viewModel.sendOtp("+91$mobile") },
                     enabled = isEnabled,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = NavyButton,
-                        disabledContainerColor = NavyButton.copy(alpha = 0.5f),
-                    ),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = NavyButton,
+                            disabledContainerColor = NavyButton.copy(alpha = 0.5f),
+                        ),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 ) {
                     if (isLoading) {
@@ -397,20 +412,22 @@ fun LoginScreen(
 
             // ── Institutional protection badge ────────────────────────────────
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(SurfaceBlue)
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(SurfaceBlue)
+                        .padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.Top,
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(BadgeBlue),
+                    modifier =
+                        Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(BadgeBlue),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -442,9 +459,10 @@ fun LoginScreen(
 
             // ── Social proof ──────────────────────────────────────────────────
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -452,12 +470,13 @@ fun LoginScreen(
                 Box(modifier = Modifier.width(64.dp).height(24.dp)) {
                     listOf(0, 8, 16).forEachIndexed { i, offset ->
                         Box(
-                            modifier = Modifier
-                                .offset(x = (i * 16).dp)
-                                .size(24.dp)
-                                .clip(CircleShape)
-                                .background(listOf(Color(0xFF4CAF50), Color(0xFF2196F3), Color(0xFFFF9800))[i])
-                                .border(2.dp, Color.White, CircleShape),
+                            modifier =
+                                Modifier
+                                    .offset(x = (i * 16).dp)
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .background(listOf(Color(0xFF4CAF50), Color(0xFF2196F3), Color(0xFFFF9800))[i])
+                                    .border(2.dp, Color.White, CircleShape),
                         )
                     }
                 }
@@ -474,17 +493,22 @@ fun LoginScreen(
 
             // ── Terms & SSL footer ────────────────────────────────────────────
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     buildAnnotatedString {
                         withStyle(SpanStyle(color = SlateHint, fontSize = 12.sp)) { append("By proceeding, you agree to our ") }
-                        withStyle(SpanStyle(color = BlueAccent, fontSize = 12.sp, textDecoration = TextDecoration.Underline)) { append("Terms of Service") }
+                        withStyle(
+                            SpanStyle(color = BlueAccent, fontSize = 12.sp, textDecoration = TextDecoration.Underline),
+                        ) { append("Terms of Service") }
                         withStyle(SpanStyle(color = SlateHint, fontSize = 12.sp)) { append(" & ") }
-                        withStyle(SpanStyle(color = BlueAccent, fontSize = 12.sp, textDecoration = TextDecoration.Underline)) { append("Privacy Policy") }
+                        withStyle(
+                            SpanStyle(color = BlueAccent, fontSize = 12.sp, textDecoration = TextDecoration.Underline),
+                        ) { append("Privacy Policy") }
                         withStyle(SpanStyle(color = SlateHint, fontSize = 12.sp)) { append(".") }
                     },
                     textAlign = TextAlign.Center,
@@ -517,8 +541,11 @@ fun LoginScreen(
 // ── UI state ──────────────────────────────────────────────────────────────────
 sealed class LoginUiState {
     object Idle : LoginUiState()
+
     object Loading : LoginUiState()
+
     object OtpSent : LoginUiState()
+
     data class Error(val message: String) : LoginUiState()
 }
 

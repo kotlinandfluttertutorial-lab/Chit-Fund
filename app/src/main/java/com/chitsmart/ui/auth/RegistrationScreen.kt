@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.SpanStyle
@@ -30,23 +29,25 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 // ── Colour tokens from Figma (node 1:1570) ───────────────────────────────────
-private val PageBg       = Color(0xFFF9F9FF)
-private val NavyDeep     = Color(0xFF041B3C)
-private val NavyMid      = Color(0xFF002141)
-private val TealAccent   = Color(0xFF00B3A1)
-private val TealDark     = Color(0xFF003E37)
-private val TealBadgeBg  = Color(0xFFE6FAF3)
-private val BlueAccent   = Color(0xFF0261A2)
-private val ErrorRed     = Color(0xFFBA1A1A)
-private val SlateBody    = Color(0xFF43474F)
-private val SlateHint    = Color(0xFF737780)
-private val SurfaceBlue  = Color(0xFFF1F3FF)
-private val InputPill    = Color(0xFFE8EDFF)
-private val FieldBg      = Color.White
-private val FieldBorder  = Color(0xFFE0E8FF)
-private val LockedBg     = Color(0xFFF1F3FF)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyMid = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val TealDark = Color(0xFF003E37)
+private val TealBadgeBg = Color(0xFFE6FAF3)
+private val BlueAccent = Color(0xFF0261A2)
+private val ErrorRed = Color(0xFFBA1A1A)
+private val SlateBody = Color(0xFF43474F)
+private val SlateHint = Color(0xFF737780)
+private val SurfaceBlue = Color(0xFFF1F3FF)
+private val InputPill = Color(0xFFE8EDFF)
+private val FieldBg = Color.White
+private val FieldBorder = Color(0xFFE0E8FF)
+private val LockedBg = Color(0xFFF1F3FF)
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,10 +70,11 @@ fun RegistrationScreen(
     val isFormValid = fullName.isNotBlank() && consentChecked
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(PageBg)
-            .systemBarsPadding(),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(PageBg)
+                .systemBarsPadding(),
     ) {
         // ── Top bar ──
         Row(
@@ -80,14 +82,23 @@ fun RegistrationScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(modifier = Modifier.size(40.dp).clip(CircleShape).background(InputPill).clickable { onBack() }, contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier.size(40.dp).clip(CircleShape).background(InputPill).clickable { onBack() },
+                contentAlignment = Alignment.Center,
+            ) {
                 Icon(Icons.Outlined.ArrowBack, contentDescription = "Back", tint = NavyDeep, modifier = Modifier.size(13.dp))
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Create your account", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep)
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(TealAccent))
-                    Text("Verified Rotational Chit Network", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = TealDark, letterSpacing = 0.33.sp)
+                    Text(
+                        "Verified Rotational Chit Network",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TealDark,
+                        letterSpacing = 0.33.sp,
+                    )
                 }
             }
             Box(modifier = Modifier.size(40.dp)) // spacer for symmetry
@@ -96,7 +107,13 @@ fun RegistrationScreen(
         // Progress bar
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("STEP 1 OF 3: ACCOUNT CREATION", fontSize = 11.sp, fontWeight = FontWeight.Medium, color = SlateBody, letterSpacing = 0.55.sp)
+                Text(
+                    "STEP 1 OF 3: ACCOUNT CREATION",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = SlateBody,
+                    letterSpacing = 0.55.sp,
+                )
                 Text("35% Completed", fontSize = 11.sp, fontWeight = FontWeight.Medium, color = BlueAccent, letterSpacing = 0.33.sp)
             }
             Spacer(Modifier.height(6.dp))
@@ -109,18 +126,31 @@ fun RegistrationScreen(
 
         // Header
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            Text("Create your account", fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep, letterSpacing = (-0.6).sp, lineHeight = 32.sp)
-            Text("Enter your basic details to start saving in verified chit circles.", fontSize = 14.sp, color = SlateBody, lineHeight = 20.sp)
+            Text(
+                "Create your account",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = NavyDeep,
+                letterSpacing = (-0.6).sp,
+                lineHeight = 32.sp,
+            )
+            Text(
+                "Enter your basic details to start saving in verified chit circles.",
+                fontSize = 14.sp,
+                color = SlateBody,
+                lineHeight = 20.sp,
+            )
         }
 
         Spacer(Modifier.height(16.dp))
 
         // ── Form ──
         Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Field 1: Full Name
@@ -128,7 +158,10 @@ fun RegistrationScreen(
                 label = "Full Name",
                 hint = "As per official ID",
                 value = fullName,
-                onValueChange = { fullName = it; nameError = null },
+                onValueChange = {
+                    fullName = it
+                    nameError = null
+                },
                 isRequired = true,
                 error = nameError,
                 leadingIcon = Icons.Outlined.Person,
@@ -140,13 +173,25 @@ fun RegistrationScreen(
                     Text("Mobile Number", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep, letterSpacing = 0.14.sp)
                     Text("*", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = ErrorRed)
                     Spacer(Modifier.weight(1f))
-                    Row(modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(TealBadgeBg).padding(horizontal = 8.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(
+                        modifier =
+                            Modifier.clip(
+                                RoundedCornerShape(20.dp),
+                            ).background(TealBadgeBg).padding(horizontal = 8.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
                         Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = TealAccent, modifier = Modifier.size(11.dp))
                         Text("OTP Verified", fontSize = 11.sp, fontWeight = FontWeight.Medium, color = TealDark, letterSpacing = 0.33.sp)
                     }
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(8.dp)).background(LockedBg).border(1.dp, FieldBorder, RoundedCornerShape(8.dp)).padding(horizontal = 12.dp),
+                    modifier =
+                        Modifier.fillMaxWidth().height(
+                            48.dp,
+                        ).clip(
+                            RoundedCornerShape(8.dp),
+                        ).background(LockedBg).border(1.dp, FieldBorder, RoundedCornerShape(8.dp)).padding(horizontal = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
@@ -183,19 +228,35 @@ fun RegistrationScreen(
                 Text("Gender", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep, letterSpacing = 0.14.sp)
                 ExposedDropdownMenuBox(expanded = showGenderMenu, onExpandedChange = { showGenderMenu = it }) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().height(48.dp).menuAnchor().clip(RoundedCornerShape(8.dp)).background(FieldBg).border(1.dp, FieldBorder, RoundedCornerShape(8.dp)).padding(horizontal = 12.dp),
+                        modifier =
+                            Modifier.fillMaxWidth().height(
+                                48.dp,
+                            ).menuAnchor().clip(
+                                RoundedCornerShape(8.dp),
+                            ).background(FieldBg).border(1.dp, FieldBorder, RoundedCornerShape(8.dp)).padding(horizontal = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Icon(Icons.Outlined.Person, contentDescription = null, tint = SlateBody, modifier = Modifier.size(16.dp))
-                            Text(if (gender.isBlank()) "Select gender" else gender, fontSize = 16.sp, color = if (gender.isBlank()) SlateHint else NavyDeep)
+                            Text(
+                                if (gender.isBlank()) "Select gender" else gender,
+                                fontSize = 16.sp,
+                                color = if (gender.isBlank()) SlateHint else NavyDeep,
+                            )
                         }
-                        Icon(if (showGenderMenu) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore, contentDescription = null, tint = SlateBody)
+                        Icon(
+                            if (showGenderMenu) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                            contentDescription = null,
+                            tint = SlateBody,
+                        )
                     }
                     ExposedDropdownMenu(expanded = showGenderMenu, onDismissRequest = { showGenderMenu = false }) {
                         genderOptions.forEach { option ->
-                            DropdownMenuItem(text = { Text(option) }, onClick = { gender = option; showGenderMenu = false })
+                            DropdownMenuItem(text = { Text(option) }, onClick = {
+                                gender = option
+                                showGenderMenu = false
+                            })
                         }
                     }
                 }
@@ -216,10 +277,16 @@ fun RegistrationScreen(
                 Text(
                     buildAnnotatedString {
                         withStyle(SpanStyle(color = SlateBody, fontSize = 12.sp)) { append("I agree to the ") }
-                        withStyle(SpanStyle(color = BlueAccent, fontSize = 12.sp, textDecoration = TextDecoration.Underline)) { append("Terms and Conditions") }
+                        withStyle(
+                            SpanStyle(color = BlueAccent, fontSize = 12.sp, textDecoration = TextDecoration.Underline),
+                        ) { append("Terms and Conditions") }
                         withStyle(SpanStyle(color = SlateBody, fontSize = 12.sp)) { append(" and ") }
-                        withStyle(SpanStyle(color = BlueAccent, fontSize = 12.sp, textDecoration = TextDecoration.Underline)) { append("Privacy Policy") }
-                        withStyle(SpanStyle(color = SlateBody, fontSize = 12.sp)) { append(" of ChitSmart and authorise Chit Funds Act mandated collections.") }
+                        withStyle(
+                            SpanStyle(color = BlueAccent, fontSize = 12.sp, textDecoration = TextDecoration.Underline),
+                        ) { append("Privacy Policy") }
+                        withStyle(
+                            SpanStyle(color = SlateBody, fontSize = 12.sp),
+                        ) { append(" of ChitSmart and authorise Chit Funds Act mandated collections.") }
                     },
                     lineHeight = 16.sp,
                 )
@@ -232,7 +299,10 @@ fun RegistrationScreen(
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
             Button(
                 onClick = {
-                    if (fullName.isBlank()) { nameError = "Full name is required"; return@Button }
+                    if (fullName.isBlank()) {
+                        nameError = "Full name is required"
+                        return@Button
+                    }
                     isLoading = true
                     onRegister(fullName, email.ifBlank { null }, dob.ifBlank { null }, gender.ifBlank { null })
                 },
@@ -276,7 +346,14 @@ private fun FormField(
             Text(hint, fontSize = 12.sp, color = SlateBody)
         }
         Row(
-            modifier = Modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(8.dp)).background(if (error != null) Color(0xFFFFEDED) else FieldBg).border(1.dp, if (error != null) ErrorRed else FieldBorder, RoundedCornerShape(8.dp)).padding(horizontal = 12.dp),
+            modifier =
+                Modifier.fillMaxWidth().height(
+                    48.dp,
+                ).clip(
+                    RoundedCornerShape(8.dp),
+                ).background(
+                    if (error != null) Color(0xFFFFEDED) else FieldBg,
+                ).border(1.dp, if (error != null) ErrorRed else FieldBorder, RoundedCornerShape(8.dp)).padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -301,4 +378,6 @@ private fun FormField(
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "Registration")
 @Composable
-fun RegistrationScreenPreview() { MaterialTheme { RegistrationScreen() } }
+fun RegistrationScreenPreview() {
+    MaterialTheme { RegistrationScreen() }
+}

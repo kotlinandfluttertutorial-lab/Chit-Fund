@@ -1,8 +1,6 @@
 package com.chitsmart.ui.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,14 +26,14 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
-private val PageBg      = Color(0xFFF9F9FF)
-private val NavyDeep    = Color(0xFF041B3C)
-private val NavyMid     = Color(0xFF002141)
-private val TealAccent  = Color(0xFF00B3A1)
-private val BlueAccent  = Color(0xFF0261A2)
-private val ErrorRed    = Color(0xFFBA1A1A)
-private val SlateBody   = Color(0xFF43474F)
-private val SlateHint   = Color(0xFF737780)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyMid = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val BlueAccent = Color(0xFF0261A2)
+private val ErrorRed = Color(0xFFBA1A1A)
+private val SlateBody = Color(0xFF43474F)
+private val SlateHint = Color(0xFF737780)
 private val SurfaceBlue = Color(0xFFF1F3FF)
 
 // ── Data model ────────────────────────────────────────────────────────────────
@@ -43,25 +41,26 @@ private val SurfaceBlue = Color(0xFFF1F3FF)
 data class BankAccount(
     val id: String,
     val bankName: String,
-    val accountType: String,       // Savings / Current
-    val maskedNumber: String,      // e.g. "•••• 4092"
+    // Savings / Current
+    val accountType: String,
+    // e.g. "•••• 4092"
+    val maskedNumber: String,
     val ifscCode: String,
     val upiIds: List<String> = emptyList(),
     val isPrimary: Boolean = false,
 )
 
-private val sampleAccounts = listOf(
-    BankAccount("1", "HDFC Bank", "Savings", "•••• 4092", "HDFC0001234", listOf("priya@hdfcbank"), isPrimary = true),
-    BankAccount("2", "SBI Bank", "Savings", "•••• 8817", "SBIN0002345", listOf("priya.sharma@oksbi")),
-)
+private val sampleAccounts =
+    listOf(
+        BankAccount("1", "HDFC Bank", "Savings", "•••• 4092", "HDFC0001234", listOf("priya@hdfcbank"), isPrimary = true),
+        BankAccount("2", "SBI Bank", "Savings", "•••• 8817", "SBIN0002345", listOf("priya.sharma@oksbi")),
+    )
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BankAccountsScreen(
-    onBack: () -> Unit = {},
-) {
+fun BankAccountsScreen(onBack: () -> Unit = {}) {
     val accounts = remember { mutableStateListOf(*sampleAccounts.toTypedArray()) }
     var showAddSheet by remember { mutableStateOf(false) }
     var removeTarget by remember { mutableStateOf<BankAccount?>(null) }
@@ -176,7 +175,10 @@ private fun BankAccountCard(
                     Text(account.bankName, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep)
                     if (account.isPrimary) {
                         Row(
-                            modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(TealAccent.copy(alpha = 0.12f)).padding(horizontal = 8.dp, vertical = 2.dp),
+                            modifier =
+                                Modifier.clip(
+                                    RoundedCornerShape(20.dp),
+                                ).background(TealAccent.copy(alpha = 0.12f)).padding(horizontal = 8.dp, vertical = 2.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(3.dp),
                         ) {
@@ -247,31 +249,39 @@ private fun AddBankAccountSheet(
                     // Input form
                     OutlinedTextField(
                         value = accountNumber,
-                        onValueChange = { accountNumber = it; accountNumberError = null },
+                        onValueChange = {
+                            accountNumber = it
+                            accountNumberError = null
+                        },
                         label = { Text("Account Number") },
                         isError = accountNumberError != null,
                         supportingText = accountNumberError?.let { { Text(it, color = ErrorRed) } },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(10.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = TealAccent,
-                            unfocusedBorderColor = Color(0xFFE2E8F0),
-                        ),
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = TealAccent,
+                                unfocusedBorderColor = Color(0xFFE2E8F0),
+                            ),
                     )
                     OutlinedTextField(
                         value = ifsc,
-                        onValueChange = { ifsc = it.uppercase(); ifscError = null },
+                        onValueChange = {
+                            ifsc = it.uppercase()
+                            ifscError = null
+                        },
                         label = { Text("IFSC Code") },
                         isError = ifscError != null,
                         supportingText = ifscError?.let { { Text(it, color = ErrorRed) } },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters, imeAction = ImeAction.Done),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(10.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = TealAccent,
-                            unfocusedBorderColor = Color(0xFFE2E8F0),
-                        ),
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = TealAccent,
+                                unfocusedBorderColor = Color(0xFFE2E8F0),
+                            ),
                     )
                     Button(
                         onClick = {
@@ -328,7 +338,7 @@ private fun AddBankAccountSheet(
                                         ifscCode = ifsc,
                                         upiIds = emptyList(),
                                         isPrimary = false,
-                                    )
+                                    ),
                                 )
                             },
                             modifier = Modifier.weight(1f).height(48.dp),
@@ -344,4 +354,6 @@ private fun AddBankAccountSheet(
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "Bank Accounts")
 @Composable
-fun BankAccountsScreenPreview() { MaterialTheme { BankAccountsScreen() } }
+fun BankAccountsScreenPreview() {
+    MaterialTheme { BankAccountsScreen() }
+}

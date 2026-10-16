@@ -26,14 +26,14 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 // ── Colour tokens from Figma (node 1:1415) ───────────────────────────────────
-private val SplashBg         = Color(0xFF073763)
-private val TealAccent        = Color(0xFF4FDBC8)
-private val TealGlow          = Color(0xFF71F8E4)
-private val BlueGlow          = Color(0xFF76B8FE)
-private val EmblemDark        = Color(0xFF002141)
-private val TextLight         = Color(0xFFE0E8FF)
-private val TextSubtle        = Color(0x99E0E8FF)
-private val BarTrack          = Color(0xFF002141)
+private val SplashBg = Color(0xFF073763)
+private val TealAccent = Color(0xFF4FDBC8)
+private val TealGlow = Color(0xFF71F8E4)
+private val BlueGlow = Color(0xFF76B8FE)
+private val EmblemDark = Color(0xFF002141)
+private val TextLight = Color(0xFFE0E8FF)
+private val TextSubtle = Color(0x99E0E8FF)
+private val BarTrack = Color(0xFF002141)
 
 @Composable
 fun SplashScreen(onNavigate: (isFirstLaunch: Boolean) -> Unit) {
@@ -61,43 +61,48 @@ fun SplashScreen(onNavigate: (isFirstLaunch: Boolean) -> Unit) {
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(SplashBg),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(SplashBg),
         contentAlignment = Alignment.Center,
     ) {
         // Decorative ambient glows
         Box(
-            modifier = Modifier
-                .size(384.dp)
-                .offset(x = (-128).dp, y = (-128).dp)
-                .clip(CircleShape)
-                .background(Color(0x1A76B8FE))
-                .blur(32.dp)
-                .align(Alignment.TopStart),
+            modifier =
+                Modifier
+                    .size(384.dp)
+                    .offset(x = (-128).dp, y = (-128).dp)
+                    .clip(CircleShape)
+                    .background(Color(0x1A76B8FE))
+                    .blur(32.dp)
+                    .align(Alignment.TopStart),
         )
         Box(
-            modifier = Modifier
-                .size(420.dp)
-                .clip(CircleShape)
-                .background(Color(0x1A4FDBC8))
-                .blur(50.dp)
-                .align(Alignment.Center),
+            modifier =
+                Modifier
+                    .size(420.dp)
+                    .clip(CircleShape)
+                    .background(Color(0x1A4FDBC8))
+                    .blur(50.dp)
+                    .align(Alignment.Center),
         )
         Box(
-            modifier = Modifier
-                .size(320.dp)
-                .offset(x = 96.dp, y = 96.dp)
-                .clip(CircleShape)
-                .background(Color(0x1A71F8E4))
-                .blur(32.dp)
-                .align(Alignment.BottomEnd),
+            modifier =
+                Modifier
+                    .size(320.dp)
+                    .offset(x = 96.dp, y = 96.dp)
+                    .clip(CircleShape)
+                    .background(Color(0x1A71F8E4))
+                    .blur(32.dp)
+                    .align(Alignment.BottomEnd),
         )
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 40.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp, vertical = 40.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -123,21 +128,23 @@ fun SplashScreen(onNavigate: (isFirstLaunch: Boolean) -> Unit) {
                 ) {
                     // Outer pulsing aura
                     Box(
-                        modifier = Modifier
-                            .size((96 * auraScale).dp)
-                            .clip(CircleShape)
-                            .background(TealAccent.copy(alpha = 0.2f)),
+                        modifier =
+                            Modifier
+                                .size((96 * auraScale).dp)
+                                .clip(CircleShape)
+                                .background(TealAccent.copy(alpha = 0.2f)),
                     )
                     // Inner gradient circle (emblem)
                     Box(
-                        modifier = Modifier
-                            .size(96.dp)
-                            .clip(CircleShape)
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(EmblemDark, SplashBg),
-                                )
-                            ),
+                        modifier =
+                            Modifier
+                                .size(96.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(EmblemDark, SplashBg),
+                                    ),
+                                ),
                         contentAlignment = Alignment.Center,
                     ) {
                         // Lotus/coin placeholder icon
@@ -150,8 +157,12 @@ fun SplashScreen(onNavigate: (isFirstLaunch: Boolean) -> Unit) {
                 // Wordmark: "Chit" + "Smart" (teal)
                 Text(
                     buildAnnotatedString {
-                        withStyle(SpanStyle(color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.9).sp)) { append("Chit") }
-                        withStyle(SpanStyle(color = TealAccent, fontSize = 36.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.9).sp)) { append("Smart") }
+                        withStyle(
+                            SpanStyle(color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.9).sp),
+                        ) { append("Chit") }
+                        withStyle(
+                            SpanStyle(color = TealAccent, fontSize = 36.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.9).sp),
+                        ) { append("Smart") }
                     },
                     textAlign = TextAlign.Center,
                 )
@@ -169,10 +180,11 @@ fun SplashScreen(onNavigate: (isFirstLaunch: Boolean) -> Unit) {
 
                 // Regulatory badge
                 Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(100.dp))
-                        .background(Color(0xFF002141).copy(alpha = 0.7f))
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(100.dp))
+                            .background(Color(0xFF002141).copy(alpha = 0.7f))
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
@@ -194,22 +206,24 @@ fun SplashScreen(onNavigate: (isFirstLaunch: Boolean) -> Unit) {
             ) {
                 // Progress bar
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(BarTrack),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(BarTrack),
                 ) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth(animatedProgress)
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(
-                                Brush.horizontalGradient(
-                                    colors = listOf(TealAccent, TealGlow, BlueGlow),
-                                )
-                            ),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth(animatedProgress)
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(3.dp))
+                                .background(
+                                    Brush.horizontalGradient(
+                                        colors = listOf(TealAccent, TealGlow, BlueGlow),
+                                    ),
+                                ),
                     )
                 }
 
@@ -217,7 +231,13 @@ fun SplashScreen(onNavigate: (isFirstLaunch: Boolean) -> Unit) {
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("Securing ledger session...", fontSize = 11.sp, color = Color(0xFFD7E2FF), fontWeight = FontWeight.Medium, letterSpacing = 0.275.sp)
+                    Text(
+                        "Securing ledger session...",
+                        fontSize = 11.sp,
+                        color = Color(0xFFD7E2FF),
+                        fontWeight = FontWeight.Medium,
+                        letterSpacing = 0.275.sp,
+                    )
                     Text("100%", fontSize = 11.sp, color = TealAccent, fontWeight = FontWeight.SemiBold, letterSpacing = 0.33.sp)
                 }
 
@@ -229,9 +249,21 @@ fun SplashScreen(onNavigate: (isFirstLaunch: Boolean) -> Unit) {
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         Icon(Icons.Outlined.Lock, contentDescription = null, tint = TextSubtle, modifier = Modifier.size(9.dp))
-                        Text("100% Encrypted & Sovereign Trust", fontSize = 11.sp, color = TextSubtle, fontWeight = FontWeight.Medium, letterSpacing = 0.33.sp)
+                        Text(
+                            "100% Encrypted & Sovereign Trust",
+                            fontSize = 11.sp,
+                            color = TextSubtle,
+                            fontWeight = FontWeight.Medium,
+                            letterSpacing = 0.33.sp,
+                        )
                     }
-                    Text("v2.4.0 (Build 8402)", fontSize = 11.sp, color = TextSubtle, fontWeight = FontWeight.Medium, textAlign = TextAlign.End)
+                    Text(
+                        "v2.4.0 (Build 8402)",
+                        fontSize = 11.sp,
+                        color = TextSubtle,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.End,
+                    )
                 }
             }
         }
@@ -240,4 +272,6 @@ fun SplashScreen(onNavigate: (isFirstLaunch: Boolean) -> Unit) {
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 840, name = "Splash Screen")
 @Composable
-fun SplashScreenPreview() { MaterialTheme { SplashScreen(onNavigate = {}) } }
+fun SplashScreenPreview() {
+    MaterialTheme { SplashScreen(onNavigate = {}) }
+}

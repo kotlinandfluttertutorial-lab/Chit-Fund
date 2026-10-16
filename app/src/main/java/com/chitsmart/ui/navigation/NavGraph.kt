@@ -1,20 +1,18 @@
 package com.chitsmart.ui.navigation
 
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.chitsmart.ui.assistant.AIChatScreen
 import com.chitsmart.ui.assistant.AssistantHomeScreen
 import com.chitsmart.ui.assistant.HumanSupportScreen
@@ -31,53 +29,68 @@ import com.chitsmart.ui.splash.SplashScreen
 
 object AppRoutes {
     // Auth flow (no bottom nav)
-    const val SPLASH         = "splash"
-    const val ONBOARDING     = "onboarding"
-    const val LOGIN          = "login"
-    const val OTP            = "otp/{mobileNumber}"
-    const val REGISTRATION   = "registration/{mobileNumber}"
+    const val SPLASH = "splash"
+    const val ONBOARDING = "onboarding"
+    const val LOGIN = "login"
+    const val OTP = "otp/{mobileNumber}"
+    const val REGISTRATION = "registration/{mobileNumber}"
 
     // Home tab
-    const val HOME           = "home"
-    const val NOTIFICATIONS  = "notifications"
+    const val HOME = "home"
+    const val NOTIFICATIONS = "notifications"
 
     // My Chits tab
-    const val BROWSE_GROUPS  = "browse_groups"
-    const val GROUP_DETAILS  = "group_details/{groupId}/{groupName}"
-    const val ENROLLMENT     = "enrollment/{groupId}/{groupName}"
-    const val MY_CHITS       = "my_chits"
-    const val GROUP_MEMBER   = "group_member/{membershipId}/{groupName}"
+    const val BROWSE_GROUPS = "browse_groups"
+    const val GROUP_DETAILS = "group_details/{groupId}/{groupName}"
+    const val ENROLLMENT = "enrollment/{groupId}/{groupName}"
+    const val MY_CHITS = "my_chits"
+    const val GROUP_MEMBER = "group_member/{membershipId}/{groupName}"
 
     // Payments tab
-    const val PAYMENTS_HOME  = "payments_home"
-    const val PAYMENT_SUMMARY   = "payment/summary/{installmentId}"
-    const val PAYMENT_HISTORY   = "payment_history"
-    const val PAYOUT_HISTORY    = "payout_history"
-    const val RECEIPT           = "receipt/{paymentId}"
+    const val PAYMENTS_HOME = "payments_home"
+    const val PAYMENT_SUMMARY = "payment/summary/{installmentId}"
+    const val PAYMENT_HISTORY = "payment_history"
+    const val PAYOUT_HISTORY = "payout_history"
+    const val RECEIPT = "receipt/{paymentId}"
 
     // Assistant tab
-    const val ASSISTANT      = "assistant"
-    const val AI_CHAT        = "ai_chat"
+    const val ASSISTANT = "assistant"
+    const val AI_CHAT = "ai_chat"
 
     // Profile tab
-    const val PROFILE        = "profile"
-    const val PERSONAL_INFO  = "personal_info"
-    const val BANK_ACCOUNTS  = "bank_accounts"
-    const val SECURITY       = "security_settings"
-    const val HELP_CENTER    = "help_centre"
+    const val PROFILE = "profile"
+    const val PERSONAL_INFO = "personal_info"
+    const val BANK_ACCOUNTS = "bank_accounts"
+    const val SECURITY = "security_settings"
+    const val HELP_CENTER = "help_centre"
     const val LANGUAGE_PREFS = "preferences"
-    const val NOMINEES       = "nominees"
+    const val NOMINEES = "nominees"
 
     // Human support
-    const val HUMAN_SUPPORT  = "human_support"
+    const val HUMAN_SUPPORT = "human_support"
 
     // Helper builders
     fun otp(mobileNumber: String) = "otp/$mobileNumber"
+
     fun registration(mobileNumber: String) = "registration/$mobileNumber"
-    fun groupDetails(groupId: String, groupName: String) = "group_details/$groupId/$groupName"
-    fun enrollment(groupId: String, groupName: String) = "enrollment/$groupId/$groupName"
-    fun groupMember(membershipId: String, groupName: String) = "group_member/$membershipId/$groupName"
+
+    fun groupDetails(
+        groupId: String,
+        groupName: String,
+    ) = "group_details/$groupId/$groupName"
+
+    fun enrollment(
+        groupId: String,
+        groupName: String,
+    ) = "enrollment/$groupId/$groupName"
+
+    fun groupMember(
+        membershipId: String,
+        groupName: String,
+    ) = "group_member/$membershipId/$groupName"
+
     fun paymentSummary(installmentId: String) = "payment/summary/$installmentId"
+
     fun receipt(paymentId: String) = "receipt/$paymentId"
 }
 
@@ -91,19 +104,24 @@ sealed class BottomNavDestination(
     // Current release: Home | My Chits | Payments | Assistant | Profile
     // Auctions tab is DEFERRED — do not add here (see docs/scope-decisions.md)
     object Home : BottomNavDestination(AppRoutes.HOME, "Home", Icons.Outlined.Home)
+
     object MyChits : BottomNavDestination(AppRoutes.MY_CHITS, "My Chits", Icons.Outlined.AccountBalance)
+
     object Payments : BottomNavDestination(AppRoutes.PAYMENTS_HOME, "Payments", Icons.Outlined.Payments)
+
     object Assistant : BottomNavDestination(AppRoutes.ASSISTANT, "Assistant", Icons.Outlined.SmartToy)
+
     object Profile : BottomNavDestination(AppRoutes.PROFILE, "Profile", Icons.Outlined.Person)
 }
 
-val bottomNavItems = listOf(
-    BottomNavDestination.Home,
-    BottomNavDestination.MyChits,
-    BottomNavDestination.Payments,
-    BottomNavDestination.Assistant,
-    BottomNavDestination.Profile,
-)
+val bottomNavItems =
+    listOf(
+        BottomNavDestination.Home,
+        BottomNavDestination.MyChits,
+        BottomNavDestination.Payments,
+        BottomNavDestination.Assistant,
+        BottomNavDestination.Profile,
+    )
 
 // ── Root nav graph ────────────────────────────────────────────────────────────
 
@@ -114,7 +132,6 @@ fun ChitSmartNavGraph(navController: NavHostController) {
         navController = navController,
         startDestination = AppRoutes.SPLASH,
     ) {
-
         // ── Auth flow ─────────────────────────────────────────────────────────
 
         composable(AppRoutes.SPLASH) {
@@ -218,7 +235,7 @@ fun ChitSmartNavGraph(navController: NavHostController) {
                 },
                 onViewDetails = { membership ->
                     navController.navigate(
-                        AppRoutes.groupMember(membership.groupName, membership.groupName)
+                        AppRoutes.groupMember(membership.groupName, membership.groupName),
                     )
                 },
                 onDownloadCertificate = { /* launch PDF intent */ },
@@ -242,10 +259,11 @@ fun ChitSmartNavGraph(navController: NavHostController) {
 
         composable(
             route = AppRoutes.GROUP_DETAILS,
-            arguments = listOf(
-                navArgument("groupId") { type = NavType.StringType },
-                navArgument("groupName") { type = NavType.StringType },
-            ),
+            arguments =
+                listOf(
+                    navArgument("groupId") { type = NavType.StringType },
+                    navArgument("groupName") { type = NavType.StringType },
+                ),
         ) { backStack ->
             val groupName = backStack.arguments?.getString("groupName") ?: ""
             GroupDetailsScreen(
@@ -259,10 +277,11 @@ fun ChitSmartNavGraph(navController: NavHostController) {
 
         composable(
             route = AppRoutes.ENROLLMENT,
-            arguments = listOf(
-                navArgument("groupId") { type = NavType.StringType },
-                navArgument("groupName") { type = NavType.StringType },
-            ),
+            arguments =
+                listOf(
+                    navArgument("groupId") { type = NavType.StringType },
+                    navArgument("groupName") { type = NavType.StringType },
+                ),
         ) { backStack ->
             val groupName = backStack.arguments?.getString("groupName") ?: ""
             EnrollmentScreen(
@@ -278,10 +297,11 @@ fun ChitSmartNavGraph(navController: NavHostController) {
 
         composable(
             route = AppRoutes.GROUP_MEMBER,
-            arguments = listOf(
-                navArgument("membershipId") { type = NavType.StringType },
-                navArgument("groupName") { type = NavType.StringType },
-            ),
+            arguments =
+                listOf(
+                    navArgument("membershipId") { type = NavType.StringType },
+                    navArgument("groupName") { type = NavType.StringType },
+                ),
         ) { backStack ->
             val groupName = backStack.arguments?.getString("groupName") ?: ""
             GroupMemberViewScreen(
@@ -394,12 +414,12 @@ fun ChitSmartNavGraph(navController: NavHostController) {
             ProfileScreen(
                 onMenuItemTap = { item ->
                     when (item.route) {
-                        AppRoutes.PERSONAL_INFO  -> navController.navigate(AppRoutes.PERSONAL_INFO)
-                        AppRoutes.BANK_ACCOUNTS  -> navController.navigate(AppRoutes.BANK_ACCOUNTS)
-                        AppRoutes.NOMINEES       -> navController.navigate(AppRoutes.NOMINEES)
-                        AppRoutes.SECURITY       -> navController.navigate(AppRoutes.SECURITY)
+                        AppRoutes.PERSONAL_INFO -> navController.navigate(AppRoutes.PERSONAL_INFO)
+                        AppRoutes.BANK_ACCOUNTS -> navController.navigate(AppRoutes.BANK_ACCOUNTS)
+                        AppRoutes.NOMINEES -> navController.navigate(AppRoutes.NOMINEES)
+                        AppRoutes.SECURITY -> navController.navigate(AppRoutes.SECURITY)
                         AppRoutes.LANGUAGE_PREFS -> navController.navigate(AppRoutes.LANGUAGE_PREFS)
-                        AppRoutes.HELP_CENTER    -> navController.navigate(AppRoutes.HELP_CENTER)
+                        AppRoutes.HELP_CENTER -> navController.navigate(AppRoutes.HELP_CENTER)
                         else -> { /* no-op for legal/about in this release */ }
                     }
                 },

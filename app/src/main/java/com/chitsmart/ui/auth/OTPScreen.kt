@@ -25,73 +25,101 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 
 // ── Colour tokens from Figma (node 1:115) ────────────────────────────────────
-private val PageBg        = Color(0xFFF9F9FF)
-private val NavyDeep      = Color(0xFF041B3C)
-private val NavyButton    = Color(0xFF002141)
-private val TealCursor    = Color(0xFF0F766E)
-private val TealEdit      = Color(0xFF0F766E)
-private val SlateBody     = Color(0xFF43474F)
-private val SlateHint     = Color(0xFF737780)
-private val SurfaceBlue   = Color(0xFFF1F3FF)
-private val ErrorBg       = Color(0xB3FFDAD6)  // rgba(255,218,214,0.7)
-private val ErrorTitle    = Color(0xFF93000A)
-private val ErrorBody     = Color(0xFFBA1A1A)
-private val DigitFilled   = Color.White
-private val DigitEmpty    = SurfaceBlue
-private val DigitBorder   = Color(0x4DC3C6D0)   // rgba(195,198,208,0.3)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyButton = Color(0xFF002141)
+private val TealCursor = Color(0xFF0F766E)
+private val TealEdit = Color(0xFF0F766E)
+private val SlateBody = Color(0xFF43474F)
+private val SlateHint = Color(0xFF737780)
+private val SurfaceBlue = Color(0xFFF1F3FF)
+private val ErrorBg = Color(0xB3FFDAD6) // rgba(255,218,214,0.7)
+private val ErrorTitle = Color(0xFF93000A)
+private val ErrorBody = Color(0xFFBA1A1A)
+private val DigitFilled = Color.White
+private val DigitEmpty = SurfaceBlue
+private val DigitBorder = Color(0x4DC3C6D0) // rgba(195,198,208,0.3)
 
 @Composable
 fun OTPScreen(
     mobileNumber: String = "+91 98765 •••••",
+    viewModel: OtpViewModel = hiltViewModel(),
     onVerified: (isNewUser: Boolean) -> Unit = {},
     onBack: () -> Unit = {},
     onEdit: () -> Unit = {},
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     var otp by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var showError by remember { mutableStateOf(false) }
-    var errorAttemptsLeft by remember { mutableIntStateOf(2) }
     var countdownSeconds by remember { mutableIntStateOf(45) }
     var canResend by remember { mutableStateOf(false) }
 
-    // Countdown timer
-    LaunchedEffect(Unit) {
-        while (countdownSeconds > 0) {
-            delay(1000)
-            countdownSeconds--
+    // Derive display values from uiState
+    val isLoading = uiState is OtpUiState.Loading
+    val isResending = uiState is OtpUiState.Resending
+    val showError = uiState is OtpUiState.Error
+    val errorMessage = (uiState as? OtpUiState.Error)?.message ?: ""
+
+    // Navigate when verified
+    LaunchedEffect(uiState) {
+        if (uiState is OtpUiState.Verified) {
+            onVerified((uiState as OtpUiState.Verified).isNewUser)
         }
-        canResend = true
+    }
+
+    // Reset OTP input when resend completes
+    LaunchedEffect(uiState) {
+        if (uiState is OtpUiState.Idle && isResending) {
+            otp = ""
+            countdownSeconds = 45
+            canResend = false
+        }
+    }
+
+    // Countdown timer
+    LaunchedEffect(canResend) {
+        if (!canResend) {
+            while (countdownSeconds > 0) {
+                delay(1000)
+                countdownSeconds--
+            }
+            canResend = true
+        }
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(PageBg)
-            .systemBarsPadding()
-            .padding(horizontal = 16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(PageBg)
+                .systemBarsPadding()
+                .padding(horizontal = 16.dp),
     ) {
         // ── Top navigation bar ────────────────────────────────────────────────
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Back button
             Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(SurfaceBlue)
-                    .clickable { onBack() },
+                modifier =
+                    Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(SurfaceBlue)
+                        .clickable { onBack() },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(Icons.Outlined.ArrowBack, contentDescription = "Back", tint = NavyDeep, modifier = Modifier.size(15.dp))
@@ -105,10 +133,11 @@ fun OTPScreen(
 
             // Help button
             Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(SurfaceBlue),
+                modifier =
+                    Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(SurfaceBlue),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(Icons.Outlined.HelpOutline, contentDescription = "Help", tint = NavyDeep, modifier = Modifier.size(17.dp))
@@ -155,7 +184,8 @@ fun OTPScreen(
             onOtpChange = { newOtp ->
                 if (newOtp.length <= 6 && newOtp.all { it.isDigit() }) {
                     otp = newOtp
-                    showError = false
+                    // Clear error when user starts re-entering OTP
+                    if (showError) viewModel.resetError()
                 }
             },
         )
@@ -164,9 +194,10 @@ fun OTPScreen(
 
         // ── Countdown / Resend ────────────────────────────────────────────────
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -175,29 +206,38 @@ fun OTPScreen(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Icon(Icons.Outlined.Timer, contentDescription = null, tint = SlateBody, modifier = Modifier.size(13.dp))
-                if (!canResend) {
-                    Text(
-                        buildAnnotatedText_Resend(countdownSeconds),
-                        fontSize = 12.sp,
-                        letterSpacing = 0.24.sp,
-                    )
-                } else {
-                    Text("OTP expired", fontSize = 12.sp, color = ErrorBody)
+                when {
+                    isResending -> {
+                        CircularProgressIndicator(modifier = Modifier.size(13.dp), color = SlateBody, strokeWidth = 1.5.dp)
+                        Text("Sending OTP…", fontSize = 12.sp, color = SlateBody)
+                    }
+                    !canResend -> {
+                        Text(
+                            buildAnnotatedText_Resend(countdownSeconds),
+                            fontSize = 12.sp,
+                            letterSpacing = 0.24.sp,
+                        )
+                    }
+                    else -> {
+                        Text("OTP expired", fontSize = 12.sp, color = ErrorBody)
+                    }
                 }
             }
             Text(
                 "Resend SMS",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = if (canResend) TealEdit else SlateHint,
+                color = if (canResend && !isResending) TealEdit else SlateHint,
                 letterSpacing = 0.14.sp,
-                modifier = Modifier
-                    .alpha(if (canResend) 1f else 0.6f)
-                    .clickable(enabled = canResend) {
-                        countdownSeconds = 45
-                        canResend = false
-                        otp = ""
-                    },
+                modifier =
+                    Modifier
+                        .alpha(if (canResend && !isResending) 1f else 0.6f)
+                        .clickable(enabled = canResend && !isResending) {
+                            otp = ""
+                            countdownSeconds = 45
+                            canResend = false
+                            viewModel.resendOtp()
+                        },
             )
         }
 
@@ -206,25 +246,26 @@ fun OTPScreen(
         // ── Error card ────────────────────────────────────────────────────────
         if (showError) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(ErrorBg)
-                    .padding(14.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(ErrorBg)
+                        .padding(14.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.Top,
             ) {
                 Icon(Icons.Outlined.ErrorOutline, contentDescription = null, tint = ErrorTitle, modifier = Modifier.size(19.dp))
                 Column {
                     Text(
-                        "Wrong OTP entered",
+                        "Verification failed",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = ErrorTitle,
                         letterSpacing = 0.14.sp,
                     )
                     Text(
-                        "$errorAttemptsLeft verification attempts remaining before a 15-minute lockout.",
+                        errorMessage,
                         fontSize = 12.sp,
                         color = ErrorBody,
                         lineHeight = 16.sp,
@@ -238,22 +279,17 @@ fun OTPScreen(
         Button(
             onClick = {
                 if (otp.length == 6) {
-                    isLoading = true
-                    // TODO: call viewModel.verifyOtp() — stubbed here
-                    showError = otp != "123456"  // stub: only 123456 works in preview
-                    if (showError) {
-                        errorAttemptsLeft--
-                        isLoading = false
-                    }
+                    viewModel.verifyOtp(otp)
                 }
             },
-            enabled = otp.length == 6 && !isLoading,
+            enabled = otp.length == 6 && !isLoading && !isResending,
             modifier = Modifier.fillMaxWidth().height(48.dp),
             shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = NavyButton,
-                disabledContainerColor = Color(0xFF002141).copy(alpha = 0.5f),
-            ),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = NavyButton,
+                    disabledContainerColor = Color(0xFF002141).copy(alpha = 0.5f),
+                ),
             elevation = ButtonDefaults.buttonElevation(4.dp),
         ) {
             if (isLoading) {
@@ -269,11 +305,12 @@ fun OTPScreen(
 
         // ── Trust indicators ──────────────────────────────────────────────────
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(SurfaceBlue)
-                .padding(14.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(SurfaceBlue)
+                    .padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             TrustRow(icon = Icons.Outlined.Security, text = "256-Bit SSL encrypted OTP delivery")
@@ -298,9 +335,10 @@ private fun OTPInputRow(
         BasicTextField(
             value = TextFieldValue(otp, selection = TextRange(otp.length)),
             onValueChange = { onOtpChange(it.text) },
-            modifier = Modifier
-                .size(1.dp)
-                .focusRequester(focusRequester),
+            modifier =
+                Modifier
+                    .size(1.dp)
+                    .focusRequester(focusRequester),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             cursorBrush = SolidColor(Color.Transparent),
         )
@@ -317,27 +355,29 @@ private fun OTPInputRow(
                 val isError = hasError
 
                 Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(
-                            when {
-                                isError && isFilled -> Color(0xFFFFDAD6).copy(alpha = 0.7f)
-                                isFilled -> DigitFilled
-                                else -> DigitEmpty
-                            }
-                        )
-                        .border(
-                            width = if (isActive) 2.dp else 1.dp,
-                            color = when {
-                                isError && isFilled -> ErrorBody
-                                isActive -> TealCursor
-                                else -> DigitBorder
-                            },
-                            shape = RoundedCornerShape(12.dp),
-                        )
-                        .clickable { focusRequester.requestFocus() },
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                when {
+                                    isError && isFilled -> Color(0xFFFFDAD6).copy(alpha = 0.7f)
+                                    isFilled -> DigitFilled
+                                    else -> DigitEmpty
+                                },
+                            )
+                            .border(
+                                width = if (isActive) 2.dp else 1.dp,
+                                color =
+                                    when {
+                                        isError && isFilled -> ErrorBody
+                                        isActive -> TealCursor
+                                        else -> DigitBorder
+                                    },
+                                shape = RoundedCornerShape(12.dp),
+                            )
+                            .clickable { focusRequester.requestFocus() },
                     contentAlignment = Alignment.Center,
                 ) {
                     if (isActive && !isFilled) {
@@ -354,10 +394,11 @@ private fun OTPInputRow(
                     } else {
                         // Unfilled dot
                         Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(SlateHint.copy(alpha = 0.4f)),
+                            modifier =
+                                Modifier
+                                    .size(8.dp)
+                                    .clip(CircleShape)
+                                    .background(SlateHint.copy(alpha = 0.4f)),
                         )
                     }
                 }
@@ -371,23 +412,28 @@ private fun BlinkingCursor() {
     val alpha by rememberInfiniteTransition(label = "cursor").animateFloat(
         initialValue = 1f,
         targetValue = 0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(500, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(500, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
         label = "cursorAlpha",
     )
     Box(
-        modifier = Modifier
-            .width(2.dp)
-            .height(24.dp)
-            .clip(RoundedCornerShape(2.dp))
-            .background(TealCursor.copy(alpha = alpha)),
+        modifier =
+            Modifier
+                .width(2.dp)
+                .height(24.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(TealCursor.copy(alpha = alpha)),
     )
 }
 
 @Composable
-private fun TrustRow(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
+private fun TrustRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),

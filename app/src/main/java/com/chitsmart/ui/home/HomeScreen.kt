@@ -18,33 +18,31 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Calendar
 
 // ── Colour tokens from Figma (node 1:467) ────────────────────────────────────
-private val PageBg        = Color(0xFFF9F9FF)
-private val NavyDeep      = Color(0xFF041B3C)
-private val NavyMid       = Color(0xFF002141)
-private val TealAccent    = Color(0xFF00B3A1)
-private val TealDark      = Color(0xFF003E37)
-private val BlueAccent    = Color(0xFF0261A2)
-private val SlateBody     = Color(0xFF43474F)
-private val SurfaceBlue   = Color(0xFFF1F3FF)
-private val PaidGreen     = Color(0xFF1B6E55)
-private val PaidGreenBg   = Color(0xFFE6FAF3)
-private val NoticeBlue    = Color(0xFF0261A2)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyMid = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val TealDark = Color(0xFF003E37)
+private val BlueAccent = Color(0xFF0261A2)
+private val SlateBody = Color(0xFF43474F)
+private val SurfaceBlue = Color(0xFFF1F3FF)
+private val PaidGreen = Color(0xFF1B6E55)
+private val PaidGreenBg = Color(0xFFE6FAF3)
+private val NoticeBlue = Color(0xFF0261A2)
 private val CardGradStart = Color(0xFF0B3D7A)
-private val CardGradEnd   = Color(0xFF1769AA)
+private val CardGradEnd = Color(0xFF1769AA)
 private val AiBannerStart = Color(0xFF003E37)
-private val AiBannerEnd   = Color(0xFF006B5E)
-private val SmartBadge    = Color(0xFF00B3A1)
+private val AiBannerEnd = Color(0xFF006B5E)
+private val SmartBadge = Color(0xFF00B3A1)
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -82,13 +80,14 @@ fun HomeScreen(
     onViewAllTransactions: () -> Unit = {},
     recentTransactions: List<RecentTransaction> = sampleTransactions,
 ) {
-    val greeting = remember {
-        when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
-            in 0..11 -> "Good morning"
-            in 12..16 -> "Good afternoon"
-            else -> "Good evening"
+    val greeting =
+        remember {
+            when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+                in 0..11 -> "Good morning"
+                in 12..16 -> "Good afternoon"
+                else -> "Good evening"
+            }
         }
-    }
 
     Scaffold(
         containerColor = PageBg,
@@ -103,10 +102,11 @@ fun HomeScreen(
         bottomBar = { HomeBottomNav() },
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(0.dp),
         ) {
             // ── Member greeting ──
@@ -188,11 +188,12 @@ fun HomeScreen(
             item {
                 Spacer(Modifier.height(16.dp))
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(SurfaceBlue)
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(SurfaceBlue)
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
                 ) {
@@ -253,10 +254,11 @@ private fun HomeTopBar(
         actions = {
             // Language toggle
             Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(100.dp))
-                    .background(Color(0xFFE8EDFF))
-                    .padding(horizontal = 2.dp, vertical = 2.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(100.dp))
+                        .background(Color(0xFFE8EDFF))
+                        .padding(horizontal = 2.dp, vertical = 2.dp),
             ) {
                 Box(
                     modifier = Modifier.clip(RoundedCornerShape(100.dp)).background(NavyMid).padding(horizontal = 8.dp, vertical = 3.dp),
@@ -272,12 +274,13 @@ private fun HomeTopBar(
                     Icon(Icons.Outlined.NotificationsNone, contentDescription = "Notifications", tint = NavyDeep)
                 }
                 Box(
-                    modifier = Modifier
-                        .size(16.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFEF4444))
-                        .align(Alignment.TopEnd)
-                        .offset(x = (-2).dp, y = 2.dp),
+                    modifier =
+                        Modifier
+                            .size(16.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFEF4444))
+                            .align(Alignment.TopEnd)
+                            .offset(x = (-2).dp, y = 2.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text("2", fontSize = 9.sp, color = Color.White, fontWeight = FontWeight.Bold)
@@ -285,12 +288,13 @@ private fun HomeTopBar(
             }
             // Profile avatar
             Box(
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, Color(0xFFD7E2FF), CircleShape)
-                    .background(Color(0xFF4CAF50)),
+                modifier =
+                    Modifier
+                        .padding(end = 8.dp)
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, Color(0xFFD7E2FF), CircleShape)
+                        .background(Color(0xFF4CAF50)),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -307,23 +311,29 @@ private fun HomeTopBar(
 // ── Member greeting card ──────────────────────────────────────────────────────
 
 @Composable
-private fun MemberGreetingCard(greeting: String, memberName: String, activeGroups: Int) {
+private fun MemberGreetingCard(
+    greeting: String,
+    memberName: String,
+    activeGroups: Int,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(1.dp, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .padding(12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .shadow(1.dp, RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
+                .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         // Avatar
         Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFD7E2FF)),
+            modifier =
+                Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFD7E2FF)),
             contentAlignment = Alignment.Center,
         ) {
             Text(memberName.first().toString(), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = BlueAccent)
@@ -347,10 +357,11 @@ private fun MemberGreetingCard(greeting: String, memberName: String, activeGroup
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(TealAccent),
+                    modifier =
+                        Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(TealAccent),
                 )
                 Text(
                     "All $activeGroups circles active & healthy",
@@ -373,13 +384,14 @@ private fun InvestmentSummaryCard(
     onPayNow: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(
-                Brush.linearGradient(colors = listOf(CardGradStart, CardGradEnd))
-            )
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    Brush.linearGradient(colors = listOf(CardGradStart, CardGradEnd)),
+                )
+                .padding(16.dp),
     ) {
         Column {
             // Header badge
@@ -389,10 +401,11 @@ private fun InvestmentSummaryCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Color(0x26FFFFFF))
-                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Color(0x26FFFFFF))
+                            .padding(horizontal = 10.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
@@ -433,7 +446,12 @@ private fun InvestmentSummaryCard(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        Icon(Icons.Outlined.CalendarToday, contentDescription = null, tint = Color(0x99FFFFFF), modifier = Modifier.size(10.dp))
+                        Icon(
+                            Icons.Outlined.CalendarToday,
+                            contentDescription = null,
+                            tint = Color(0x99FFFFFF),
+                            modifier = Modifier.size(10.dp),
+                        )
                         Text("Due $dueDate", fontSize = 10.sp, color = Color(0x99FFFFFF))
                     }
                 }
@@ -450,10 +468,11 @@ private fun InvestmentSummaryCard(
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     listOf("50k", "1L", "25k").forEach { label ->
                         Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(20.dp))
-                                .background(Color(0x26FFFFFF))
-                                .padding(horizontal = 8.dp, vertical = 3.dp),
+                            modifier =
+                                Modifier
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(Color(0x26FFFFFF))
+                                    .padding(horizontal = 8.dp, vertical = 3.dp),
                         ) {
                             Text(label, fontSize = 10.sp, color = Color(0xCCFFFFFF))
                         }
@@ -483,12 +502,13 @@ private fun QuickActionsSection(
     onDownloadReceipt: () -> Unit,
     onContactSupport: () -> Unit,
 ) {
-    val actions = listOf(
-        QuickAction(Icons.Outlined.Payments, "Pay", "Installment"),
-        QuickAction(Icons.Outlined.Description, "My", "Statement"),
-        QuickAction(Icons.Outlined.Download, "Download", "Receipt"),
-        QuickAction(Icons.Outlined.SupportAgent, "Contact", "Support"),
-    )
+    val actions =
+        listOf(
+            QuickAction(Icons.Outlined.Payments, "Pay", "Installment"),
+            QuickAction(Icons.Outlined.Description, "My", "Statement"),
+            QuickAction(Icons.Outlined.Download, "Download", "Receipt"),
+            QuickAction(Icons.Outlined.SupportAgent, "Contact", "Support"),
+        )
     val callbacks = listOf(onPayInstallment, onMyStatement, onDownloadReceipt, onContactSupport)
 
     Row(
@@ -517,17 +537,19 @@ private fun QuickActionsSection(
     ) {
         actions.forEachIndexed { i, action ->
             Column(
-                modifier = Modifier
-                    .clickable { callbacks[i]() }
-                    .width(72.dp),
+                modifier =
+                    Modifier
+                        .clickable { callbacks[i]() }
+                        .width(72.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(52.dp)
-                        .shadow(1.dp, RoundedCornerShape(16.dp))
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color.White),
+                    modifier =
+                        Modifier
+                            .size(52.dp)
+                            .shadow(1.dp, RoundedCornerShape(16.dp))
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -561,12 +583,13 @@ private fun QuickActionsSection(
 @Composable
 private fun AiAssistantBanner(onClick: () -> Unit) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Brush.linearGradient(colors = listOf(AiBannerStart, AiBannerEnd)))
-            .clickable { onClick() }
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(Brush.linearGradient(colors = listOf(AiBannerStart, AiBannerEnd)))
+                .clickable { onClick() }
+                .padding(16.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -574,10 +597,11 @@ private fun AiAssistantBanner(onClick: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color(0x33FFFFFF)),
+                modifier =
+                    Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(Color(0x33FFFFFF)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = Color(0xFF71F8E4), modifier = Modifier.size(20.dp))
@@ -606,10 +630,11 @@ private fun AiAssistantBanner(onClick: () -> Unit) {
                 )
             }
             Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color(0x33FFFFFF))
-                    .padding(horizontal = 8.dp, vertical = 3.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color(0x33FFFFFF))
+                        .padding(horizontal = 8.dp, vertical = 3.dp),
             ) {
                 Text("SMART", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TealAccent, letterSpacing = 0.5.sp)
             }
@@ -622,21 +647,23 @@ private fun AiAssistantBanner(onClick: () -> Unit) {
 @Composable
 private fun NoticeCard() {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(1.dp, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .padding(12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .shadow(1.dp, RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
+                .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         // Thumbnail placeholder
         Box(
-            modifier = Modifier
-                .size(56.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color(0xFFD7E2FF)),
+            modifier =
+                Modifier
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFFD7E2FF)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(Icons.Outlined.Groups, contentDescription = null, tint = BlueAccent, modifier = Modifier.size(24.dp))
@@ -673,20 +700,22 @@ private fun NoticeCard() {
 @Composable
 private fun TransactionRow(transaction: RecentTransaction) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(1.dp, RoundedCornerShape(10.dp))
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color.White)
-            .padding(12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .shadow(1.dp, RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.White)
+                .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
-                .background(PaidGreenBg),
+            modifier =
+                Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(PaidGreenBg),
             contentAlignment = Alignment.Center,
         ) {
             Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = PaidGreen, modifier = Modifier.size(18.dp))
@@ -698,10 +727,11 @@ private fun TransactionRow(transaction: RecentTransaction) {
         Column(horizontalAlignment = Alignment.End) {
             Text(transaction.amount, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep)
             Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(PaidGreenBg)
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(PaidGreenBg)
+                        .padding(horizontal = 8.dp, vertical = 2.dp),
             ) {
                 Text(
                     transaction.status,
@@ -723,26 +753,29 @@ private fun HomeBottomNav() {
         tonalElevation = 0.dp,
         modifier = Modifier.shadow(8.dp),
     ) {
-        val items = listOf(
-            Icons.Outlined.Home to "Home",
-            Icons.Outlined.AccountBalance to "My Chits",
-            Icons.Outlined.Payments to "Payments",
-            Icons.Outlined.SmartToy to "Assistant",
-            Icons.Outlined.Person to "Profile",
-        )
+        val items =
+            listOf(
+                Icons.Outlined.Home to "Home",
+                Icons.Outlined.AccountBalance to "My Chits",
+                Icons.Outlined.Payments to "Payments",
+                Icons.Outlined.SmartToy to "Assistant",
+                Icons.Outlined.Person to "Profile",
+            )
         items.forEachIndexed { index, (icon, label) ->
             NavigationBarItem(
-                selected = index == 0, // Home is selected
+                // Home is selected
+                selected = index == 0,
                 onClick = {},
                 icon = { Icon(icon, contentDescription = label, modifier = Modifier.size(22.dp)) },
                 label = { Text(label, fontSize = 10.sp) },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = NavyMid,
-                    selectedTextColor = NavyMid,
-                    indicatorColor = Color(0xFFF1F3FF),
-                    unselectedIconColor = SlateBody,
-                    unselectedTextColor = SlateBody,
-                ),
+                colors =
+                    NavigationBarItemDefaults.colors(
+                        selectedIconColor = NavyMid,
+                        selectedTextColor = NavyMid,
+                        indicatorColor = Color(0xFFF1F3FF),
+                        unselectedIconColor = SlateBody,
+                        unselectedTextColor = SlateBody,
+                    ),
             )
         }
     }
@@ -750,11 +783,12 @@ private fun HomeBottomNav() {
 
 // ── Sample data ───────────────────────────────────────────────────────────────
 
-private val sampleTransactions = listOf(
-    RecentTransaction("Family Savings 50K", "12/10/2026", "Month 6", "₹2,500", "Paid"),
-    RecentTransaction("Community Chit 1L", "10/09/2026", "Month 3", "₹5,000", "Paid"),
-    RecentTransaction("Monthly Circle 25K", "15/08/2026", "Month 8", "₹1,250", "Paid"),
-)
+private val sampleTransactions =
+    listOf(
+        RecentTransaction("Family Savings 50K", "12/10/2026", "Month 6", "₹2,500", "Paid"),
+        RecentTransaction("Community Chit 1L", "10/09/2026", "Month 3", "₹5,000", "Paid"),
+        RecentTransaction("Monthly Circle 25K", "15/08/2026", "Month 8", "₹1,250", "Paid"),
+    )
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "Home Screen")
 @Composable

@@ -26,17 +26,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
-private val PageBg       = Color(0xFFF9F9FF)
-private val NavyDeep     = Color(0xFF041B3C)
-private val NavyMid      = Color(0xFF002141)
-private val TealAccent   = Color(0xFF00B3A1)
-private val BlueAccent   = Color(0xFF0261A2)
-private val SlateBody    = Color(0xFF43474F)
-private val SlateHint    = Color(0xFF737780)
-private val SurfaceBlue  = Color(0xFFF1F3FF)
-private val InputPill    = Color(0xFFE8EDFF)
-private val PolicyBg     = Color(0xFFE8EDFF)
-private val PolicyText   = Color(0xFF005048)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyMid = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val BlueAccent = Color(0xFF0261A2)
+private val SlateBody = Color(0xFF43474F)
+private val SlateHint = Color(0xFF737780)
+private val SurfaceBlue = Color(0xFFF1F3FF)
+private val InputPill = Color(0xFFE8EDFF)
+private val PolicyBg = Color(0xFFE8EDFF)
+private val PolicyText = Color(0xFF005048)
 
 // ── Data models ───────────────────────────────────────────────────────────────
 
@@ -51,26 +51,29 @@ private data class RecentConversation(
     val messageCount: Int,
 )
 
-private val languages = listOf(
-    Language("en", "English"),
-    Language("hi", "हिंदी"),
-    Language("ta", "தமிழ்"),
-    Language("te", "తెలుగు"),
-    Language("kn", "ಕನ್ನಡ"),
-    Language("ml", "മലയാളം"),
-)
+private val languages =
+    listOf(
+        Language("en", "English"),
+        Language("hi", "हिंदी"),
+        Language("ta", "தமிழ்"),
+        Language("te", "తెలుగు"),
+        Language("kn", "ಕನ್ನಡ"),
+        Language("ml", "മലയാളം"),
+    )
 
-private val suggestedQuestions = listOf(
-    SuggestedQuestion("What is my outstanding balance?", Icons.Outlined.AccountBalance),
-    SuggestedQuestion("When is my next installment due?", Icons.Outlined.CalendarToday),
-    SuggestedQuestion("How does foreman commission work?", Icons.Outlined.Gavel),
-)
+private val suggestedQuestions =
+    listOf(
+        SuggestedQuestion("What is my outstanding balance?", Icons.Outlined.AccountBalance),
+        SuggestedQuestion("When is my next installment due?", Icons.Outlined.CalendarToday),
+        SuggestedQuestion("How does foreman commission work?", Icons.Outlined.Gavel),
+    )
 
-private val recentConversations = listOf(
-    RecentConversation("1", "What is my total due this month?", "Today, 10:30 AM", 4),
-    RecentConversation("2", "Explain the chit fund process", "Yesterday, 3:45 PM", 6),
-    RecentConversation("3", "How to update my bank account?", "13 Oct 2026", 3),
-)
+private val recentConversations =
+    listOf(
+        RecentConversation("1", "What is my total due this month?", "Today, 10:30 AM", 4),
+        RecentConversation("2", "Explain the chit fund process", "Yesterday, 3:45 PM", 6),
+        RecentConversation("3", "How to update my bank account?", "13 Oct 2026", 3),
+    )
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
@@ -122,8 +125,9 @@ fun AssistantHomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Row(
-                        modifier = Modifier.weight(1f).clip(RoundedCornerShape(24.dp)).background(Color.White)
-                            .shadow(1.dp, RoundedCornerShape(24.dp)).padding(horizontal = 16.dp, vertical = 12.dp),
+                        modifier =
+                            Modifier.weight(1f).clip(RoundedCornerShape(24.dp)).background(Color.White)
+                                .shadow(1.dp, RoundedCornerShape(24.dp)).padding(horizontal = 16.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         BasicTextField(
@@ -140,13 +144,14 @@ fun AssistantHomeScreen(
                         Icon(Icons.Outlined.Mic, contentDescription = "Voice input", tint = SlateHint, modifier = Modifier.size(18.dp))
                     }
                     Box(
-                        modifier = Modifier.size(44.dp).clip(CircleShape)
-                            .background(if (inputText.isNotBlank()) TealAccent else Color(0xFFE0E8FF))
-                            .clickable(enabled = inputText.isNotBlank()) {
-                                val msg = inputText
-                                inputText = ""
-                                onStartChat(msg)
-                            },
+                        modifier =
+                            Modifier.size(44.dp).clip(CircleShape)
+                                .background(if (inputText.isNotBlank()) TealAccent else Color(0xFFE0E8FF))
+                                .clickable(enabled = inputText.isNotBlank()) {
+                                    val msg = inputText
+                                    inputText = ""
+                                    onStartChat(msg)
+                                },
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -165,30 +170,41 @@ fun AssistantHomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp),
         ) {
-
             // ── Language chips ───────────────────────────────────────────────
             item {
                 Column(
-                    modifier = Modifier.fillMaxWidth().shadow(1.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
+                    modifier =
+                        Modifier.fillMaxWidth().shadow(
+                            1.dp,
+                            RoundedCornerShape(12.dp),
+                        ).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    Text("RESPONSE LANGUAGE", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = BlueAccent, letterSpacing = 0.55.sp)
+                    Text(
+                        "RESPONSE LANGUAGE",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = BlueAccent,
+                        letterSpacing = 0.55.sp,
+                    )
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(languages) { lang ->
                             FilterChip(
                                 selected = selectedLanguage == lang.code,
                                 onClick = { selectedLanguage = lang.code },
                                 label = { Text(lang.nativeName, fontSize = 13.sp) },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = TealAccent,
-                                    selectedLabelColor = NavyDeep,
-                                ),
-                                border = FilterChipDefaults.filterChipBorder(
-                                    enabled = true,
-                                    selected = selectedLanguage == lang.code,
-                                    borderColor = Color(0xFFE2E8F0),
-                                    selectedBorderColor = TealAccent,
-                                ),
+                                colors =
+                                    FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = TealAccent,
+                                        selectedLabelColor = NavyDeep,
+                                    ),
+                                border =
+                                    FilterChipDefaults.filterChipBorder(
+                                        enabled = true,
+                                        selected = selectedLanguage == lang.code,
+                                        borderColor = Color(0xFFE2E8F0),
+                                        selectedBorderColor = TealAccent,
+                                    ),
                             )
                         }
                     }
@@ -200,16 +216,29 @@ fun AssistantHomeScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         Icon(Icons.Outlined.Lightbulb, contentDescription = null, tint = SlateBody, modifier = Modifier.size(15.dp))
-                        Text("SUGGESTED QUESTIONS", fontSize = 11.sp, fontWeight = FontWeight.Medium, color = SlateBody, letterSpacing = 0.275.sp)
+                        Text(
+                            "SUGGESTED QUESTIONS",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = SlateBody,
+                            letterSpacing = 0.275.sp,
+                        )
                     }
                     suggestedQuestions.forEach { q ->
                         Row(
-                            modifier = Modifier.fillMaxWidth().shadow(1.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Color.White)
-                                .clickable { onStartChat(q.text) }.padding(14.dp),
+                            modifier =
+                                Modifier.fillMaxWidth().shadow(
+                                    1.dp,
+                                    RoundedCornerShape(12.dp),
+                                ).clip(RoundedCornerShape(12.dp)).background(Color.White)
+                                    .clickable { onStartChat(q.text) }.padding(14.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            Box(modifier = Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(PolicyBg), contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(PolicyBg),
+                                contentAlignment = Alignment.Center,
+                            ) {
                                 Icon(q.icon, contentDescription = null, tint = PolicyText, modifier = Modifier.size(18.dp))
                             }
                             Text(q.text, modifier = Modifier.weight(1f), fontSize = 14.sp, color = NavyDeep)
@@ -223,10 +252,20 @@ fun AssistantHomeScreen(
             if (recentConversations.isNotEmpty()) {
                 item {
                     Column(
-                        modifier = Modifier.fillMaxWidth().shadow(1.dp, RoundedCornerShape(12.dp)).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
+                        modifier =
+                            Modifier.fillMaxWidth().shadow(
+                                1.dp,
+                                RoundedCornerShape(12.dp),
+                            ).clip(RoundedCornerShape(12.dp)).background(Color.White).padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(0.dp),
                     ) {
-                        Text("RECENT CONVERSATIONS", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = BlueAccent, letterSpacing = 0.55.sp)
+                        Text(
+                            "RECENT CONVERSATIONS",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = BlueAccent,
+                            letterSpacing = 0.55.sp,
+                        )
                         Spacer(Modifier.height(8.dp))
                         recentConversations.forEachIndexed { i, conv ->
                             if (i > 0) HorizontalDivider(color = Color(0xFFF1F3FF))
@@ -235,14 +274,22 @@ fun AssistantHomeScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                             ) {
-                                Box(modifier = Modifier.size(36.dp).clip(CircleShape).background(SurfaceBlue), contentAlignment = Alignment.Center) {
+                                Box(
+                                    modifier = Modifier.size(36.dp).clip(CircleShape).background(SurfaceBlue),
+                                    contentAlignment = Alignment.Center,
+                                ) {
                                     Icon(Icons.Outlined.Chat, contentDescription = null, tint = NavyMid, modifier = Modifier.size(18.dp))
                                 }
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(conv.preview, fontSize = 13.sp, color = NavyDeep, fontWeight = FontWeight.Medium, maxLines = 1)
                                     Text("${conv.date}  ·  ${conv.messageCount} messages", fontSize = 11.sp, color = SlateHint)
                                 }
-                                Icon(Icons.Outlined.ChevronRight, contentDescription = null, tint = SlateHint, modifier = Modifier.size(16.dp))
+                                Icon(
+                                    Icons.Outlined.ChevronRight,
+                                    contentDescription = null,
+                                    tint = SlateHint,
+                                    modifier = Modifier.size(16.dp),
+                                )
                             }
                         }
                     }
@@ -259,7 +306,13 @@ fun AssistantHomeScreen(
                         Icon(Icons.Outlined.Info, contentDescription = null, tint = SlateBody, modifier = Modifier.size(14.dp))
                         Text("About ChitSmart AI", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = SlateBody)
                     }
-                    Text("I can access your account information and approved chit fund policy documents. I cannot initiate transactions or access other members' data.", fontSize = 12.sp, color = SlateHint, lineHeight = 18.sp)
+                    Text(
+                        "I can access your account information and approved chit fund policy documents. " +
+                            "I cannot initiate transactions or access other members' data.",
+                        fontSize = 12.sp,
+                        color = SlateHint,
+                        lineHeight = 18.sp,
+                    )
                 }
                 Spacer(Modifier.height(8.dp))
             }
@@ -269,4 +322,6 @@ fun AssistantHomeScreen(
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "Assistant Home")
 @Composable
-fun AssistantHomeScreenPreview() { MaterialTheme { AssistantHomeScreen() } }
+fun AssistantHomeScreenPreview() {
+    MaterialTheme { AssistantHomeScreen() }
+}

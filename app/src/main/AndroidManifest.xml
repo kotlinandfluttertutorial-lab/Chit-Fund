@@ -18,6 +18,9 @@
 
     <!-- Camera — for future KYC selfie capture (deferred release) -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:name=".ChitSmartApplication"
@@ -42,7 +45,7 @@
             </intent-filter>
 
             <!-- Deep links for payment callbacks -->
-            <intent-filter android:autoVerify="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />

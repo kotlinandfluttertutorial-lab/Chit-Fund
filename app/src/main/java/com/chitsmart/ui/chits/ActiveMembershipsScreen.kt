@@ -30,21 +30,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // ── Colour tokens from Figma (node 1:263) ────────────────────────────────────
-private val PageBg        = Color(0xFFF9F9FF)
-private val NavyDeep      = Color(0xFF041B3C)
-private val NavyMid       = Color(0xFF002141)
-private val NavyButton    = Color(0xFF002141)
-private val TealAccent    = Color(0xFF00B3A1)
-private val TealBadgeBg   = Color(0xFFE6FAF6)
-private val BlueAccent    = Color(0xFF0261A2)
-private val SlateBody     = Color(0xFF43474F)
-private val SurfaceBlue   = Color(0xFFF1F3FF)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyMid = Color(0xFF002141)
+private val NavyButton = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val TealBadgeBg = Color(0xFFE6FAF6)
+private val BlueAccent = Color(0xFF0261A2)
+private val SlateBody = Color(0xFF43474F)
+private val SurfaceBlue = Color(0xFFF1F3FF)
 private val ProgressTrack = Color(0xFFE0E8FF)
-private val GoldBg        = Color(0xFFFFF8E1)
-private val GoldText      = Color(0xFF795500)
+private val GoldBg = Color(0xFFFFF8E1)
+private val GoldText = Color(0xFF795500)
 private val CompletedGray = Color(0xFF6B7280)
-private val CertBlue      = BlueAccent
-private val BadgeLight    = Color(0xFFD3E3FF)
+private val CertBlue = BlueAccent
+private val BadgeLight = Color(0xFFD3E3FF)
 
 // ── Data models ───────────────────────────────────────────────────────────────
 
@@ -77,14 +77,20 @@ fun ActiveMembershipsScreen(
     onBack: () -> Unit = {},
     onNotifications: () -> Unit = {},
 ) {
-    val filterOptions = listOf("All (${memberships.size})", "Active (${memberships.count { it.status == MembershipStatus.ACTIVE }})", "Completed (${memberships.count { it.status == MembershipStatus.COMPLETED }})")
+    val filterOptions =
+        listOf(
+            "All (${memberships.size})",
+            "Active (${memberships.count { it.status == MembershipStatus.ACTIVE }})",
+            "Completed (${memberships.count { it.status == MembershipStatus.COMPLETED }})",
+        )
     var selectedFilter by remember { mutableIntStateOf(0) }
 
-    val filtered = when (selectedFilter) {
-        1 -> memberships.filter { it.status == MembershipStatus.ACTIVE }
-        2 -> memberships.filter { it.status == MembershipStatus.COMPLETED }
-        else -> memberships
-    }
+    val filtered =
+        when (selectedFilter) {
+            1 -> memberships.filter { it.status == MembershipStatus.ACTIVE }
+            2 -> memberships.filter { it.status == MembershipStatus.COMPLETED }
+            else -> memberships
+        }
 
     Scaffold(
         containerColor = PageBg,
@@ -94,10 +100,11 @@ fun ActiveMembershipsScreen(
         bottomBar = { ActiveMembershipsBottomNav() },
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp),
         ) {
             // ── Filter chips ──
             item {
@@ -109,12 +116,13 @@ fun ActiveMembershipsScreen(
                     items(filterOptions.size) { i ->
                         val selected = selectedFilter == i
                         Box(
-                            modifier = Modifier
-                                .shadow(if (selected) 1.dp else 0.dp, RoundedCornerShape(100.dp))
-                                .clip(RoundedCornerShape(100.dp))
-                                .background(if (selected) NavyButton else SurfaceBlue)
-                                .clickable { selectedFilter = i }
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            modifier =
+                                Modifier
+                                    .shadow(if (selected) 1.dp else 0.dp, RoundedCornerShape(100.dp))
+                                    .clip(RoundedCornerShape(100.dp))
+                                    .background(if (selected) NavyButton else SurfaceBlue)
+                                    .clickable { selectedFilter = i }
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
                         ) {
                             Text(
                                 filterOptions[i],
@@ -135,15 +143,17 @@ fun ActiveMembershipsScreen(
                 val membership = filtered[i]
                 if (i > 0) Spacer(Modifier.height(14.dp))
                 when (membership.status) {
-                    MembershipStatus.ACTIVE -> ActiveMembershipCard(
-                        membership = membership,
-                        onPayNow = { onPayNow(membership) },
-                        onViewDetails = { onViewDetails(membership) },
-                    )
-                    MembershipStatus.COMPLETED -> CompletedMembershipCard(
-                        membership = membership,
-                        onDownloadCertificate = { onDownloadCertificate(membership) },
-                    )
+                    MembershipStatus.ACTIVE ->
+                        ActiveMembershipCard(
+                            membership = membership,
+                            onPayNow = { onPayNow(membership) },
+                            onViewDetails = { onViewDetails(membership) },
+                        )
+                    MembershipStatus.COMPLETED ->
+                        CompletedMembershipCard(
+                            membership = membership,
+                            onDownloadCertificate = { onDownloadCertificate(membership) },
+                        )
                     else -> {}
                 }
             }
@@ -201,13 +211,14 @@ private fun ActiveMembershipCard(
     onViewDetails: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(1.dp, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .clickable { onViewDetails() }
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .shadow(1.dp, RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
+                .clickable { onViewDetails() }
+                .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         // ── Card header ──
@@ -227,16 +238,19 @@ private fun ActiveMembershipCard(
                 Text(
                     buildAnnotatedString {
                         withStyle(SpanStyle(color = SlateBody, fontSize = 12.sp, fontWeight = FontWeight.Normal)) { append("Chit Value: ") }
-                        withStyle(SpanStyle(color = NavyDeep, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)) { append(membership.chitValue) }
+                        withStyle(
+                            SpanStyle(color = NavyDeep, fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
+                        ) { append(membership.chitValue) }
                     },
                 )
             }
             // Active badge
             Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(TealBadgeBg)
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(TealBadgeBg)
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
             ) {
                 Text(
                     "Active",
@@ -295,22 +309,24 @@ private fun ActiveMembershipCard(
 
             // Progress bar
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(6.dp)
-                    .clip(RoundedCornerShape(3.dp))
-                    .background(ProgressTrack),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(ProgressTrack),
             ) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth(membership.progressPercent)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(
-                            Brush.horizontalGradient(
-                                colors = listOf(TealAccent, Color(0xFF14B8A6)),
-                            )
-                        ),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth(membership.progressPercent)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(
+                                Brush.horizontalGradient(
+                                    colors = listOf(TealAccent, Color(0xFF14B8A6)),
+                                ),
+                            ),
                 )
             }
 
@@ -329,12 +345,13 @@ private fun ActiveMembershipCard(
                     )
                 }
                 Row(
-                    modifier = Modifier
-                        .shadow(1.dp, RoundedCornerShape(8.dp))
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(TealAccent)
-                        .clickable { onPayNow() }
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    modifier =
+                        Modifier
+                            .shadow(1.dp, RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(TealAccent)
+                            .clickable { onPayNow() }
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
@@ -360,13 +377,14 @@ private fun CompletedMembershipCard(
     onDownloadCertificate: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .alpha(0.9f)
-            .shadow(1.dp, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .alpha(0.9f)
+                .shadow(1.dp, RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
+                .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         // Header
@@ -380,15 +398,18 @@ private fun CompletedMembershipCard(
                 Text(
                     buildAnnotatedString {
                         withStyle(SpanStyle(color = SlateBody, fontSize = 12.sp)) { append("Chit Value: ") }
-                        withStyle(SpanStyle(color = NavyDeep, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)) { append(membership.chitValue) }
+                        withStyle(
+                            SpanStyle(color = NavyDeep, fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
+                        ) { append(membership.chitValue) }
                     },
                 )
             }
             Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(SurfaceBlue)
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(SurfaceBlue)
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
             ) {
                 Text("Completed", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = CompletedGray, letterSpacing = 0.33.sp)
             }
@@ -396,11 +417,12 @@ private fun CompletedMembershipCard(
 
         // Status details box
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(SurfaceBlue)
-                .padding(12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(SurfaceBlue)
+                    .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Top,
         ) {
@@ -427,21 +449,23 @@ private fun CompletedMembershipCard(
                 letterSpacing = 0.24.sp,
                 lineHeight = 16.sp,
                 textAlign = TextAlign.End,
-                modifier = Modifier
-                    .clickable { onDownloadCertificate() }
-                    .padding(start = 8.dp),
+                modifier =
+                    Modifier
+                        .clickable { onDownloadCertificate() }
+                        .padding(start = 8.dp),
             )
         }
 
         // Rotational savings badge
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(
-                    Brush.horizontalGradient(colors = listOf(Color(0xFF0B3D7A), Color(0xFF1769AA)))
-                )
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(
+                        Brush.horizontalGradient(colors = listOf(Color(0xFF0B3D7A), Color(0xFF1769AA))),
+                    )
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -466,7 +490,11 @@ private fun CompletedMembershipCard(
 // ── Shared helpers ────────────────────────────────────────────────────────────
 
 @Composable
-private fun StatColumn(label: String, value: String, modifier: Modifier = Modifier) {
+private fun StatColumn(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier = modifier) {
         Text(label, fontSize = 11.sp, color = SlateBody, fontWeight = FontWeight.Medium, letterSpacing = 0.33.sp)
         Text(value, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep)
@@ -477,7 +505,10 @@ private fun StatColumn(label: String, value: String, modifier: Modifier = Modifi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ActiveMembershipsTopBar(onBack: () -> Unit, onNotifications: () -> Unit) {
+private fun ActiveMembershipsTopBar(
+    onBack: () -> Unit,
+    onNotifications: () -> Unit,
+) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = PageBg.copy(alpha = 0.8f)),
         title = {
@@ -489,10 +520,11 @@ private fun ActiveMembershipsTopBar(onBack: () -> Unit, onNotifications: () -> U
         actions = {
             // Language toggle
             Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(100.dp))
-                    .background(SurfaceBlue)
-                    .padding(horizontal = 2.dp, vertical = 2.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(100.dp))
+                        .background(SurfaceBlue)
+                        .padding(horizontal = 2.dp, vertical = 2.dp),
             ) {
                 Box(modifier = Modifier.clip(RoundedCornerShape(100.dp)).background(NavyMid).padding(horizontal = 8.dp, vertical = 3.dp)) {
                     Text("EN", fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.SemiBold)
@@ -507,12 +539,13 @@ private fun ActiveMembershipsTopBar(onBack: () -> Unit, onNotifications: () -> U
             }
             // Profile avatar
             Box(
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, Color(0xFFD7E2FF), CircleShape)
-                    .background(Color(0xFF4CAF50)),
+                modifier =
+                    Modifier
+                        .padding(end = 8.dp)
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, Color(0xFFD7E2FF), CircleShape)
+                        .background(Color(0xFF4CAF50)),
                 contentAlignment = Alignment.Center,
             ) {
                 Text("P", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
@@ -526,17 +559,28 @@ private fun ActiveMembershipsTopBar(onBack: () -> Unit, onNotifications: () -> U
 @Composable
 private fun ActiveMembershipsBottomNav() {
     NavigationBar(containerColor = Color.White, tonalElevation = 0.dp, modifier = Modifier.shadow(8.dp)) {
-        val items = listOf(Icons.Outlined.Home to "Home", Icons.Outlined.AccountBalance to "My Chits", Icons.Outlined.Payments to "Payments", Icons.Outlined.SmartToy to "Assistant", Icons.Outlined.Person to "Profile")
+        val items =
+            listOf(
+                Icons.Outlined.Home to "Home",
+                Icons.Outlined.AccountBalance to "My Chits",
+                Icons.Outlined.Payments to "Payments",
+                Icons.Outlined.SmartToy to "Assistant",
+                Icons.Outlined.Person to "Profile",
+            )
         items.forEachIndexed { index, (icon, label) ->
             NavigationBarItem(
                 selected = index == 1,
                 onClick = {},
                 icon = { Icon(icon, contentDescription = label, modifier = Modifier.size(22.dp)) },
                 label = { Text(label, fontSize = 10.sp) },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = NavyMid, selectedTextColor = NavyMid,
-                    indicatorColor = SurfaceBlue, unselectedIconColor = SlateBody, unselectedTextColor = SlateBody,
-                ),
+                colors =
+                    NavigationBarItemDefaults.colors(
+                        selectedIconColor = NavyMid,
+                        selectedTextColor = NavyMid,
+                        indicatorColor = SurfaceBlue,
+                        unselectedIconColor = SlateBody,
+                        unselectedTextColor = SlateBody,
+                    ),
             )
         }
     }
@@ -544,48 +588,49 @@ private fun ActiveMembershipsBottomNav() {
 
 // ── Sample data matching Figma exactly ───────────────────────────────────────
 
-val sampleMemberships = listOf(
-    Membership(
-        groupName = "Family Savings 50K",
-        chitValue = "₹50,000",
-        monthlyContribution = "₹2,500",
-        installmentsPaid = 6,
-        installmentsTotal = 24,
-        progressPercent = 0.25f,
-        nextDueDate = "15/10/2026",
-        status = MembershipStatus.ACTIVE,
-        payoutReceived = false,
-        payoutAmount = null,
-        payoutDate = null,
-    ),
-    Membership(
-        groupName = "Community Chit 1L",
-        chitValue = "₹1,00,000",
-        monthlyContribution = "₹5,000",
-        installmentsPaid = 14,
-        installmentsTotal = 20,
-        progressPercent = 0.70f,
-        nextDueDate = "20/10/2026",
-        status = MembershipStatus.ACTIVE,
-        payoutReceived = true,
-        payoutAmount = "₹82,500",
-        payoutDate = "12/04/2026",
-    ),
-    Membership(
-        groupName = "Monthly Circle 25K",
-        chitValue = "₹25,000",
-        monthlyContribution = "₹1,250",
-        installmentsPaid = 20,
-        installmentsTotal = 20,
-        progressPercent = 1.0f,
-        nextDueDate = null,
-        status = MembershipStatus.COMPLETED,
-        payoutReceived = true,
-        payoutAmount = "₹23,750",
-        payoutDate = "18/08/2026",
-        completedDetails = "Prize successfully settled",
-    ),
-)
+val sampleMemberships =
+    listOf(
+        Membership(
+            groupName = "Family Savings 50K",
+            chitValue = "₹50,000",
+            monthlyContribution = "₹2,500",
+            installmentsPaid = 6,
+            installmentsTotal = 24,
+            progressPercent = 0.25f,
+            nextDueDate = "15/10/2026",
+            status = MembershipStatus.ACTIVE,
+            payoutReceived = false,
+            payoutAmount = null,
+            payoutDate = null,
+        ),
+        Membership(
+            groupName = "Community Chit 1L",
+            chitValue = "₹1,00,000",
+            monthlyContribution = "₹5,000",
+            installmentsPaid = 14,
+            installmentsTotal = 20,
+            progressPercent = 0.70f,
+            nextDueDate = "20/10/2026",
+            status = MembershipStatus.ACTIVE,
+            payoutReceived = true,
+            payoutAmount = "₹82,500",
+            payoutDate = "12/04/2026",
+        ),
+        Membership(
+            groupName = "Monthly Circle 25K",
+            chitValue = "₹25,000",
+            monthlyContribution = "₹1,250",
+            installmentsPaid = 20,
+            installmentsTotal = 20,
+            progressPercent = 1.0f,
+            nextDueDate = null,
+            status = MembershipStatus.COMPLETED,
+            payoutReceived = true,
+            payoutAmount = "₹23,750",
+            payoutDate = "18/08/2026",
+            completedDetails = "Prize successfully settled",
+        ),
+    )
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "Active Memberships")
 @Composable

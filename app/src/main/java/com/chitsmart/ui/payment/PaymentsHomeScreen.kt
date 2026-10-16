@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -27,22 +26,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // ── Colour tokens from Figma (node 1:717) ────────────────────────────────────
-private val PageBg        = Color(0xFFF9F9FF)
-private val NavyDeep      = Color(0xFF041B3C)
-private val NavyBanner    = Color(0xFF073763)
-private val NavyMid       = Color(0xFF002141)
-private val TealAccent    = Color(0xFF00B3A1)
-private val BlueAccent    = Color(0xFF0261A2)
-private val SlateBody     = Color(0xFF43474F)
-private val SlateBlue     = Color(0xFF7DA1D3)
-private val SurfaceBlue   = Color(0xFFF1F3FF)
-private val InputPill     = Color(0xFFE8EDFF)
-private val ErrorRed      = Color(0xFFBA1A1A)
-private val ErrorBg       = Color(0xFFFFDAD6)
-private val ErrorText     = Color(0xFF93000A)
-private val PaidGreen     = Color(0xFF1B6E55)
-private val PaidGreenBg   = Color(0xFFE6FAF3)
-private val TealCTA       = TealAccent
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyBanner = Color(0xFF073763)
+private val NavyMid = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val BlueAccent = Color(0xFF0261A2)
+private val SlateBody = Color(0xFF43474F)
+private val SlateBlue = Color(0xFF7DA1D3)
+private val SurfaceBlue = Color(0xFFF1F3FF)
+private val InputPill = Color(0xFFE8EDFF)
+private val ErrorRed = Color(0xFFBA1A1A)
+private val ErrorBg = Color(0xFFFFDAD6)
+private val ErrorText = Color(0xFF93000A)
+private val PaidGreen = Color(0xFF1B6E55)
+private val PaidGreenBg = Color(0xFFE6FAF3)
+private val TealCTA = TealAccent
 
 data class InstallmentDue(
     val groupName: String,
@@ -85,21 +84,23 @@ fun PaymentsHomeScreen(
             item {
                 Spacer(Modifier.height(0.dp))
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(NavyBanner)
-                        .shadow(4.dp, RoundedCornerShape(12.dp))
-                        .padding(16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(NavyBanner)
+                            .shadow(4.dp, RoundedCornerShape(12.dp))
+                            .padding(16.dp),
                 ) {
                     // Decorative blur circle
                     Box(
-                        modifier = Modifier
-                            .size(128.dp)
-                            .align(Alignment.BottomEnd)
-                            .offset(x = 24.dp, y = 24.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF0261A2).copy(alpha = 0.2f)),
+                        modifier =
+                            Modifier
+                                .size(128.dp)
+                                .align(Alignment.BottomEnd)
+                                .offset(x = 24.dp, y = 24.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF0261A2).copy(alpha = 0.2f)),
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -127,15 +128,21 @@ fun PaymentsHomeScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                             ) {
-                                Icon(Icons.Outlined.CalendarToday, contentDescription = null, tint = SlateBlue, modifier = Modifier.size(11.dp))
+                                Icon(
+                                    Icons.Outlined.CalendarToday,
+                                    contentDescription = null,
+                                    tint = SlateBlue,
+                                    modifier = Modifier.size(11.dp),
+                                )
                                 Text("Across 2 active groups this cycle", fontSize = 11.sp, color = SlateBlue, letterSpacing = 0.33.sp)
                             }
                         }
                         Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFD1E4FF).copy(alpha = 0.2f)),
+                            modifier =
+                                Modifier
+                                    .size(48.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFFD1E4FF).copy(alpha = 0.2f)),
                             contentAlignment = Alignment.Center,
                         ) {
                             Icon(Icons.Outlined.Payments, contentDescription = null, tint = Color.White, modifier = Modifier.size(22.dp))
@@ -150,12 +157,13 @@ fun PaymentsHomeScreen(
                     items(filters.size) { i ->
                         val selected = selectedFilter == i
                         Row(
-                            modifier = Modifier
-                                .shadow(if (selected) 1.dp else 0.dp, RoundedCornerShape(100.dp))
-                                .clip(RoundedCornerShape(100.dp))
-                                .background(if (selected) NavyMid else InputPill)
-                                .clickable { selectedFilter = i }
-                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                            modifier =
+                                Modifier
+                                    .shadow(if (selected) 1.dp else 0.dp, RoundedCornerShape(100.dp))
+                                    .clip(RoundedCornerShape(100.dp))
+                                    .background(if (selected) NavyMid else InputPill)
+                                    .clickable { selectedFilter = i }
+                                    .padding(horizontal = 16.dp, vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
@@ -233,14 +241,18 @@ fun PaymentsHomeScreen(
 }
 
 @Composable
-private fun DueInstallmentCard(due: InstallmentDue, onPay: () -> Unit) {
+private fun DueInstallmentCard(
+    due: InstallmentDue,
+    onPay: () -> Unit,
+) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(1.dp, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .shadow(1.dp, RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
+                .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         // Header row
@@ -253,15 +265,22 @@ private fun DueInstallmentCard(due: InstallmentDue, onPay: () -> Unit) {
                 // Overdue / Due badge
                 if (due.isOverdue) {
                     Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(ErrorBg)
-                            .padding(horizontal = 8.dp, vertical = 2.dp),
+                        modifier =
+                            Modifier
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(ErrorBg)
+                                .padding(horizontal = 8.dp, vertical = 2.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         Icon(Icons.Outlined.Warning, contentDescription = null, tint = ErrorText, modifier = Modifier.size(11.dp))
-                        Text("Overdue by ${due.overdueDays} days", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = ErrorText, letterSpacing = 0.33.sp)
+                        Text(
+                            "Overdue by ${due.overdueDays} days",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = ErrorText,
+                            letterSpacing = 0.33.sp,
+                        )
                     }
                     Spacer(Modifier.height(4.dp))
                 }
@@ -286,11 +305,12 @@ private fun DueInstallmentCard(due: InstallmentDue, onPay: () -> Unit) {
 
         // Financial calculation row
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(SurfaceBlue)
-                .padding(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(SurfaceBlue)
+                    .padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -312,11 +332,12 @@ private fun DueInstallmentCard(due: InstallmentDue, onPay: () -> Unit) {
             }
             // Total row
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFE8EDFF).copy(alpha = 0.6f))
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFE8EDFF).copy(alpha = 0.6f))
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -328,11 +349,12 @@ private fun DueInstallmentCard(due: InstallmentDue, onPay: () -> Unit) {
                 )
                 // Pay CTA
                 Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(TealCTA)
-                        .clickable { onPay() }
-                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(TealCTA)
+                            .clickable { onPay() }
+                            .padding(horizontal = 14.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
@@ -353,12 +375,13 @@ private fun QuickAccessCard(
     onClick: () -> Unit,
 ) {
     Column(
-        modifier = modifier
-            .shadow(1.dp, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .clickable { onClick() }
-            .padding(14.dp),
+        modifier =
+            modifier
+                .shadow(1.dp, RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
+                .clickable { onClick() }
+                .padding(14.dp),
     ) {
         Box(
             modifier = Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(SurfaceBlue),
@@ -385,12 +408,22 @@ private fun PaymentsTopBar(onNotifications: () -> Unit) {
         },
         actions = {
             Row(modifier = Modifier.clip(RoundedCornerShape(100.dp)).background(InputPill).padding(horizontal = 2.dp, vertical = 2.dp)) {
-                Box(modifier = Modifier.clip(RoundedCornerShape(100.dp)).background(NavyMid).padding(horizontal = 8.dp, vertical = 3.dp)) { Text("EN", fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.SemiBold) }
+                Box(modifier = Modifier.clip(RoundedCornerShape(100.dp)).background(NavyMid).padding(horizontal = 8.dp, vertical = 3.dp)) {
+                    Text("EN", fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.SemiBold)
+                }
                 Box(modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)) { Text("हिंदी", fontSize = 10.sp, color = SlateBody) }
             }
             Spacer(Modifier.width(4.dp))
-            IconButton(onClick = onNotifications) { Icon(Icons.Outlined.NotificationsNone, contentDescription = "Notifications", tint = NavyDeep) }
-            Box(modifier = Modifier.padding(end = 8.dp).size(44.dp).clip(CircleShape).border(2.dp, Color(0xFFD7E2FF), CircleShape).background(Color(0xFF4CAF50)), contentAlignment = Alignment.Center) {
+            IconButton(
+                onClick = onNotifications,
+            ) { Icon(Icons.Outlined.NotificationsNone, contentDescription = "Notifications", tint = NavyDeep) }
+            Box(
+                modifier =
+                    Modifier.padding(
+                        end = 8.dp,
+                    ).size(44.dp).clip(CircleShape).border(2.dp, Color(0xFFD7E2FF), CircleShape).background(Color(0xFF4CAF50)),
+                contentAlignment = Alignment.Center,
+            ) {
                 Text("P", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
         },
@@ -400,18 +433,43 @@ private fun PaymentsTopBar(onNotifications: () -> Unit) {
 @Composable
 private fun PaymentsBottomNav() {
     NavigationBar(containerColor = Color.White, tonalElevation = 0.dp, modifier = Modifier.shadow(8.dp)) {
-        listOf(Icons.Outlined.Home to "Home", Icons.Outlined.AccountBalance to "My Chits", Icons.Outlined.Payments to "Payments", Icons.Outlined.SmartToy to "Assistant", Icons.Outlined.Person to "Profile").forEachIndexed { index, (icon, label) ->
-            NavigationBarItem(selected = index == 2, onClick = {}, icon = { Icon(icon, contentDescription = label, modifier = Modifier.size(22.dp)) }, label = { Text(label, fontSize = 10.sp) },
-                colors = NavigationBarItemDefaults.colors(selectedIconColor = NavyMid, selectedTextColor = NavyMid, indicatorColor = SurfaceBlue, unselectedIconColor = SlateBody, unselectedTextColor = SlateBody))
+        listOf(
+            Icons.Outlined.Home to "Home",
+            Icons.Outlined.AccountBalance to "My Chits",
+            Icons.Outlined.Payments to "Payments",
+            Icons.Outlined.SmartToy to "Assistant",
+            Icons.Outlined.Person to "Profile",
+        ).forEachIndexed {
+                index,
+                (icon, label),
+            ->
+            NavigationBarItem(
+                selected = index == 2,
+                onClick = {
+                },
+                icon = { Icon(icon, contentDescription = label, modifier = Modifier.size(22.dp)) },
+                label = { Text(label, fontSize = 10.sp) },
+                colors =
+                    NavigationBarItemDefaults.colors(
+                        selectedIconColor = NavyMid,
+                        selectedTextColor = NavyMid,
+                        indicatorColor = SurfaceBlue,
+                        unselectedIconColor = SlateBody,
+                        unselectedTextColor = SlateBody,
+                    ),
+            )
         }
     }
 }
 
-private val sampleDues = listOf(
-    InstallmentDue("Family Savings 50K", "₹50,000", 7, 24, "₹2,500", "₹50", "₹2,550", "13/10/2026", isOverdue = true, overdueDays = 2),
-    InstallmentDue("Community Chit 1L", "₹1,00,000", 15, 20, "₹5,000", null, "₹5,000", "20/10/2026", isOverdue = false),
-)
+private val sampleDues =
+    listOf(
+        InstallmentDue("Family Savings 50K", "₹50,000", 7, 24, "₹2,500", "₹50", "₹2,550", "13/10/2026", isOverdue = true, overdueDays = 2),
+        InstallmentDue("Community Chit 1L", "₹1,00,000", 15, 20, "₹5,000", null, "₹5,000", "20/10/2026", isOverdue = false),
+    )
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "Payments Home")
 @Composable
-fun PaymentsHomeScreenPreview() { MaterialTheme { PaymentsHomeScreen() } }
+fun PaymentsHomeScreenPreview() {
+    MaterialTheme { PaymentsHomeScreen() }
+}

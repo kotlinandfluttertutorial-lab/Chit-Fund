@@ -21,13 +21,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
-private val PageBg      = Color(0xFFF9F9FF)
-private val NavyDeep    = Color(0xFF041B3C)
-private val NavyMid     = Color(0xFF002141)
-private val TealAccent  = Color(0xFF00B3A1)
-private val BlueAccent  = Color(0xFF0261A2)
-private val SlateBody   = Color(0xFF43474F)
-private val SlateHint   = Color(0xFF737780)
+private val PageBg = Color(0xFFF9F9FF)
+private val NavyDeep = Color(0xFF041B3C)
+private val NavyMid = Color(0xFF002141)
+private val TealAccent = Color(0xFF00B3A1)
+private val BlueAccent = Color(0xFF0261A2)
+private val SlateBody = Color(0xFF43474F)
+private val SlateHint = Color(0xFF737780)
 private val SurfaceBlue = Color(0xFFF1F3FF)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,11 +87,28 @@ fun HumanSupportScreen(
                                 modifier = Modifier.size(52.dp).clip(CircleShape).background(SurfaceBlue),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                Icon(Icons.Outlined.SupportAgent, contentDescription = null, tint = NavyMid, modifier = Modifier.size(26.dp))
+                                Icon(
+                                    Icons.Outlined.SupportAgent,
+                                    contentDescription = null,
+                                    tint = NavyMid,
+                                    modifier = Modifier.size(26.dp),
+                                )
                             }
                         }
-                        Text("Connecting to support…", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep, textAlign = TextAlign.Center)
-                        Text("Please wait while we connect you with a support agent.", fontSize = 13.sp, color = SlateBody, textAlign = TextAlign.Center, lineHeight = 20.sp)
+                        Text(
+                            "Connecting to support…",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = NavyDeep,
+                            textAlign = TextAlign.Center,
+                        )
+                        Text(
+                            "Please wait while we connect you with a support agent.",
+                            fontSize = 13.sp,
+                            color = SlateBody,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 20.sp,
+                        )
                     }
                 }
                 else -> {
@@ -105,12 +122,23 @@ fun HumanSupportScreen(
                             modifier = Modifier.size(80.dp).clip(CircleShape).background(Color(0xFFFFF3CD)),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Icon(Icons.Outlined.AccessTime, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(40.dp))
+                            Icon(
+                                Icons.Outlined.AccessTime,
+                                contentDescription = null,
+                                tint = Color(0xFFF59E0B),
+                                modifier = Modifier.size(40.dp),
+                            )
                         }
 
                         // Heading
                         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text("Support Agents Unavailable", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = NavyDeep, textAlign = TextAlign.Center)
+                            Text(
+                                "Support Agents Unavailable",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = NavyDeep,
+                                textAlign = TextAlign.Center,
+                            )
                             Text(
                                 "Our human support agents are currently offline. Support is available Monday–Saturday, 9 AM – 6 PM IST.",
                                 fontSize = 14.sp,
@@ -165,10 +193,20 @@ fun HumanSupportScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = TealAccent, modifier = Modifier.size(18.dp))
+                                Icon(
+                                    Icons.Outlined.AutoAwesome,
+                                    contentDescription = null,
+                                    tint = TealAccent,
+                                    modifier = Modifier.size(18.dp),
+                                )
                                 Text("Try ChitSmart AI first", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep)
                             }
-                            Text("Our AI assistant can instantly answer most questions about your account and chit fund policies.", fontSize = 12.sp, color = SlateBody, lineHeight = 18.sp)
+                            Text(
+                                "Our AI assistant can instantly answer most questions about your account and chit fund policies.",
+                                fontSize = 12.sp,
+                                color = SlateBody,
+                                lineHeight = 18.sp,
+                            )
                         }
 
                         // Go Back button
@@ -191,4 +229,6 @@ fun HumanSupportScreen(
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "Human Support")
 @Composable
-fun HumanSupportScreenPreview() { MaterialTheme { HumanSupportScreen() } }
+fun HumanSupportScreenPreview() {
+    MaterialTheme { HumanSupportScreen() }
+}

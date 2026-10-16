@@ -78,40 +78,49 @@ Header "Backend  (Python / FastAPI)"
 $backendDir = Join-Path $REPO_ROOT "backend"
 Push-Location $backendDir
 
-$pyCmd = if (Get-Command py -ErrorAction SilentlyContinue) { "py" }
+# Prefer the project venv; fall back to system python
+$venvPy = Join-Path $backendDir ".venv\Scripts\python.exe"
+$pyCmd = if (Test-Path $venvPy) { $venvPy }
+         elseif (Get-Command py -ErrorAction SilentlyContinue) { "py" }
          elseif (Get-Command python -ErrorAction SilentlyContinue) { "python" }
          else { $null }
 
 if ($pyCmd) {
-    # Check ruff is importable (py -m ruff works even without ruff on PATH)
-    $ruffCheck = & $pyCmd -m ruff --version 2>$null
-    if ($LASTEXITCODE -eq 0) {
-        Invoke-Check "Ruff lint"   { & $pyCmd -m ruff check .          2>&1 } "cd backend; $pyCmd -m ruff check . --fix"
-        Invoke-Check "Ruff format" { & $pyCmd -m ruff format --check .  2>&1 } "cd backend; $pyCmd -m ruff format ."
+    if ($pyCmd -eq $venvPy) {
+        Pass "Using project venv: $venvPy"
     } else {
-        Warn "ruff not installed - run: $pyCmd -m pip install ruff"
+        Warn "Project .venv not found - using system python ($pyCmd). Run: python -m venv .venv ; .venv\Scripts\pip install -r requirements.txt"
     }
 
+    # Ruff lint + format (using py -m ruff as specified)
+    $ruffCheck = & py -m ruff --version 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        Invoke-Check "Ruff lint"   { py -m ruff check . 2>&1 }          "cd backend; py -m ruff check . --fix"
+        Invoke-Check "Ruff format" { py -m ruff format . 2>&1 }         "cd backend; py -m ruff format ."
+    } else {
+        Warn "ruff not installed - run: py -m pip install ruff"
+    }
+
+    # Mypy type check
     $mypyCheck = & $pyCmd -m mypy --version 2>$null
     if ($LASTEXITCODE -eq 0) {
-        Invoke-Check "Mypy type check" { & $pyCmd -m mypy app --ignore-missing-imports --no-error-summary 2>&1 } "cd backend; $pyCmd -m mypy app --ignore-missing-imports"
+        Invoke-Check "Mypy type check" { & $pyCmd -m mypy app --ignore-missing-imports --no-error-summary 2>&1 } "cd backend; python -m mypy app --ignore-missing-imports"
     } else {
-        Warn "mypy not installed - run: $pyCmd -m pip install mypy"
+        Warn "mypy not installed - run: .venv\Scripts\pip install mypy"
+    }
+
+    # pytest: always run non-DB tests; add DB tests when DATABASE_URL is set
+    if ($env:DATABASE_URL) {
+        Invoke-Check "pytest (all tests)" { & $pyCmd -m pytest tests/ -v --asyncio-mode=auto -x 2>&1 } "cd backend; python -m pytest tests/ -v --asyncio-mode=auto -x"
+    } else {
+        # Health and unit tests do not need a DB - run them unconditionally
+        Invoke-Check "pytest (no-DB tests)" { & $pyCmd -m pytest tests/ -v --asyncio-mode=auto -x -m "not db" 2>&1 } "cd backend; python -m pytest tests/ -v -m 'not db'"
+        Warn "DATABASE_URL not set - DB-dependent tests skipped"
+        Warn 'Set it with: $env:DATABASE_URL = "postgresql+asyncpg://user:pass@localhost:5432/chitsmart_dev"'
     }
 } else {
-    Warn "Python not found - skipping backend lint checks"
-    Warn "Install Python from https://python.org and run: py -m pip install ruff mypy"
-}
-
-if ($env:DATABASE_URL) {
-    if ($pyCmd) {
-        Invoke-Check "pytest" { & $pyCmd -m pytest tests/ -v --asyncio-mode=auto -x 2>&1 } "cd backend; $pyCmd -m pytest tests/ -v --asyncio-mode=auto -x"
-    }
-}
-
-if (-not $env:DATABASE_URL) {
-    Warn "DATABASE_URL not set - skipping pytest (requires PostgreSQL)"
-    Warn 'Set it with: $env:DATABASE_URL = "postgresql+asyncpg://user:pass@localhost:5432/chitsmart_dev"'
+    Warn "Python not found - skipping all backend checks"
+    Warn "Install Python from https://python.org and activate the venv: .venv\Scripts\Activate.ps1"
 }
 
 Pop-Location
@@ -123,12 +132,16 @@ Header "Android  (Kotlin / Jetpack Compose)"
 
 $gradlew = Join-Path $REPO_ROOT "gradlew.bat"
 if (Test-Path $gradlew) {
-    Invoke-Check "Android Lint"       { & $gradlew lint              --quiet 2>&1 } ".\gradlew lint"
-    Invoke-Check "Android unit tests" { & $gradlew testDebugUnitTest --quiet 2>&1 } ".\gradlew testDebugUnitTest"
+    Invoke-Check "Android compile"    { & $gradlew :app:compileDebugKotlin --quiet 2>&1 } ".\gradlew :app:compileDebugKotlin"
+    Invoke-Check "Android lintDebug"  { & $gradlew lintDebug               --quiet 2>&1 } ".\gradlew lintDebug"
+    Invoke-Check "Android lint"       { & $gradlew lint                    --quiet 2>&1 } ".\gradlew lint"
+    Invoke-Check "ktlint check"       { & $gradlew ktlintCheck             --quiet 2>&1 } ".\gradlew ktlintFormat"
+    Invoke-Check "ktlint format"      { & $gradlew ktlintFormat            --quiet 2>&1 } ".\gradlew ktlintFormat"
+    Invoke-Check "Android unit tests" { & $gradlew :app:testDebugUnitTest  --quiet 2>&1 } ".\gradlew :app:testDebugUnitTest"
 } else {
     Warn "gradlew.bat not found at repo root - skipping Android checks"
     Warn "These run automatically in GitHub Actions (android.yml)"
-    Warn "Run manually once gradlew exists: .\gradlew lint testDebugUnitTest"
+    Warn "Run manually once gradlew exists: .\gradlew lintDebug lint ktlintCheck ktlintFormat :app:testDebugUnitTest"
 }
 
 # ----------------------------------------------------------

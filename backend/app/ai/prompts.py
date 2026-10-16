@@ -100,10 +100,7 @@ def build_system_prompt(
     if policy_context:
         parts.append(_POLICY_CONTEXT_HEADER)
         for i, chunk in enumerate(policy_context, start=1):
-            parts.append(
-                f"### [{i}] {chunk.document_name} — {chunk.section_reference}\n"
-                f"{chunk.content}\n\n"
-            )
+            parts.append(f"### [{i}] {chunk.document_name} — {chunk.section_reference}\n{chunk.content}\n\n")
     else:
         parts.append(_NO_POLICY_CONTEXT)
 

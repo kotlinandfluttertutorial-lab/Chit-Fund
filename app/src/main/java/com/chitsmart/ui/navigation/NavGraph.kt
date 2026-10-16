@@ -107,6 +107,7 @@ val bottomNavItems = listOf(
 
 // ── Root nav graph ────────────────────────────────────────────────────────────
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChitSmartNavGraph(navController: NavHostController) {
     NavHost(
@@ -447,9 +448,9 @@ fun ChitSmartNavGraph(navController: NavHostController) {
 
         composable(AppRoutes.NOMINEES) {
             // Nominees screen — stub for this release (deferred implementation)
-            androidx.compose.material3.Scaffold(
+            Scaffold(
                 topBar = {
-                    androidx.compose.material3.TopAppBar(
+                    TopAppBar(
                         title = { Text("Nominees", fontWeight = FontWeight.SemiBold) },
                         navigationIcon = {
                             IconButton(onClick = { navController.popBackStack() }) {

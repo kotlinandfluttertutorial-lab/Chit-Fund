@@ -196,7 +196,7 @@ fun HelpCentreScreen(
                     Box(modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Icon(Icons.Outlined.SearchOff, contentDescription = null, tint = SlateHint, modifier = Modifier.size(40.dp))
-                            Text("No FAQs found for "$searchQuery"", fontSize = 14.sp, color = SlateBody)
+                            Text("No FAQs found for '$searchQuery'", fontSize = 14.sp, color = SlateBody)
                             Text("Try asking the AI assistant for personalised help.", fontSize = 12.sp, color = SlateHint)
                         }
                     }

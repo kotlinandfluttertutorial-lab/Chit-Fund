@@ -13,7 +13,6 @@ Admin RAG pipeline uses this model internally via rag_pipeline.py.
 
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
 
 from sqlalchemy import Column, DateTime, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
@@ -60,8 +59,4 @@ class PolicyChunk(Base):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<PolicyChunk id={self.id!r} "
-            f"doc={self.document_name!r} "
-            f"section={self.section_reference!r}>"
-        )
+        return f"<PolicyChunk id={self.id!r} doc={self.document_name!r} section={self.section_reference!r}>"

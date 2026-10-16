@@ -18,14 +18,12 @@ Design decisions:
 
 import json
 import logging
-import uuid
 from typing import AsyncGenerator
 
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.embeddings import get_embedding
 from app.ai.prompts import build_system_prompt
 from app.ai.rag_pipeline import retrieve_relevant_chunks
 from app.ai.tool_executor import execute_tool
@@ -43,8 +41,7 @@ def _get_client() -> AsyncOpenAI:
     if _client is None:
         if not settings.OPENAI_API_KEY:
             raise RuntimeError(
-                "OPENAI_API_KEY is not configured. "
-                "Set it in the .env file before using the AI assistant."
+                "OPENAI_API_KEY is not configured. Set it in the .env file before using the AI assistant."
             )
         _client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
     return _client
@@ -92,11 +89,14 @@ async def stream_chat_response(
 
         # Emit policy references so the client can show chips
         for chunk in chunks:
-            yield _sse("policy", {
-                "document_name": chunk.document_name,
-                "section_reference": chunk.section_reference,
-                "similarity": round(chunk.similarity, 3),
-            })
+            yield _sse(
+                "policy",
+                {
+                    "document_name": chunk.document_name,
+                    "section_reference": chunk.section_reference,
+                    "similarity": round(chunk.similarity, 3),
+                },
+            )
 
         # ── Step 2: Build messages ─────────────────────────────────────────────
         system_prompt = build_system_prompt(
@@ -167,18 +167,20 @@ async def stream_chat_response(
         # ── Step 4: Execute tool calls if requested ────────────────────────────
         if tool_calls:
             # Append the assistant's tool-call message
-            messages.append({
-                "role": "assistant",
-                "content": "".join(collected_content) or None,
-                "tool_calls": [
-                    {
-                        "id": tc["id"],
-                        "type": "function",
-                        "function": {"name": tc["name"], "arguments": tc["arguments"]},
-                    }
-                    for tc in tool_calls
-                ],
-            })
+            messages.append(
+                {
+                    "role": "assistant",
+                    "content": "".join(collected_content) or None,
+                    "tool_calls": [
+                        {
+                            "id": tc["id"],
+                            "type": "function",
+                            "function": {"name": tc["name"], "arguments": tc["arguments"]},
+                        }
+                        for tc in tool_calls
+                    ],
+                }
+            )
 
             # Execute each tool and append results
             for tc in tool_calls:
@@ -195,11 +197,13 @@ async def stream_chat_response(
                     logger.exception("Tool execution failed: tool=%r", tc["name"])
                     tool_result = json.dumps({"error": str(exc)})
 
-                messages.append({
-                    "role": "tool",
-                    "tool_call_id": tc["id"],
-                    "content": tool_result,
-                })
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tc["id"],
+                        "content": tool_result,
+                    }
+                )
 
             # ── Step 5: Second streaming call after tool results ───────────────
             stream2 = await client.chat.completions.create(
@@ -220,6 +224,6 @@ async def stream_chat_response(
 
         yield _sse("done", {"finish_reason": finish_reason or "stop"})
 
-    except Exception as exc:
+    except Exception:
         logger.exception("stream_chat_response failed for member %s", member_id)
         yield _sse("error", {"message": "An error occurred. Please try again."})

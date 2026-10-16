@@ -24,8 +24,7 @@ def _get_client() -> AsyncOpenAI:
     if _client is None:
         if not settings.OPENAI_API_KEY:
             raise RuntimeError(
-                "OPENAI_API_KEY is not configured. "
-                "Set it in the .env file before using the AI assistant."
+                "OPENAI_API_KEY is not configured. Set it in the .env file before using the AI assistant."
             )
         _client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
     return _client

@@ -93,9 +93,7 @@ async def retrieve_relevant_chunks(
         rows = result.fetchall()
     except Exception as exc:
         # pgvector not installed or table empty — degrade gracefully
-        logger.warning(
-            "RAG retrieval failed (pgvector may not be installed): %s", exc
-        )
+        logger.warning("RAG retrieval failed (pgvector may not be installed): %s", exc)
         return []
 
     chunks = [

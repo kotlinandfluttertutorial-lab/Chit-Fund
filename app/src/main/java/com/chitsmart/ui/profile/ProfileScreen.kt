@@ -67,17 +67,17 @@ fun ProfileScreen(
 
     val sections = listOf(
         ProfileSection("ACCOUNT & BANKING", listOf(
-            ProfileMenuItem(Icons.Outlined.Person, "Personal Information", "Name, DOB, gender"),
-            ProfileMenuItem(Icons.Outlined.AccountBalance, "Bank Accounts", "HDFC Bank ••••4092", badge = "Primary", badgeColor = BlueAccent),
-            ProfileMenuItem(Icons.Outlined.People, "Nominees", "Update beneficiary details"),
+            ProfileMenuItem(Icons.Outlined.Person, "Personal Information", "Name, DOB, gender", route = "personal_info"),
+            ProfileMenuItem(Icons.Outlined.AccountBalance, "Bank Accounts", "HDFC Bank ••••4092", badge = "Primary", badgeColor = BlueAccent, route = "bank_accounts"),
+            ProfileMenuItem(Icons.Outlined.People, "Nominees", "Update beneficiary details", route = "nominees"),
         )),
         ProfileSection("SECURITY & PREFERENCES", listOf(
-            ProfileMenuItem(Icons.Outlined.Lock, "Security Settings", "MPIN, biometric, sessions", badge = "Active", badgeColor = TealAccent),
-            ProfileMenuItem(Icons.Outlined.Language, "Language & Preferences", "English (EN)", badge = "EN"),
-            ProfileMenuItem(Icons.Outlined.Notifications, "Notification Preferences", "SMS, Push, Email"),
+            ProfileMenuItem(Icons.Outlined.Lock, "Security Settings", "MPIN, biometric, sessions", badge = "Active", badgeColor = TealAccent, route = "security_settings"),
+            ProfileMenuItem(Icons.Outlined.Language, "Language & Preferences", "English (EN)", badge = "EN", route = "preferences"),
+            ProfileMenuItem(Icons.Outlined.Notifications, "Notification Preferences", "SMS, Push, Email", route = "preferences"),
         )),
         ProfileSection("SUPPORT & REGULATORY", listOf(
-            ProfileMenuItem(Icons.Outlined.HelpOutline, "Help Centre", "FAQs, guides, tutorials"),
+            ProfileMenuItem(Icons.Outlined.HelpOutline, "Help Centre", "FAQs, guides, tutorials", route = "help_centre"),
             ProfileMenuItem(Icons.Outlined.Gavel, "Legal & Compliance", "Chit Funds Act, 1982 — TN-RO-2024"),
             ProfileMenuItem(Icons.Outlined.Info, "About ChitSmart", "v2.4.0 (Build 8402)"),
         )),

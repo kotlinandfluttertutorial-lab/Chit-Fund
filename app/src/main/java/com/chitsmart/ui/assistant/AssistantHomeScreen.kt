@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 private val PageBg       = Color(0xFFF9F9FF)
 private val NavyDeep     = Color(0xFF041B3C)
 private val NavyMid      = Color(0xFF002141)
-private val TealAccent   = Color(0xFF4FDBC8)
+private val TealAccent   = Color(0xFF00B3A1)
 private val BlueAccent   = Color(0xFF0261A2)
 private val SlateBody    = Color(0xFF43474F)
 private val SlateHint    = Color(0xFF737780)

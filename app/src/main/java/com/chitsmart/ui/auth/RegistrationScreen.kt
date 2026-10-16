@@ -49,6 +49,7 @@ private val FieldBorder  = Color(0xFFE0E8FF)
 private val LockedBg     = Color(0xFFF1F3FF)
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun RegistrationScreen(
     mobileNumber: String = "98765 43210",
     onRegister: (fullName: String, email: String?, dob: String?, gender: String?) -> Unit = { _, _, _, _ -> },

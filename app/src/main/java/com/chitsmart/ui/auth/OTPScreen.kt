@@ -98,7 +98,7 @@ fun OTPScreen(
             }
 
             // ChitSmart wordmark
-            Row(verticalAlignment = Alignment.Baseline, horizontalArrangement = Arrangement.spacedBy(0.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                 Text("Chit", fontSize = 16.sp, color = NavyButton, letterSpacing = (-0.4).sp)
                 Text("Smart", fontSize = 16.sp, color = Color(0xFF4FDBC8), letterSpacing = (-0.4).sp)
             }

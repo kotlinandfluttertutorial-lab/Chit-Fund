@@ -458,3 +458,137 @@ private val sampleMessages = listOf(
 @Preview(showBackground = true, widthDp = 390, heightDp = 860, name = "AI Chat")
 @Composable
 fun AIChatScreenPreview() { MaterialTheme { AIChatScreen() } }
+
+// ── Policy Reference Bottom Sheet (Batch 4) ───────────────────────────────────
+
+/**
+ * ModalBottomSheet that displays the full policy reference when a policy chip is tapped.
+ * Shows document title, section badge, highlighted excerpt, and share/bookmark actions.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PolicyReferenceBottomSheet(
+    chip: PolicyChip,
+    onDismiss: () -> Unit,
+    onViewFullDocument: () -> Unit = {},
+    onShare: () -> Unit = {},
+    onBookmark: () -> Unit = {},
+) {
+    var bookmarked by remember { mutableStateOf(false) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = Color.White,
+    ) {
+        Column(
+            modifier = androidx.compose.ui.Modifier
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            // Header
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Box(
+                    modifier = androidx.compose.ui.Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(PolicyBg),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(Icons.Outlined.Gavel, contentDescription = null, tint = PolicyText, modifier = androidx.compose.ui.Modifier.size(20.dp))
+                }
+                Column(modifier = androidx.compose.ui.Modifier.weight(1f)) {
+                    Text("Policy Reference", fontSize = 12.sp, color = SlateHint, letterSpacing = 0.33.sp)
+                    Text(chip.label, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = NavyDeep, lineHeight = 20.sp)
+                }
+            }
+
+            // Section reference badge
+            Row(
+                modifier = androidx.compose.ui.Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(PolicyBg)
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Icon(Icons.Outlined.Bookmark, contentDescription = null, tint = PolicyText, modifier = androidx.compose.ui.Modifier.size(13.dp))
+                Text(chip.reference, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = PolicyText, letterSpacing = 0.24.sp)
+            }
+
+            // Highlighted excerpt (teal left border card)
+            Row(
+                modifier = androidx.compose.ui.Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(SurfaceBlue),
+            ) {
+                Box(
+                    modifier = androidx.compose.ui.Modifier
+                        .width(4.dp)
+                        .fillMaxHeight()
+                        .background(TealBorder)
+                        .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)),
+                )
+                Column(modifier = androidx.compose.ui.Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("EXCERPT", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = SlateHint, letterSpacing = 0.5.sp)
+                    Text(
+                        "The foreman of a chit fund is entitled to a commission not exceeding five percent of the chit amount, as specified under this Act. This commission is deducted from the chit amount prior to distribution to the prize winner.",
+                        fontSize = 13.sp,
+                        color = NavyDeep,
+                        lineHeight = 20.sp,
+                    )
+                }
+            }
+
+            // View Full Document button
+            OutlinedButton(
+                onClick = onViewFullDocument,
+                modifier = androidx.compose.ui.Modifier.fillMaxWidth().height(48.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = BlueAccent),
+            ) {
+                Icon(Icons.Outlined.OpenInNew, contentDescription = null, modifier = androidx.compose.ui.Modifier.size(16.dp))
+                Spacer(androidx.compose.ui.Modifier.width(6.dp))
+                Text("View Full Document", fontWeight = FontWeight.SemiBold)
+            }
+
+            // Share + Bookmark row
+            Row(
+                modifier = androidx.compose.ui.Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                OutlinedButton(
+                    onClick = onShare,
+                    modifier = androidx.compose.ui.Modifier.weight(1f).height(44.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = SlateBody),
+                ) {
+                    Icon(Icons.Outlined.Share, contentDescription = null, modifier = androidx.compose.ui.Modifier.size(15.dp))
+                    Spacer(androidx.compose.ui.Modifier.width(4.dp))
+                    Text("Share", fontSize = 13.sp)
+                }
+                OutlinedButton(
+                    onClick = {
+                        bookmarked = !bookmarked
+                        onBookmark()
+                    },
+                    modifier = androidx.compose.ui.Modifier.weight(1f).height(44.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = if (bookmarked) TealAccent else SlateBody),
+                ) {
+                    Icon(
+                        if (bookmarked) Icons.Outlined.Bookmark else Icons.Outlined.BookmarkBorder,
+                        contentDescription = null,
+                        modifier = androidx.compose.ui.Modifier.size(15.dp),
+                    )
+                    Spacer(androidx.compose.ui.Modifier.width(4.dp))
+                    Text(if (bookmarked) "Saved" else "Bookmark", fontSize = 13.sp)
+                }
+            }
+        }
+    }
+}

@@ -244,6 +244,7 @@ private fun SummaryRow(label: String, value: String) {
 // ── Step 2: Nominee ───────────────────────────────────────────────────────────
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun NomineeStep(
     nomineeName: String, relationship: String, mobile: String,
     onNameChange: (String) -> Unit, onRelationshipChange: (String) -> Unit, onMobileChange: (String) -> Unit,
@@ -385,7 +386,7 @@ private fun ESignStep(
                     buildAnnotatedString {
                         withStyle(SpanStyle(fontWeight = FontWeight.SemiBold, color = NavyDeep, fontSize = 13.sp)) { append("CHITSMART CHIT FUND ENROLLMENT AGREEMENT\n\n") }
                         withStyle(SpanStyle(color = SlateBody, fontSize = 12.sp)) {
-                            append("This agreement is entered into between ChitSmart Foreman Services Pvt. Ltd. (hereinafter "Foreman") and the Member (hereinafter "Member") for participation in the chit group \"$groupName\".\n\n")
+                            append("This agreement is entered into between ChitSmart Foreman Services Pvt. Ltd. (hereinafter \"Foreman\") and the Member (hereinafter \"Member\") for participation in the chit group \"$groupName\".\n\n")
                             append("1. INSTALLMENT OBLIGATIONS\nThe Member agrees to pay the stipulated monthly installment on or before the due date. Late payments attract a fee as specified in the schedule.\n\n")
                             append("2. PAYOUT DISBURSEMENT\nPayouts are made via NEFT/IMPS to the registered bank account within 3 working days of payout cycle completion.\n\n")
                             append("3. FOREMAN COMMISSION\nForeman is entitled to a commission not exceeding 5% of the chit value as permitted under the Chit Funds Act, 1982.\n\n")

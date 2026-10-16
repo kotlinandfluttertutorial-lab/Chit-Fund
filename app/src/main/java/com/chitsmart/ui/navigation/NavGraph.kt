@@ -3,19 +3,28 @@ package com.chitsmart.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.chitsmart.ui.assistant.AIChatScreen
+import com.chitsmart.ui.assistant.AssistantHomeScreen
+import com.chitsmart.ui.assistant.HumanSupportScreen
 import com.chitsmart.ui.auth.*
 import com.chitsmart.ui.chits.*
 import com.chitsmart.ui.home.HomeScreen
 import com.chitsmart.ui.notifications.NotificationsScreen
 import com.chitsmart.ui.onboarding.OnboardingScreen
 import com.chitsmart.ui.payment.*
-import com.chitsmart.ui.profile.ProfileScreen
+import com.chitsmart.ui.profile.*
 import com.chitsmart.ui.splash.SplashScreen
 
 // ── Route constants ────────────────────────────────────────────────────────────
@@ -52,6 +61,15 @@ object AppRoutes {
 
     // Profile tab
     const val PROFILE        = "profile"
+    const val PERSONAL_INFO  = "personal_info"
+    const val BANK_ACCOUNTS  = "bank_accounts"
+    const val SECURITY       = "security_settings"
+    const val HELP_CENTER    = "help_centre"
+    const val LANGUAGE_PREFS = "preferences"
+    const val NOMINEES       = "nominees"
+
+    // Human support
+    const val HUMAN_SUPPORT  = "human_support"
 
     // Helper builders
     fun otp(mobileNumber: String) = "otp/$mobileNumber"
@@ -330,25 +348,42 @@ fun ChitSmartNavGraph(navController: NavHostController) {
         composable(
             route = AppRoutes.RECEIPT,
             arguments = listOf(navArgument("paymentId") { type = NavType.StringType }),
-        ) {
-            // ReceiptScreen will be a standalone screen (CHIT-83)
-            // Interim: navigate back until it is implemented
-            LaunchedEffect(Unit) { navController.popBackStack() }
+        ) { backStack ->
+            val paymentId = backStack.arguments?.getString("paymentId") ?: ""
+            ReceiptScreen(
+                paymentId = paymentId,
+                onBack = { navController.popBackStack() },
+                onDownloadPDF = { /* launch PDF intent */ },
+                onShareWhatsApp = { /* launch WhatsApp share intent */ },
+                onShareEmail = { /* launch email share intent */ },
+            )
         }
 
         // ── Assistant tab ─────────────────────────────────────────────────────
 
         composable(AppRoutes.ASSISTANT) {
-            AIChatScreen(
+            AssistantHomeScreen(
+                onStartChat = { message ->
+                    navController.navigate(AppRoutes.AI_CHAT)
+                },
+                onResumeConversation = { _ ->
+                    navController.navigate(AppRoutes.AI_CHAT)
+                },
                 onBack = { navController.popBackStack() },
-                onHumanSupport = { /* navigate to support chat */ },
             )
         }
 
         composable(AppRoutes.AI_CHAT) {
             AIChatScreen(
                 onBack = { navController.popBackStack() },
-                onHumanSupport = { /* navigate to support chat */ },
+                onHumanSupport = { navController.navigate(AppRoutes.HUMAN_SUPPORT) },
+            )
+        }
+
+        composable(AppRoutes.HUMAN_SUPPORT) {
+            HumanSupportScreen(
+                onBack = { navController.popBackStack() },
+                onEmailSupport = { /* launch email intent */ },
             )
         }
 
@@ -356,7 +391,17 @@ fun ChitSmartNavGraph(navController: NavHostController) {
 
         composable(AppRoutes.PROFILE) {
             ProfileScreen(
-                onMenuItemTap = { /* route based on item.route */ },
+                onMenuItemTap = { item ->
+                    when (item.route) {
+                        AppRoutes.PERSONAL_INFO  -> navController.navigate(AppRoutes.PERSONAL_INFO)
+                        AppRoutes.BANK_ACCOUNTS  -> navController.navigate(AppRoutes.BANK_ACCOUNTS)
+                        AppRoutes.NOMINEES       -> navController.navigate(AppRoutes.NOMINEES)
+                        AppRoutes.SECURITY       -> navController.navigate(AppRoutes.SECURITY)
+                        AppRoutes.LANGUAGE_PREFS -> navController.navigate(AppRoutes.LANGUAGE_PREFS)
+                        AppRoutes.HELP_CENTER    -> navController.navigate(AppRoutes.HELP_CENTER)
+                        else -> { /* no-op for legal/about in this release */ }
+                    }
+                },
                 onLogout = {
                     navController.navigate(AppRoutes.LOGIN) {
                         popUpTo(AppRoutes.SPLASH) { inclusive = true }
@@ -364,6 +409,63 @@ fun ChitSmartNavGraph(navController: NavHostController) {
                 },
                 onBack = { navController.popBackStack() },
             )
+        }
+
+        composable(AppRoutes.PERSONAL_INFO) {
+            PersonalInfoScreen(
+                onBack = { navController.popBackStack() },
+                onSave = { _, _, _ -> navController.popBackStack() },
+            )
+        }
+
+        composable(AppRoutes.BANK_ACCOUNTS) {
+            BankAccountsScreen(
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(AppRoutes.SECURITY) {
+            SecuritySettingsScreen(
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(AppRoutes.HELP_CENTER) {
+            HelpCentreScreen(
+                onBack = { navController.popBackStack() },
+                onAskAI = { navController.navigate(AppRoutes.AI_CHAT) },
+                onHumanSupport = { navController.navigate(AppRoutes.HUMAN_SUPPORT) },
+            )
+        }
+
+        composable(AppRoutes.LANGUAGE_PREFS) {
+            PreferencesScreen(
+                onBack = { navController.popBackStack() },
+                onSave = { _ -> navController.popBackStack() },
+            )
+        }
+
+        composable(AppRoutes.NOMINEES) {
+            // Nominees screen — stub for this release (deferred implementation)
+            androidx.compose.material3.Scaffold(
+                topBar = {
+                    androidx.compose.material3.TopAppBar(
+                        title = { Text("Nominees", fontWeight = FontWeight.SemiBold) },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                    )
+                },
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(innerPadding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("Nominees management coming soon.", color = Color(0xFF64748B))
+                }
+            }
         }
     }
 }

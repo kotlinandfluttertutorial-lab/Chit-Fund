@@ -90,8 +90,8 @@ class AuthRepositoryTest {
         val result = repository.verifyOtp("+911234567890", "123456")
         assertTrue(result is Result.Success)
         assertEquals(true, (result as Result.Success).data.isNewUser)
-        assertEquals("access-abc", fakeTokenStorage.accessToken)
-        assertEquals("refresh-xyz", fakeTokenStorage.refreshToken)
+        assertEquals("access-abc", fakeTokenStorage.storedAccess)
+        assertEquals("refresh-xyz", fakeTokenStorage.storedRefresh)
     }
 
     @Test
@@ -107,7 +107,7 @@ class AuthRepositoryTest {
         val result = repository.verifyOtp("+911234567890", "654321")
         assertTrue(result is Result.Success)
         assertEquals(false, (result as Result.Success).data.isNewUser)
-        assertEquals("access-returning", fakeTokenStorage.accessToken)
+        assertEquals("access-returning", fakeTokenStorage.storedAccess)
     }
 
     @Test
@@ -140,7 +140,7 @@ class AuthRepositoryTest {
         )
         val result = repository.register("Priya Nair", "priya@example.com", null, null)
         assertTrue(result is Result.Success)
-        assertEquals("new-access-token", fakeTokenStorage.accessToken)
+        assertEquals("new-access-token", fakeTokenStorage.storedAccess)
     }
 
     @Test
@@ -155,21 +155,21 @@ class AuthRepositoryTest {
 
     @Test
     fun `logout clears tokens from store`() = runTest {
-        fakeTokenStorage.accessToken = "some-access"
-        fakeTokenStorage.refreshToken = "some-refresh"
+        fakeTokenStorage.saveAccessToken("some-access")
+        fakeTokenStorage.saveRefreshToken("some-refresh")
         fakeApi.logoutResponse = Response.success(Unit)
 
         val result = repository.logout()
 
         assertTrue(result is Result.Success)
-        assertNull(fakeTokenStorage.accessToken)
-        assertNull(fakeTokenStorage.refreshToken)
+        assertNull(fakeTokenStorage.storedAccess)
+        assertNull(fakeTokenStorage.storedRefresh)
     }
 
     @Test
     fun `logout without refresh token still clears store`() = runTest {
         // No refresh token stored — should still succeed (no API call needed)
-        fakeTokenStorage.refreshToken = null
+        // fakeTokenStorage starts with null refresh token by default
         val result = repository.logout()
         assertTrue(result is Result.Success)
     }
@@ -179,14 +179,21 @@ class AuthRepositoryTest {
 
 /** In-memory [TokenStorage] fake for tests. */
 private class FakeTokenStorage : TokenStorage {
-    var accessToken: String? = null
-    var refreshToken: String? = null
+    private var _accessToken: String? = null
+    private var _refreshToken: String? = null
 
-    override fun saveAccessToken(token: String) { accessToken = token }
-    override fun saveRefreshToken(token: String) { refreshToken = token }
-    override fun getAccessToken(): String? = accessToken
-    override fun getRefreshToken(): String? = refreshToken
-    override fun clearTokens() { accessToken = null; refreshToken = null }
+    // Use different property names to avoid JVM signature clash with interface methods
+    @get:JvmName("storedAccessToken")
+    val storedAccess: String? get() = _accessToken
+
+    @get:JvmName("storedRefreshToken")
+    val storedRefresh: String? get() = _refreshToken
+
+    override fun saveAccessToken(token: String) { _accessToken = token }
+    override fun saveRefreshToken(token: String) { _refreshToken = token }
+    override fun getAccessToken(): String? = _accessToken
+    override fun getRefreshToken(): String? = _refreshToken
+    override fun clearTokens() { _accessToken = null; _refreshToken = null }
 }
 
 /** Programmable fake for [AuthApiService]. */

@@ -35,7 +35,7 @@ const sampleMember = {
 };
 
 export default function MemberDetailsPage() {
-  const { memberId } = useParams();
+  useParams(); // memberId used for future API call
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
   const m = sampleMember;

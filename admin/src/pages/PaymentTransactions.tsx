@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import { Download, Search, Filter, Receipt } from "lucide-react";
+import { Download, Search, Receipt } from "lucide-react";
 
 const transactions = [
   { id: "TXN-001", date: "12/10/2026 10:32", member: "Priya Sharma", memberId: "CS-8402", group: "Family Savings 50K", month: "Oct 2026", amount: "₹2,500", method: "UPI", gateway: "RZP_001234", status: "SUCCESSFUL" },

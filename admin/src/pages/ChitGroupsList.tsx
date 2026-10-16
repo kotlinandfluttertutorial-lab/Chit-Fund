@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate as _useNavigate } from "react-router-dom";
 import { Plus, Search, Filter } from "lucide-react";
 
 const groups = [
@@ -17,7 +17,6 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function ChitGroupsListPage() {
-  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const filtered = groups.filter((g) => g.name.toLowerCase().includes(search.toLowerCase()));
 

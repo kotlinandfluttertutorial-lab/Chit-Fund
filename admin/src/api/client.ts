@@ -5,7 +5,8 @@
 import axios, { AxiosError } from "axios";
 import type { ApiError } from "../types";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api/v1";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL ?? "http://localhost:8000/api/v1";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,

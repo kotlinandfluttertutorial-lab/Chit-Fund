@@ -1,5 +1,5 @@
 import { TrendingUp, TrendingDown, Users, Landmark, IndianRupee, AlertCircle, Plus, Send, Download } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 // ── KPI Cards ─────────────────────────────────────────────────────────────────
 

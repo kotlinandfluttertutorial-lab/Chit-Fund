@@ -10,16 +10,15 @@ from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, field_validator
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.core.deps import get_current_member
 from app.core.security import (
     create_access_token,
-    create_refresh_token,
     hash_refresh_token,
-    verify_token,
 )
 
 router = APIRouter()
@@ -149,9 +148,9 @@ async def verify_otp(
     Verify the 6-digit OTP. Returns JWT tokens and is_new_user flag.
     Creates a member record with kyc_status=NOT_REQUIRED if the mobile is new.
     """
-    from app.models.otp_session import OtpSession
-    from app.models.member import Member, AccountStatus, KYCStatus
+    from app.models.member import AccountStatus, KYCStatus, Member
     from app.models.member_session import MemberSession
+    from app.models.otp_session import OtpSession
 
     # Find latest valid unused OTP for this mobile
     result = await db.execute(
@@ -224,19 +223,52 @@ async def verify_otp(
 async def register(
     request: RegisterRequest,
     db: AsyncSession = Depends(get_db),
-    current_member=Depends(lambda: None),  # replaced by get_current_member when deps are wired
+    current_member=Depends(get_current_member),
 ) -> AuthTokenResponse:
     """
     Update member profile after OTP verification (called when is_new_user=true).
     Requires a valid JWT from verify-otp.
     NO Aadhaar or PAN fields — KYC is deferred.
     """
-    # TODO: inject get_current_member dependency once core deps module is complete
-    # This stub returns a placeholder response for scaffolding purposes
+    from datetime import date
+
+    from app.models.member import Gender
+
+    # Update name
+    current_member.full_name = request.full_name
+
+    # Update optional fields
+    if request.email is not None:
+        current_member.email = request.email
+
+    if request.date_of_birth is not None:
+        try:
+            current_member.date_of_birth = date.fromisoformat(request.date_of_birth)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="date_of_birth must be in YYYY-MM-DD format",
+            )
+
+    if request.gender is not None:
+        try:
+            current_member.gender = Gender(request.gender.upper())
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid gender value. Allowed: {[g.value for g in Gender]}",
+            )
+
+    await db.commit()
+    await db.refresh(current_member)
+
+    # Issue a fresh access token; no new refresh token on profile update
+    access_token = create_access_token(subject=str(current_member.id))
+
     return AuthTokenResponse(
         is_new_user=False,
-        access_token="STUB_TOKEN",
-        refresh_token="STUB_REFRESH",
+        access_token=access_token,
+        refresh_token="",  # refresh token unchanged; client should keep existing one
     )
 
 

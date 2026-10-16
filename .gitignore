@@ -35,3 +35,15 @@ google-services.json
 *.hprof
 /admin/node_modules/
 /admin/dist/
+
+# Environment files and secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.p12
+backend/uploads/
+__pycache__/
+*.pyc
+backend/.env

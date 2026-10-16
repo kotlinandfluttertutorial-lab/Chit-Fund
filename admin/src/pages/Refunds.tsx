@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, X, MessageSquare, Paperclip, Check } from "lucide-react";
+import { Plus, Mail, AlertCircle, Download } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -142,7 +142,7 @@ export default function RefundsPage() {
       {/* Toast */}
       {toast && (
         <div className="fixed top-5 right-6 z-50 flex items-center gap-2 bg-[#073763] text-white text-sm px-4 py-2.5 rounded-lg shadow-lg">
-          <Check size={14} />
+          <span>✓</span>
           {toast}
         </div>
       )}
@@ -217,7 +217,7 @@ export default function RefundsPage() {
               <div className="flex items-center gap-3">
                 <StatusChip status={selected.status} />
                 <button onClick={() => setSelected(null)} className="p-1.5 rounded hover:bg-[#F1F3FF] text-[#64748B]">
-                  <X size={16} />
+                  <AlertCircle size={16} />
                 </button>
               </div>
             </div>
@@ -250,7 +250,7 @@ export default function RefundsPage() {
               {/* Communication thread */}
               <div className="px-5 py-4 border-b border-[#E2E8F0]">
                 <h4 className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                  <MessageSquare size={12} />
+                  <Mail size={12} />
                   Communication Thread
                 </h4>
                 <div className="space-y-3">
@@ -286,7 +286,7 @@ export default function RefundsPage() {
               {/* File attachments */}
               <div className="px-5 py-4 border-b border-[#E2E8F0]">
                 <h4 className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                  <Paperclip size={12} />
+                  <Download size={12} />
                   Attachments
                 </h4>
                 <p className="text-xs text-[#64748B]">No attachments for this dispute.</p>
@@ -335,7 +335,7 @@ export default function RefundsPage() {
                   disabled={!actionReason.trim()}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#14B8A6] text-white text-sm font-medium hover:bg-[#00B3A1] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
-                  <Check size={14} />
+                  <Download size={14} />
                   Approve Refund
                 </button>
                 <button
@@ -343,7 +343,7 @@ export default function RefundsPage() {
                   disabled={!actionReason.trim()}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
-                  <X size={14} />
+                  <AlertCircle size={14} />
                   Reject Dispute
                 </button>
               </div>

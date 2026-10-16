@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { CheckSquare, Send, Download, X, Check } from "lucide-react";
+import { useState } from "react";
+import { Download, Send, AlertCircle } from "lucide-react";
 
 // ── Mock data ──────────────────────────────────────────────────────────────
 
@@ -159,7 +159,7 @@ export default function InstallmentCollectionPage() {
       {/* Toast */}
       {toast && (
         <div className="fixed top-5 right-6 z-50 flex items-center gap-2 bg-[#073763] text-white text-sm px-4 py-2.5 rounded-lg shadow-lg">
-          <Check size={14} />
+          <span>✓</span>
           {toast}
         </div>
       )}
@@ -225,7 +225,7 @@ export default function InstallmentCollectionPage() {
               onClick={() => setShowMarkModal(true)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white text-[#073763] text-xs font-semibold hover:bg-[#F1F3FF] transition-colors"
             >
-              <CheckSquare size={13} />
+              <Download size={13} />
               Mark as Paid (Offline)
             </button>
             <button
@@ -246,7 +246,7 @@ export default function InstallmentCollectionPage() {
               onClick={() => setSelectedIds(new Set())}
               className="p-1.5 rounded text-blue-200 hover:text-white"
             >
-              <X size={14} />
+              <AlertCircle size={14} />
             </button>
           </div>
         </div>

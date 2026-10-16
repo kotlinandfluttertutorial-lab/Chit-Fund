@@ -1,5 +1,5 @@
 ﻿import { useState, useMemo } from "react";
-import { Download, FileText } from "lucide-react";
+import { Download, BookOpen } from "lucide-react";
 
 // ── Mock data ──────────────────────────────────────────────────────────────
 
@@ -110,7 +110,7 @@ export default function LedgerPage() {
             onClick={downloadPDF}
             className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-sm font-medium text-[#041B3C] hover:bg-[#F1F3FF] transition-colors"
           >
-            <FileText size={14} />
+            <BookOpen size={14} />
             Download PDF
           </button>
           <button

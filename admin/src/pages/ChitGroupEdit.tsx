@@ -3,7 +3,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useParams, useNavigate } from "react-router-dom";
-import { Save, Send, ArrowLeft, X, Check } from "lucide-react";
+import { Download, Send, ArrowLeft, AlertCircle } from "lucide-react";
 
 // ── Validation schema ──────────────────────────────────────────────────────
 
@@ -118,7 +118,7 @@ export default function ChitGroupEditPage() {
       {/* Toast */}
       {toast && (
         <div className="fixed top-5 right-6 z-50 flex items-center gap-2 bg-[#073763] text-white text-sm px-4 py-2.5 rounded-lg shadow-lg">
-          <Check size={14} />
+          <span>✓</span>
           {toast}
         </div>
       )}
@@ -231,7 +231,7 @@ export default function ChitGroupEditPage() {
               onClick={handleSubmit(onSaveDraft)}
               className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-sm font-medium text-[#041B3C] hover:bg-[#F1F3FF] transition-colors"
             >
-              <Save size={14} />
+              <Download size={14} />
               Save as Draft
             </button>
             <button
@@ -308,7 +308,7 @@ export default function ChitGroupEditPage() {
               onClick={() => setShowConfirm(false)}
               className="absolute top-4 right-4 text-[#64748B] hover:text-[#041B3C]"
             >
-              <X size={16} />
+              <AlertCircle size={16} />
             </button>
             <h3 className="font-semibold text-[#041B3C] text-lg mb-2">Publish Chit Group?</h3>
             <p className="text-sm text-[#64748B] mb-5">

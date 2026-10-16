@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, Download, Send, ChevronDown } from "lucide-react";
+import { Search, Download, Send, ChevronRight } from "lucide-react";
 
 // ── Mock data ──────────────────────────────────────────────────────────────
 
@@ -99,10 +99,11 @@ export default function AccountStatementPage() {
     setTimeout(() => setToast(null), 3000);
   }
 
-  const rawRows = selectedMember ? (MOCK_STATEMENTS[selectedMember.id] ?? []) : [];
-  const openingBalance = selectedMember ? (OPENING_BALANCES[selectedMember.id] ?? 0) : 0;
+  const selectedMemberId = selectedMember?.id;
+  const openingBalance = selectedMemberId ? (OPENING_BALANCES[selectedMemberId] ?? 0) : 0;
 
   const { rows, closingBalance } = useMemo(() => {
+    const rawRows = selectedMemberId ? (MOCK_STATEMENTS[selectedMemberId] ?? []) : [];
     let filtered = rawRows;
 
     if (periodMode === "month") {
@@ -118,7 +119,7 @@ export default function AccountStatementPage() {
     });
 
     return { rows, closingBalance: running };
-  }, [rawRows, periodMode, selectedMonth, fromDate, toDate, openingBalance]);
+  }, [selectedMemberId, periodMode, selectedMonth, fromDate, toDate, openingBalance]);
 
   function downloadPDF() {
     console.log("Generating PDF statement...");
@@ -155,7 +156,7 @@ export default function AccountStatementPage() {
               >
                 <Send size={14} />
                 Send to Member
-                <ChevronDown size={12} />
+                <ChevronRight size={12} />
               </button>
               {showSendMenu && (
                 <div className="absolute top-full mt-1 right-0 bg-white rounded-lg border border-[#E2E8F0] shadow-lg z-10 min-w-[140px] py-1">

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Check, Plus, Trash2, Save, Send } from "lucide-react";
+import { ArrowLeft, ChevronRight, Plus, Download, Send, AlertCircle } from "lucide-react";
 
 // ── Schemas per step ───────────────────────────────────────────────────────
 
@@ -73,7 +73,7 @@ function StepIndicator({ current }: { current: number }) {
                     : "bg-white border-[#E2E8F0] text-[#64748B]"
                 }`}
               >
-                {done ? <Check size={14} /> : i + 1}
+                {done ? <span>✓</span> : i + 1}
               </div>
               <span
                 className={`text-xs mt-1 font-medium ${
@@ -186,7 +186,7 @@ export default function MemberEditPage() {
       {/* Toast */}
       {toast && (
         <div className="fixed top-5 right-6 z-50 flex items-center gap-2 bg-[#073763] text-white text-sm px-4 py-2.5 rounded-lg shadow-lg">
-          <Check size={14} />
+          <span>✓</span>
           {toast}
         </div>
       )}
@@ -327,7 +327,7 @@ export default function MemberEditPage() {
                     onClick={() => removeBankAccount(acc.id)}
                     className="p-1.5 rounded text-red-400 hover:bg-red-50 transition-colors"
                   >
-                    <Trash2 size={13} />
+                    <AlertCircle size={13} />
                   </button>
                 </div>
               </div>
@@ -487,7 +487,7 @@ export default function MemberEditPage() {
                 onClick={handleSubmit(onSaveDraft)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-sm font-medium text-[#041B3C] hover:bg-[#F1F3FF] transition-colors"
               >
-                <Save size={14} />
+                <Download size={14} />
                 Save as Draft
               </button>
               <button
@@ -517,7 +517,7 @@ export default function MemberEditPage() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#073763] text-white text-sm font-medium hover:bg-[#1769AA] transition-colors"
             >
               Next
-              <ArrowRight size={14} />
+              <ChevronRight size={14} />
             </button>
           </div>
         )}

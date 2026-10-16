@@ -12,7 +12,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { ArrowUpDown, Download, FileText } from "lucide-react";
+import { ArrowUpDown, Download, BookOpen } from "lucide-react";
 
 // ── Mock data ──────────────────────────────────────────────────────────────
 
@@ -189,7 +189,7 @@ export default function CollectionAnalyticsPage() {
             onClick={exportPDF}
             className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-sm font-medium text-[#041B3C] hover:bg-[#F1F3FF] transition-colors"
           >
-            <FileText size={14} />
+            <BookOpen size={14} />
             Export PDF
           </button>
         </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertTriangle, Check, X } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 // ── Mock data ──────────────────────────────────────────────────────────────
 
@@ -107,7 +107,7 @@ export default function ReconciliationPage() {
       {/* Approval toast */}
       {approved && (
         <div className="fixed top-5 right-6 z-50 flex items-center gap-2 bg-green-600 text-white text-sm px-4 py-2.5 rounded-lg shadow-lg">
-          <Check size={14} />
+          <span>✓</span>
           Reconciliation approved for {selectedDate}
         </div>
       )}
@@ -121,8 +121,8 @@ export default function ReconciliationPage() {
         <div className="flex items-center gap-3">
           {/* Status badge */}
           <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${statusStyles[status]}`}>
-            {status === "DISCREPANCY" && <AlertTriangle size={12} />}
-            {status === "BALANCED" && <Check size={12} />}
+            {status === "DISCREPANCY" && <AlertCircle size={12} />}
+            {status === "BALANCED" && <span>✓</span>}
             {status}
           </span>
 
@@ -158,7 +158,7 @@ export default function ReconciliationPage() {
             bgColor: discrepancy !== 0 ? "#FEF2F2" : "#F0FDF4",
           },
         ].map(({ label, value, color, bgColor }) => (
-          <div key={label} className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4">
+          <div key={label} className="rounded-xl border border-[#E2E8F0] shadow-sm p-4" style={{ backgroundColor: bgColor }}>
             <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-2">{label}</p>
             <p className="text-2xl font-bold" style={{ color }}>
               {value}
@@ -264,7 +264,7 @@ export default function ReconciliationPage() {
         <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center justify-between bg-red-50">
             <h3 className="font-semibold text-red-700 flex items-center gap-2">
-              <AlertTriangle size={15} />
+              <AlertCircle size={15} />
               Unmatched Transactions ({unmatchedList.length})
             </h3>
           </div>
@@ -299,7 +299,7 @@ export default function ReconciliationPage() {
                       <button className="px-2 py-1 rounded text-xs font-medium bg-amber-50 text-amber-700 hover:bg-amber-100">Investigate</button>
                       <button className="px-2 py-1 rounded text-xs font-medium bg-red-50 text-red-700 hover:bg-red-100">Escalate</button>
                       <button onClick={() => dismissUnmatched(t.id)} className="p-1 rounded text-[#64748B] hover:text-red-500">
-                        <X size={12} />
+                        <AlertCircle size={12} />
                       </button>
                     </div>
                   </td>

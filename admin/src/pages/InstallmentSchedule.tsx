@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import { Bell, Check, X, Pencil } from "lucide-react";
+import { Bell, Edit } from "lucide-react";
 
 // ── Mock data ──────────────────────────────────────────────────────────────
 
@@ -179,7 +179,7 @@ export default function InstallmentSchedulePage() {
       {/* Reminder success toast */}
       {reminderSent && (
         <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-2.5 rounded-xl">
-          <Check size={14} />
+          <span>✓</span>
           Reminder sent to {overdueCount} member(s) in {groupName}
         </div>
       )}
@@ -230,10 +230,10 @@ export default function InstallmentSchedulePage() {
                             className="px-2 py-1 rounded border border-[#14B8A6] text-sm text-[#172B4D] focus:outline-none"
                           />
                           <button onClick={() => saveEdit(row.id)} className="text-green-600 hover:text-green-700">
-                            <Check size={14} />
+                            <span>✓</span>
                           </button>
                           <button onClick={cancelEdit} className="text-red-400 hover:text-red-600">
-                            <X size={14} />
+                            <span>✕</span>
                           </button>
                         </div>
                       ) : (
@@ -246,7 +246,7 @@ export default function InstallmentSchedulePage() {
                             month: "short",
                             year: "numeric",
                           })}
-                          <Pencil size={11} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#64748B]" />
+                          <Edit size={11} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#64748B]" />
                         </button>
                       )}
                     </td>

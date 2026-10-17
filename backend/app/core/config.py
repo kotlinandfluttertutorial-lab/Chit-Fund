@@ -45,9 +45,7 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------ #
     # Database
     # ------------------------------------------------------------------ #
-    DATABASE_URL: str = (
-        "postgresql+asyncpg://chitsmart:password@localhost:5432/chitsmart_dev"
-    )
+    DATABASE_URL: str = "postgresql+asyncpg://chitsmart:password@localhost:5432/chitsmart_dev"
     DATABASE_POOL_SIZE: int = 10
     DATABASE_MAX_OVERFLOW: int = 20
 

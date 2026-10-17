@@ -7,7 +7,10 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint)
-    alias(libs.plugins.google.services)
+}
+
+if (providers.gradleProperty("skipGoogleServices").orNull != "true") {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 // ---------------------------------------------------------------------------

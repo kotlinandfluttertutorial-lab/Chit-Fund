@@ -33,6 +33,16 @@ npm run dev
 API: http://localhost:8000  
 Admin: http://localhost:5173
 
+### Android Firebase configuration
+
+The Android app uses Firebase Phone Auth. Download the configuration for the
+Firebase Android app with package name `com.chitsmart` and save it as
+`app/google-services.json`; this file is git-ignored and must not be committed.
+CI lint, unit-test, and debug APK jobs pass `-PskipGoogleServices=true` because
+those checks do not contact Firebase. Release builds require the real
+configuration. The Android release workflow restores it from the
+base64-encoded `GOOGLE_SERVICES_JSON_BASE64` repository secret.
+
 ---
 
 ## Environment variables reference

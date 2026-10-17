@@ -158,10 +158,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Android Lint
-        run: ./gradlew lint
+        run: ./gradlew -PskipGoogleServices=true lint
 
       - name: Unit tests
-        run: ./gradlew testDebugUnitTest
+        run: ./gradlew -PskipGoogleServices=true testDebugUnitTest
 
       - name: Upload lint report
         if: always()

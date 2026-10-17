@@ -32,8 +32,7 @@ object NetworkModule {
     // Routes that must NOT receive the Authorization header.
     private val unauthenticatedPaths =
         setOf(
-            "auth/send-otp",
-            "auth/verify-otp",
+            "auth/verify-firebase-token",
             "auth/refresh",
         )
 

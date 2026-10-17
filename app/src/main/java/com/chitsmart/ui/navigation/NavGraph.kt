@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import android.net.Uri
 import com.chitsmart.ui.assistant.AIChatScreen
 import com.chitsmart.ui.assistant.AssistantHomeScreen
 import com.chitsmart.ui.assistant.HumanSupportScreen
@@ -32,7 +33,7 @@ object AppRoutes {
     const val SPLASH = "splash"
     const val ONBOARDING = "onboarding"
     const val LOGIN = "login"
-    const val OTP = "otp/{mobileNumber}"
+    const val OTP = "otp/{mobileNumber}/{verificationId}"
     const val REGISTRATION = "registration/{mobileNumber}"
 
     // Home tab
@@ -70,7 +71,7 @@ object AppRoutes {
     const val HUMAN_SUPPORT = "human_support"
 
     // Helper builders
-    fun otp(mobileNumber: String) = "otp/$mobileNumber"
+    fun otp(mobileNumber: String, verificationId: String) = "otp/$mobileNumber/${Uri.encode(verificationId)}"
 
     fun registration(mobileNumber: String) = "registration/$mobileNumber"
 
@@ -157,8 +158,8 @@ fun ChitSmartNavGraph(navController: NavHostController) {
 
         composable(AppRoutes.LOGIN) {
             LoginScreen(
-                onOtpSent = { mobile ->
-                    navController.navigate(AppRoutes.otp(mobile))
+                onOtpSent = { mobile, verificationId ->
+                    navController.navigate(AppRoutes.otp(mobile, verificationId))
                 },
                 onRegister = {
                     // Direct registration without OTP (edge case — admin flow)
@@ -169,7 +170,10 @@ fun ChitSmartNavGraph(navController: NavHostController) {
 
         composable(
             route = AppRoutes.OTP,
-            arguments = listOf(navArgument("mobileNumber") { type = NavType.StringType }),
+            arguments = listOf(
+                navArgument("mobileNumber") { type = NavType.StringType },
+                navArgument("verificationId") { type = NavType.StringType; defaultValue = "" },
+            ),
         ) { backStack ->
             val mobile = backStack.arguments?.getString("mobileNumber") ?: ""
             OTPScreen(

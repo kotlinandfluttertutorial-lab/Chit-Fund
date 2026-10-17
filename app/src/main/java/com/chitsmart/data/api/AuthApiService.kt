@@ -7,13 +7,9 @@ import retrofit2.http.POST
 
 // ── Request bodies ────────────────────────────────────────────────────────────
 
-data class SendOtpRequest(
+data class VerifyFirebaseTokenRequest(
+    @SerializedName("firebase_id_token") val firebaseIdToken: String,
     @SerializedName("mobile_number") val mobileNumber: String,
-)
-
-data class VerifyOtpRequest(
-    @SerializedName("mobile_number") val mobileNumber: String,
-    @SerializedName("otp") val otp: String,
 )
 
 data class RegisterRequest(
@@ -33,11 +29,6 @@ data class LogoutRequest(
 
 // ── Response bodies ───────────────────────────────────────────────────────────
 
-data class SendOtpResponse(
-    @SerializedName("message") val message: String,
-    @SerializedName("expires_in_seconds") val expiresInSeconds: Int,
-)
-
 data class AuthTokenResponse(
     @SerializedName("is_new_user") val isNewUser: Boolean,
     @SerializedName("access_token") val accessToken: String,
@@ -53,14 +44,9 @@ data class TokenResponse(
 // ── API service interface ─────────────────────────────────────────────────────
 
 interface AuthApiService {
-    @POST("auth/send-otp")
-    suspend fun sendOtp(
-        @Body request: SendOtpRequest,
-    ): Response<SendOtpResponse>
-
-    @POST("auth/verify-otp")
-    suspend fun verifyOtp(
-        @Body request: VerifyOtpRequest,
+    @POST("auth/verify-firebase-token")
+    suspend fun verifyFirebaseToken(
+        @Body request: VerifyFirebaseTokenRequest,
     ): Response<AuthTokenResponse>
 
     @POST("auth/register")

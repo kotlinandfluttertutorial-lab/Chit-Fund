@@ -25,14 +25,9 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     ALGORITHM: str = "HS256"
 
-    # OTP
-    OTP_EXPIRE_MINUTES: int = 10
-    OTP_LENGTH: int = 6
-
-    # SMS (for OTP delivery)
-    SMS_PROVIDER: str = "twilio"  # twilio | msg91 | aws_sns
-    SMS_API_KEY: Optional[str] = None
-    SMS_SENDER_ID: str = "CHTSMT"
+    # Firebase Admin SDK — path to the service account key JSON file.
+    # Never commit the key file itself; backend/firebase-service-account.json is gitignored.
+    FIREBASE_SERVICE_ACCOUNT_PATH: str = "firebase-service-account.json"
 
     # OpenAI
     OPENAI_API_KEY: Optional[str] = None
@@ -56,6 +51,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"  # tolerate legacy/unknown keys in .env (e.g. SMS_*, OTP_*)
 
 
 settings = Settings()

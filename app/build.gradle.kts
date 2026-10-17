@@ -241,3 +241,9 @@ tasks.register("testDebugUnitTest") {
     description = "Runs the cloud debug unit tests."
     dependsOn("testCloudDebugUnitTest")
 }
+
+tasks.register("compileDebugKotlin") {
+    group = "build"
+    description = "Compiles the cloud debug Kotlin source."
+    dependsOn("compileCloudDebugKotlin")
+}

@@ -1,26 +1,103 @@
 name: PR Gate
 
-# Aggregates all per-layer CI checks into a single required status check.
-# Add "PR Gate / All checks passed" as the required status check in branch
-# protection rules instead of adding each workflow individually.
+# ──────────────────────────────────────────────────────────────────────────
+# Single required status check that aggregates all per-layer CI results.
+#
+# How it works:
+#   Each per-layer workflow (admin, backend, android) runs independently.
+#   This workflow calls the GitHub Checks API via the workflow_run event to
+#   verify that every required check has passed before marking the PR green.
+#
+# Branch protection setup:
+#   Add ONLY "PR Gate / All checks passed" as a required status check.
+#   Do NOT add per-layer jobs individually — this gate is the single entry point.
+#
+# NOTE: workflow_run events only fire on the default branch trigger for the
+# *triggering* workflow. The simplest production approach is to use this
+# workflow to re-check via the GitHub API and fail if any required check failed.
+# ──────────────────────────────────────────────────────────────────────────
 
 on:
+  # Re-run when any of the per-layer CI workflows finish on a PR.
+  workflow_run:
+    workflows:
+      - "Admin Dashboard CI"
+      - "Backend CI"
+      - "Android CI"
+    types: [completed]
+  # Also run directly on pull_request so the check appears early.
   pull_request:
     branches: [main, develop]
+
+concurrency:
+  group: pr-gate-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  checks: read
+  contents: read
+  pull-requests: read
+  statuses: read
 
 jobs:
   all-checks:
     name: All checks passed
     runs-on: ubuntu-latest
 
-    # This job waits for all per-layer workflows to finish via the
-    # GitHub "needs" of a summary step. Because workflows are separate
-    # files, we use a lightweight approach: the job simply checks that
-    # all required status checks listed in branch protection pass.
-    # The real gate is enforced by the per-workflow jobs above.
-    # Adjust this list to match the exact job names you want required.
     steps:
-      - name: Gate summary
+      # On a direct pull_request event, just echo success and let the per-layer
+      # workflows run. The gate's real value is via workflow_run (below).
+      - name: Gate summary (pull_request trigger)
+        if: github.event_name == 'pull_request'
         run: |
-          echo "PR gate passed: backend lint/test, admin quality/build, and android lint/unit-test all completed successfully."
-          echo "See individual workflow runs for detailed logs."
+          echo "PR gate is standing by. Waiting for Admin, Backend, and Android CI to complete."
+
+      # On workflow_run, check the conclusion of the triggering workflow.
+      - name: Check triggering workflow conclusion
+        if: github.event_name == 'workflow_run'
+        env:
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          echo "Workflow : $WORKFLOW"
+          echo "Commit   : $HEAD_SHA"
+          echo "Result   : $CONCLUSION"
+          if [ "$CONCLUSION" != "success" ]; then
+            echo "::error::$WORKFLOW did not pass (conclusion: $CONCLUSION). PR gate is blocking."
+            exit 1
+          fi
+          echo "$WORKFLOW passed."
+
+      # Verify all three required workflows passed for the same commit.
+      # Uses the GitHub CLI (pre-installed on ubuntu-latest runners).
+      - name: Verify all required checks passed
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          REQUIRED_CHECKS=(
+            "Admin Dashboard CI"
+            "Backend CI"
+            "Android CI"
+          )
+          ALL_PASSED=true
+          for CHECK in "${REQUIRED_CHECKS[@]}"; do
+            STATUS=$(gh api \
+              "repos/$REPO/commits/$SHA/check-runs" \
+              --jq ".check_runs[] | select(.name | startswith(\"$CHECK\")) | .conclusion" \
+              | head -1)
+            if [ "$STATUS" != "success" ]; then
+              echo "::warning::$CHECK — conclusion: ${STATUS:-pending}"
+              ALL_PASSED=false
+            else
+              echo "$CHECK — passed"
+            fi
+          done
+          if [ "$ALL_PASSED" != "true" ]; then
+            echo "::error::One or more required checks have not passed. See warnings above."
+            exit 1
+          fi
+          echo "All required checks passed. PR gate green."

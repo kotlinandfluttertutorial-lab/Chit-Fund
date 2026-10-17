@@ -1,4 +1,4 @@
-# ChitSmart — Local Development Setup
+﻿# ChitSmart — Local Development Setup
 
 Complete step-by-step setup for a developer joining the project.
 
@@ -70,10 +70,10 @@ OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-4o
 OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 
-# Razorpay — get test keys from dashboard.razorpay.com
-PAYMENT_GATEWAY=razorpay
-PAYMENT_KEY_ID=rzp_test_XXXXX
-PAYMENT_KEY_SECRET=XXXXX
+# Payment gateway — no third-party gateway is integrated in this release.
+# PAYMENT_KEY_ID and PAYMENT_KEY_SECRET are reserved for a future integration.
+# PAYMENT_KEY_ID=
+# PAYMENT_KEY_SECRET=
 
 # CORS — comma-separated origins allowed
 ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
@@ -201,3 +201,32 @@ All PRs target `dev`. `dev` → `main` only after:
 4. Call `POST /api/v1/auth/send-otp` with a test mobile number — confirm OTP appears in the API terminal
 5. Read `docs/scope-decisions.md` — understand what is deferred and why before adding any code
 6. Read `docs/LEARNING.md` — understand the patterns before writing any code
+
+---
+
+## Before pushing code
+
+Run the pre-push quality gate. It checks lint, types, tests, and secrets before your
+changes reach GitHub Actions.
+
+```powershell
+# Windows
+.\check-before-push.ps1
+```
+
+```bash
+# macOS / Linux / WSL
+bash check-before-push.sh
+```
+
+Full guide: `docs/deployment/check-before-push.md`
+
+---
+
+## Further reading
+
+| Document | What it covers |
+|---|---|
+| `docs/deployment/check-before-push.md` | Pre-push script — all sections, fix shortcuts, skip rules |
+| `docs/deployment/build-variants.md` | Local dev vs local Docker vs staging vs production builds |
+| `docs/deployment/cicd.md` | GitHub Actions workflows — every job, trigger, secret, and cache |

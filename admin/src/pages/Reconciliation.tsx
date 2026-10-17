@@ -199,7 +199,7 @@ export default function ReconciliationPage() {
         <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-[#E2E8F0] bg-[#F0FDFA]">
             <h3 className="text-sm font-semibold text-[#14B8A6]">Gateway Settlements</h3>
-            <p className="text-xs text-[#64748B]">Razorpay · {formatINR(totalReceived)} settled</p>
+            <p className="text-xs text-[#64748B]">Payment Gateway · {formatINR(totalReceived)} settled</p>
           </div>
           <table className="w-full text-xs">
             <thead className="bg-[#F7FAFC]">

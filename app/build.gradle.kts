@@ -21,9 +21,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Razorpay payment gateway — override in local.properties for prod
+        // Payment gateway build config — override in local.properties when a gateway is integrated
         buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8000/api/v1/\"")
-        buildConfigField("String", "RAZORPAY_KEY_ID", "\"rzp_test_PLACEHOLDER\"")
     }
 
     buildTypes {

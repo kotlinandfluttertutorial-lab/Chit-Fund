@@ -41,10 +41,14 @@
 └─────────────────────┘
 
 External integrations:
-  ┌──────────────┐  ┌──────────────┐
-  │  Razorpay    │  │  SMS Provider│
-  │  Payment GW  │  │  Twilio/MSG91│
-  └──────────────┘  └──────────────┘
+  ┌──────────────┐
+  │  SMS Provider│
+  │  Twilio/MSG91│
+  └──────────────┘
+
+Note: No third-party payment gateway is integrated in this release.
+Payment orders are managed internally. A gateway integration
+(e.g. UPI aggregator) is planned for a future release.
 ```
 
 ## Data flow — member pays an installment
@@ -53,9 +57,9 @@ External integrations:
 1. Android: Member taps "Pay Now" → PaymentSummaryScreen
 2. Android: Selects UPI method → POST /api/v1/payments
 3. Backend: Validates installment, creates Payment record (PENDING)
-4. Backend: Creates Razorpay order → returns order_id to app
-5. Android: Opens Razorpay SDK → user authenticates + authorises
-6. Razorpay: Sends webhook to POST /api/v1/payments/webhook
+4. Backend: Generates internal order reference → returns order_id to app
+5. Android: Displays payment confirmation screen
+6. Backend: Receives webhook callback → POST /api/v1/payments/webhook
 7. Backend: Verifies HMAC-SHA256 signature
 8. Backend: Updates Payment.status = SUCCESSFUL
 9. Backend: Appends LedgerEntry (credit) — immutable
@@ -126,7 +130,7 @@ External integrations:
 | ORM | SQLAlchemy 2.0 async | Mature Python ORM, full async support, Alembic migrations |
 | Auth | JWT HS256 + OTP | Stateless, mobile-friendly, no password to forget |
 | AI | OpenAI API + LangChain | Best-in-class models, manageable cost, serverless |
-| Payment | Razorpay | India-first gateway, UPI native support, good webhook support |
+| Payment | Internal order management | No external gateway dependency in this release; gateway integration planned |
 | Containerisation | Docker + Docker Compose | Reproducible dev environment, PostgreSQL with pgvector |
 
 ## What is NOT in this architecture
@@ -139,3 +143,4 @@ By explicit scope decision (`docs/scope-decisions.md`):
 - **No Redis** — not needed at current scale; add if rate limiting or caching requires it
 - **No microservices** — modular monolith appropriate for current scale
 - **No message queue** — synchronous webhooks sufficient; add if webhook reliability becomes an issue
+- **No third-party payment gateway** — no external payment gateway is integrated in this release; the payment flow uses internal order IDs pending gateway selection

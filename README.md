@@ -13,7 +13,7 @@ ChitSmart is a three-application platform for managing chit funds — rotating s
 The platform includes:
 - **Android customer app** — 27 screens for members to pay installments, view memberships, access AI assistance, and manage their profile
 - **Admin dashboard** — 24 pages for operations staff to manage members, chit groups, installments, payments, reconciliation, ledger, reports, and RBAC
-- **Backend API** — FastAPI with PostgreSQL, pgvector RAG, Razorpay integration, JWT auth, and AI chat with SSE streaming
+- **Backend API** — FastAPI with PostgreSQL, pgvector RAG, JWT auth, and AI chat with SSE streaming
 
 ---
 
@@ -45,7 +45,7 @@ See **[docs/RUNNING.md](docs/RUNNING.md)** for the complete setup guide includin
 | Admin | React 18, TypeScript, Vite, Tailwind CSS, TanStack Query, Recharts |
 | Backend | Python 3.12, FastAPI, SQLAlchemy 2.0 async, Alembic, PostgreSQL 16 |
 | AI | OpenAI gpt-4o + text-embedding-3-small, pgvector cosine RAG, SSE streaming |
-| Payments | Razorpay (UPI, Net Banking, Debit Card, NEFT/RTGS) |
+| Payments | UPI, Net Banking, Debit Card, NEFT/RTGS (internal order management; gateway integration planned) |
 | Infrastructure | Docker Compose, GitHub Actions CI/CD |
 
 ---

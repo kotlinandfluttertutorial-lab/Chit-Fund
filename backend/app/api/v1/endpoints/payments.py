@@ -1,10 +1,14 @@
 """
 Payments endpoints — CHIT-39.
 
-POST /payments              Create Razorpay order (requires auth)
-POST /payments/webhook      Razorpay webhook (NO auth — server-to-server)
+POST /payments              Create payment order (requires auth)
+POST /payments/webhook      Payment gateway callback (NO auth — server-to-server)
 GET  /payments              List payments with pagination + filters (requires auth)
 GET  /payments/{id}/receipt Digital receipt (requires auth)
+
+No third-party gateway is integrated in this release.  The webhook endpoint
+is wired and verifies HMAC-SHA256 signatures; it is ready to receive callbacks
+once a gateway is connected.
 """
 
 from __future__ import annotations
@@ -54,33 +58,34 @@ async def create_payment(
     service: PaymentService = Depends(_get_payment_service),
 ) -> PaymentResponse:
     """
-    Create a Razorpay payment order for an installment.
-    Returns the payment record with status=PENDING and the gateway order_id.
+    Create a payment order for an installment.
+    Returns the payment record with status=PENDING and the order reference.
     """
     return await service.create_payment_intent(db, current_member, request)
 
 
 @router.post("/webhook", status_code=status.HTTP_200_OK)
-async def razorpay_webhook(
+async def payment_webhook(
     request: Request,
     db: AsyncSession = Depends(get_db),
     service: PaymentService = Depends(_get_payment_service),
-    x_razorpay_signature: Optional[str] = Header(None),
+    x_payment_signature: Optional[str] = Header(None),
 ) -> dict:
     """
-    Razorpay payment.captured webhook.
-    This endpoint is intentionally unauthenticated — it is called by Razorpay servers.
+    Payment gateway webhook — payment.captured callback.
+    This endpoint is intentionally unauthenticated — it is called by the gateway server.
     Signature verification is performed inside the service layer.
+
+    Header: X-Payment-Signature (HMAC-SHA256 of the raw request body).
     """
     payload_bytes = await request.body()
 
-    if x_razorpay_signature is None:
+    if x_payment_signature is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Missing X-Razorpay-Signature header",
+            detail="Missing X-Payment-Signature header",
         )
 
-    # Parse JSON to extract order/payment ids
     import json
 
     try:
@@ -98,13 +103,13 @@ async def razorpay_webhook(
 
     payment_entity = payload.get("payload", {}).get("payment", {}).get("entity", {})
     order_id = payment_entity.get("order_id", "")
-    razorpay_payment_id = payment_entity.get("id", "")
+    gateway_payment_id = payment_entity.get("id", "")
 
     await service.process_webhook(
         db=db,
         order_id=order_id,
-        razorpay_payment_id=razorpay_payment_id,
-        signature=x_razorpay_signature,
+        gateway_payment_id=gateway_payment_id,
+        signature=x_payment_signature,
         payload_bytes=payload_bytes,
     )
 

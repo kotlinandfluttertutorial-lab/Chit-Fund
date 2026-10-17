@@ -1,3 +1,15 @@
+# =============================================================================
+# docker-compose.yml — LOCAL development variant
+#
+# Usage:
+#   docker compose up          # start everything
+#   docker compose up --build  # rebuild after dependency changes
+#
+# The cloud override file (docker-compose.cloud.yml) is layered on top for
+# production / staging deployments:
+#   docker compose -f docker-compose.yml -f docker-compose.cloud.yml up -d
+# =============================================================================
+
 version: "3.9"
 
 services:
@@ -24,19 +36,27 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: dev          # <-- build the dev stage
     container_name: chitsmart_api
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
-    env_file: ./backend/.env
+    env_file:
+      - ./backend/.env.local  # preferred
     environment:
+      ENV: local
       DATABASE_URL: postgresql+asyncpg://chitsmart:password@db:5432/chitsmart_dev
+      DEBUG: "true"
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      - ./backend:/app    # hot-reload: source is mounted, not baked in
+    command: >
+      uvicorn app.main:app
+      --host 0.0.0.0
+      --port 8000
+      --reload
 
 volumes:
   pgdata:

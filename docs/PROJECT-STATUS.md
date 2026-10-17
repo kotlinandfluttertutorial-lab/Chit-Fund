@@ -57,7 +57,7 @@
 - ✅ All UI screens implemented (Android + Admin)
 - ✅ Database schema (all 16 tables, deferred schema for KYC/auctions/bids)
 - ✅ Auth API (OTP send/verify, register, refresh, logout)
-- ✅ Payments API (Razorpay create order, webhook, history, receipt)
+- ✅ Payments API (internal order management, webhook handler, payment history, receipt)
 - ✅ AI backend (RAG pipeline, pgvector, read-only tools, SSE streaming)
 - ✅ Docker Compose for local dev
 - ✅ Alembic migrations
@@ -72,7 +72,7 @@
 | Android font files (Inter TTF in res/font/) | P0 | 30 min |
 | Real backend endpoint implementations (members, chit_groups, installments, ledger, reports — 9 stub routers) | P0 | ~2 weeks |
 | Policy document ingestion into policy_chunks table | P0 | 2 hours |
-| Production secrets (Razorpay live key, real OpenAI key, managed PostgreSQL) | P0 | 1 day |
+| Production secrets (real OpenAI key, managed PostgreSQL, payment gateway keys when gateway is integrated) | P0 | 1 day |
 | Automated test suite (backend pytest, admin Vitest, Android Compose tests) | P1 | 1 week |
 | Load testing | P1 | 3 days |
 | Legal/compliance review (Chit Funds Act, DPDPA, payment provider T&Cs) | P0 | External |

@@ -4,8 +4,7 @@ import com.chitsmart.data.api.AuthApiService
 import com.chitsmart.data.api.LogoutRequest
 import com.chitsmart.data.api.RefreshRequest
 import com.chitsmart.data.api.RegisterRequest
-import com.chitsmart.data.api.SendOtpRequest
-import com.chitsmart.data.api.VerifyOtpRequest
+import com.chitsmart.data.api.VerifyFirebaseTokenRequest
 import com.chitsmart.data.local.TokenStorage
 import java.io.IOException
 import javax.inject.Inject
@@ -14,7 +13,7 @@ import javax.inject.Singleton
 /**
  * Repository for all authentication operations.
  * Wraps [AuthApiService] calls in try/catch and maps HTTP responses
- * to the sealed [Result] type. Persists tokens to [TokenStore] on success.
+ * to the sealed [Result] type. Persists tokens to [TokenStorage] on success.
  */
 @Singleton
 class AuthRepository
@@ -24,35 +23,22 @@ class AuthRepository
         private val tokenStore: TokenStorage,
     ) {
         /**
-         * Request an OTP to be sent to [mobile].
-         * Returns [Result.Success] with an expiry message, or [Result.Error] with
-         * a user-facing message derived from the HTTP status.
+         * Verify a Firebase Phone Auth ID token with the ChitSmart backend.
+         * On success, saves both access and refresh tokens to [TokenStorage].
+         * Returns [Result.Success] with [VerifyResult] containing [isNewUser].
          */
-        suspend fun sendOtp(mobile: String): Result<String> =
-            safeCall {
-                val response = api.sendOtp(SendOtpRequest(mobile))
-                when {
-                    response.isSuccessful -> {
-                        val message = response.body()?.message ?: "OTP sent"
-                        Result.Success(message)
-                    }
-                    response.code() == 422 -> Result.Error("Invalid mobile number")
-                    response.code() == 429 -> Result.Error("Too many OTP requests. Please wait.")
-                    else -> Result.Error("Something went wrong. Please try again.")
-                }
-            }
-
-        /**
-         * Verify the [otp] entered for the given [mobile].
-         * On success, saves both tokens to [TokenStore].
-         * Returns [Result.Success] with the [VerifyResult] containing `isNewUser`.
-         */
-        suspend fun verifyOtp(
-            mobile: String,
-            otp: String,
+        suspend fun verifyFirebaseToken(
+            firebaseIdToken: String,
+            mobileNumber: String,
         ): Result<VerifyResult> =
             safeCall {
-                val response = api.verifyOtp(VerifyOtpRequest(mobile, otp))
+                val response =
+                    api.verifyFirebaseToken(
+                        VerifyFirebaseTokenRequest(
+                            firebaseIdToken = firebaseIdToken,
+                            mobileNumber = mobileNumber,
+                        ),
+                    )
                 when {
                     response.isSuccessful -> {
                         val body = response.body()!!
@@ -62,15 +48,14 @@ class AuthRepository
                         }
                         Result.Success(VerifyResult(isNewUser = body.isNewUser))
                     }
-                    response.code() == 401 -> Result.Error("Incorrect OTP.")
-                    response.code() == 410 -> Result.Error("OTP has expired. Please request a new one.")
-                    response.code() == 422 -> Result.Error("Invalid request. Please check your details.")
+                    response.code() == 401 -> Result.Error("Firebase token verification failed.")
+                    response.code() == 422 -> Result.Error("Invalid request. Please try again.")
                     else -> Result.Error("Something went wrong. Please try again.")
                 }
             }
 
         /**
-         * Complete registration for a new user after OTP verification.
+         * Complete registration for a new user after Firebase verification.
          * On success, saves the refreshed access token.
          */
         suspend fun register(
@@ -142,5 +127,5 @@ class AuthRepository
         }
     }
 
-/** Value returned by [AuthRepository.verifyOtp] on success. */
+/** Value returned by [AuthRepository.verifyFirebaseToken] on success. */
 data class VerifyResult(val isNewUser: Boolean)

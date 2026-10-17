@@ -10,7 +10,11 @@
 
 ## Task
 
-Implement `POST /api/v1/payments` (create payment intent) and `POST /api/v1/payments/webhook` (Razorpay gateway callback).
+Implement `POST /api/v1/payments` (create payment intent) and `POST /api/v1/payments/webhook` (payment gateway callback).
+
+No third-party gateway is integrated in this release. The service generates an
+internal order reference (`order_<hex>`). The webhook handler is implemented and
+ready to receive callbacks once a gateway is selected and connected.
 
 ## POST `/api/v1/payments`
 
@@ -36,19 +40,19 @@ Response 201:
 1. Verify installment belongs to the authenticated member's group
 2. Calculate late fee (if due date passed + grace period)
 3. Create `Payment` record with `status=PENDING`
-4. Call Razorpay API to create order
+4. Generate internal order reference (no external gateway call in this release)
 5. Write a `LedgerEntry` of type `INSTALLMENT` when payment is SUCCESSFUL (in webhook handler)
 
-## POST `/api/v1/payments/webhook` (Razorpay)
+## POST `/api/v1/payments/webhook`
 
 ```
-No auth (verified by Razorpay signature header)
-Request: Razorpay webhook payload (JSON)
+No auth (verified by HMAC-SHA256 signature header: X-Payment-Signature)
+Request: Payment gateway webhook payload (JSON)
 Response 200: { "status": "ok" }
 ```
 
 ### Webhook handler
-1. Verify `X-Razorpay-Signature` header using HMAC-SHA256
+1. Verify `X-Payment-Signature` header using HMAC-SHA256 (key = `PAYMENT_KEY_SECRET`)
 2. Parse event type: `payment.captured` | `payment.failed`
 3. `payment.captured`: update `Payment.status = SUCCESSFUL`, create ledger entry
 4. `payment.failed`: update `Payment.status = FAILED`, store `failure_reason`
@@ -71,7 +75,7 @@ LedgerEntry(
 
 ## Acceptance criteria
 - [ ] Payment intent creation validates the installment belongs to the member
-- [ ] Razorpay order created and order_id returned
+- [ ] Internal order reference generated and returned as gateway_order_id
 - [ ] Webhook signature verification — reject invalid signatures with 400
 - [ ] `payment.captured` creates ledger entry in the same DB transaction
 - [ ] `payment.failed` stores the failure reason

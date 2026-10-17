@@ -2,7 +2,10 @@
 Payment service — business logic for payment creation, webhook processing,
 receipt generation, and ledger double-entry.
 
-Uses httpx to call the Razorpay REST API directly (no razorpay SDK).
+No third-party payment gateway is integrated in this release.
+Payment orders are created internally; gateway_reference holds a synthetic
+order ID that will be replaced when a gateway is wired in a future release.
+
 Financial records are NEVER deleted — use status=VOIDED with a reason.
 """
 
@@ -14,7 +17,6 @@ import uuid
 from datetime import datetime, timezone
 from decimal import Decimal
 
-import httpx
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -44,8 +46,12 @@ class PaymentService:
         request: PaymentCreateRequest,
     ) -> PaymentResponse:
         """
-        Create a Razorpay order and save a PENDING Payment record.
-        Returns PaymentResponse with gateway_reference = Razorpay order_id.
+        Create a payment order and save a PENDING Payment record.
+        Returns PaymentResponse with gateway_reference = internal order_id.
+
+        No external gateway call is made in this release.  When a payment
+        gateway is integrated, replace _create_internal_order with the
+        gateway's order-creation call and update process_webhook accordingly.
         """
         schedule = await self.installment_repo.get_by_id(request.installment_schedule_id)
         if schedule is None:
@@ -58,11 +64,8 @@ class PaymentService:
         late_fee = Decimal("0.00")
         total_amount = amount + late_fee
 
-        # Create Razorpay order via REST API
-        order_id = await self._create_razorpay_order(
-            amount_paise=int(total_amount * 100),
-            receipt_hint=f"member_{member.id}",
-        )
+        # Generate an internal order reference (no external gateway call)
+        order_id = self._create_internal_order(member_id=member.id)
 
         payment = await self.payment_repo.create(
             member_id=member.id,
@@ -78,40 +81,13 @@ class PaymentService:
 
         return PaymentResponse.model_validate(payment)
 
-    async def _create_razorpay_order(
-        self,
-        amount_paise: int,
-        receipt_hint: str,
-    ) -> str:
+    def _create_internal_order(self, member_id: uuid.UUID) -> str:
         """
-        POST https://api.razorpay.com/v1/orders via httpx with Basic auth.
-        Returns the Razorpay order_id string.
-
-        Falls back to a synthetic order_id when payment keys are not configured
-        (development / test mode).
+        Generate a unique internal order reference.
+        Format: order_<16 hex chars>
+        Replace this method when integrating a payment gateway.
         """
-        if not settings.PAYMENT_KEY_ID or not settings.PAYMENT_KEY_SECRET:
-            # No payment keys configured — return a synthetic order id for dev
-            return f"order_dev_{uuid.uuid4().hex[:16]}"
-
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.post(
-                "https://api.razorpay.com/v1/orders",
-                auth=(settings.PAYMENT_KEY_ID, settings.PAYMENT_KEY_SECRET),
-                json={
-                    "amount": amount_paise,
-                    "currency": "INR",
-                    "receipt": receipt_hint[:40],  # Razorpay receipt max 40 chars
-                },
-            )
-
-        if response.status_code != 200:
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail=f"Payment gateway error: {response.text}",
-            )
-
-        return response.json()["id"]
+        return f"order_{uuid.uuid4().hex[:16]}"
 
     # ── Webhook ───────────────────────────────────────────────────────────────
 
@@ -121,8 +97,11 @@ class PaymentService:
         signature: str,
     ) -> bool:
         """
-        Verify Razorpay webhook signature.
-        HMAC-SHA256: key = PAYMENT_KEY_SECRET, message = raw payload bytes.
+        Verify a webhook payload signature using HMAC-SHA256.
+        key = PAYMENT_KEY_SECRET, message = raw payload bytes.
+
+        Returns False when no PAYMENT_KEY_SECRET is configured (dev mode).
+        Replace the signature scheme to match whichever gateway is integrated.
         """
         if not settings.PAYMENT_KEY_SECRET:
             return False
@@ -137,16 +116,18 @@ class PaymentService:
         self,
         db: AsyncSession,
         order_id: str,
-        razorpay_payment_id: str,
+        gateway_payment_id: str,
         signature: str,
         payload_bytes: bytes,
     ) -> None:
         """
-        Process a Razorpay payment.captured webhook event.
+        Process a payment.captured webhook event.
         1. Verify signature.
         2. Find payment by order_id (gateway_reference).
         3. Mark SUCCESSFUL, generate receipt_number.
         4. Write double-entry LedgerEntry.
+
+        The field name gateway_payment_id is gateway-agnostic.
         """
         if not self.verify_webhook_signature(payload_bytes, signature):
             raise HTTPException(
@@ -165,14 +146,13 @@ class PaymentService:
 
         # Generate receipt number: CS-YYYYMM-XXXXXX
         now = datetime.now(timezone.utc)
-        # Use payment id last 6 hex chars as sequence proxy (no sequence table yet)
         seq = str(payment.id).replace("-", "")[-6:].upper()
         receipt_number = f"CS-{now.strftime('%Y%m')}-{seq}"
 
         await self.payment_repo.update_status(
             payment.id,
             status=PaymentStatus.SUCCESSFUL,
-            gateway_reference=razorpay_payment_id,
+            gateway_reference=gateway_payment_id,
             receipt_number=receipt_number,
         )
 

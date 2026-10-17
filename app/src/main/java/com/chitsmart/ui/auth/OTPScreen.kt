@@ -52,11 +52,13 @@ private val DigitBorder = Color(0x4DC3C6D0) // rgba(195,198,208,0.3)
 fun OTPScreen(
     mobileNumber: String = "+91 98765 •••••",
     viewModel: OtpViewModel = hiltViewModel(),
+    loginViewModel: LoginViewModel = hiltViewModel(),
     onVerified: (isNewUser: Boolean) -> Unit = {},
     onBack: () -> Unit = {},
     onEdit: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val pendingCredential by loginViewModel.pendingCredential.collectAsStateWithLifecycle()
 
     var otp by remember { mutableStateOf("") }
     var countdownSeconds by remember { mutableIntStateOf(45) }
@@ -68,6 +70,14 @@ fun OTPScreen(
     val showError = uiState is OtpUiState.Error
     val errorMessage = (uiState as? OtpUiState.Error)?.message ?: ""
 
+    // If Firebase auto-retrieved the SMS, verify immediately without user input
+    LaunchedEffect(pendingCredential) {
+        val credential = pendingCredential
+        if (credential != null) {
+            viewModel.verifyWithCredential(credential)
+        }
+    }
+
     // Navigate when verified
     LaunchedEffect(uiState) {
         if (uiState is OtpUiState.Verified) {
@@ -75,7 +85,7 @@ fun OTPScreen(
         }
     }
 
-    // Reset OTP input when resend completes
+    // When resend completes (Idle after Resending), navigate back so user can re-send
     LaunchedEffect(uiState) {
         if (uiState is OtpUiState.Idle && isResending) {
             otp = ""
@@ -236,7 +246,7 @@ fun OTPScreen(
                             otp = ""
                             countdownSeconds = 45
                             canResend = false
-                            viewModel.resendOtp()
+                            onBack()
                         },
             )
         }
@@ -315,7 +325,7 @@ fun OTPScreen(
         ) {
             TrustRow(icon = Icons.Outlined.Security, text = "256-Bit SSL encrypted OTP delivery")
             TrustRow(icon = Icons.Outlined.Lock, text = "OTP valid for 10 minutes only")
-            TrustRow(icon = Icons.Outlined.VerifiedUser, text = "Rate-limited: 3 attempts per hour")
+            TrustRow(icon = Icons.Outlined.VerifiedUser, text = "Secured by Firebase Phone Auth")
         }
     }
 }

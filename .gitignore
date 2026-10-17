@@ -31,6 +31,10 @@ render.experimental.xml
 # Google Services (e.g. APIs or Firebase)
 google-services.json
 
+# Firebase service account key (backend) — never commit
+firebase-service-account.json
+backend/firebase-service-account.json
+
 # Android Profiling
 *.hprof
 /admin/node_modules/

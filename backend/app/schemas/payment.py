@@ -109,8 +109,8 @@ class PayoutListResponse(BaseModel):
 
 
 class WebhookPayload(BaseModel):
-    """Razorpay payment.captured webhook payload (key fields only)."""
+    """Payment gateway webhook payload (key fields only)."""
 
-    razorpay_order_id: str
-    razorpay_payment_id: str
-    razorpay_signature: str
+    order_id: str
+    gateway_payment_id: str
+    signature: str

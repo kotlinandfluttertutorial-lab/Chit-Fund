@@ -1,5 +1,6 @@
 package com.chitsmart.ui.navigation
 
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -32,7 +33,7 @@ object AppRoutes {
     const val SPLASH = "splash"
     const val ONBOARDING = "onboarding"
     const val LOGIN = "login"
-    const val OTP = "otp/{mobileNumber}"
+    const val OTP = "otp/{mobileNumber}/{verificationId}"
     const val REGISTRATION = "registration/{mobileNumber}"
 
     // Home tab
@@ -70,7 +71,10 @@ object AppRoutes {
     const val HUMAN_SUPPORT = "human_support"
 
     // Helper builders
-    fun otp(mobileNumber: String) = "otp/$mobileNumber"
+    fun otp(
+        mobileNumber: String,
+        verificationId: String,
+    ) = "otp/$mobileNumber/${Uri.encode(verificationId)}"
 
     fun registration(mobileNumber: String) = "registration/$mobileNumber"
 
@@ -157,8 +161,8 @@ fun ChitSmartNavGraph(navController: NavHostController) {
 
         composable(AppRoutes.LOGIN) {
             LoginScreen(
-                onOtpSent = { mobile ->
-                    navController.navigate(AppRoutes.otp(mobile))
+                onOtpSent = { mobile, verificationId ->
+                    navController.navigate(AppRoutes.otp(mobile, verificationId))
                 },
                 onRegister = {
                     // Direct registration without OTP (edge case — admin flow)
@@ -169,7 +173,14 @@ fun ChitSmartNavGraph(navController: NavHostController) {
 
         composable(
             route = AppRoutes.OTP,
-            arguments = listOf(navArgument("mobileNumber") { type = NavType.StringType }),
+            arguments =
+                listOf(
+                    navArgument("mobileNumber") { type = NavType.StringType },
+                    navArgument("verificationId") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    },
+                ),
         ) { backStack ->
             val mobile = backStack.arguments?.getString("mobileNumber") ?: ""
             OTPScreen(

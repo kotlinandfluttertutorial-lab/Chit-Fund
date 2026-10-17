@@ -1,5 +1,6 @@
 package com.chitsmart.ui.auth
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -50,17 +52,20 @@ private val BorderColor = Color(0xFFE0E8FF)
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
-    onOtpSent: (mobileNumber: String) -> Unit,
+    onOtpSent: (mobileNumber: String, verificationId: String) -> Unit,
     onRegister: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var mobile by remember { mutableStateOf("") }
     var language by remember { mutableStateOf("EN") }
+    val activity = LocalContext.current as Activity
 
-    // Navigate when OTP sent successfully
+    // Navigate when OTP sent or auto-verified
     LaunchedEffect(uiState) {
-        if (uiState is LoginUiState.OtpSent) {
-            onOtpSent("+91$mobile")
+        when (val s = uiState) {
+            is LoginUiState.OtpSent -> onOtpSent("+91$mobile", s.verificationId)
+            is LoginUiState.AutoVerified -> onOtpSent("+91$mobile", "")
+            else -> Unit
         }
     }
 
@@ -340,7 +345,7 @@ fun LoginScreen(
                 val isEnabled = mobile.length == 10 && !isLoading
 
                 Button(
-                    onClick = { viewModel.sendOtp("+91$mobile") },
+                    onClick = { viewModel.startFirebasePhoneAuth("+91$mobile", activity) },
                     enabled = isEnabled,
                     modifier =
                         Modifier
@@ -536,17 +541,6 @@ fun LoginScreen(
             }
         }
     }
-}
-
-// ── UI state ──────────────────────────────────────────────────────────────────
-sealed class LoginUiState {
-    object Idle : LoginUiState()
-
-    object Loading : LoginUiState()
-
-    object OtpSent : LoginUiState()
-
-    data class Error(val message: String) : LoginUiState()
 }
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 840, name = "Login Screen")

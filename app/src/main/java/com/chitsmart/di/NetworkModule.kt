@@ -1,8 +1,8 @@
 package com.chitsmart.di
 
-import com.chitsmart.BuildConfig
 import com.chitsmart.data.api.AuthApiService
 import com.chitsmart.data.local.TokenStorage
+import com.chitsmart.utils.AppConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,50 +17,52 @@ import okhttp3.Route
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 /**
  * Hilt module — provides OkHttpClient, Retrofit, and AuthApiService.
  *
- * The AuthInterceptor attaches the Bearer token to every request.
- * The TokenAuthenticator handles 401 responses by refreshing the access token
- * and retrying once (standard OkHttp Authenticator pattern).
+ * Build-variant awareness comes from [AppConfig]:
+ *  • local  — verbose BODY logging, short timeouts, no connection retry
+ *  • cloud  — no logging, longer timeouts, retry on connection failure
+ *
+ * Token handling:
+ *  • AuthInterceptor attaches Bearer header to every authenticated request.
+ *  • TokenAuthenticator handles 401 by refreshing the access token (once).
  */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    // Routes that must NOT receive the Authorization header.
+    /** Paths that must NOT receive an Authorization header. */
     private val unauthenticatedPaths =
         setOf(
-            "auth/send-otp",
-            "auth/verify-otp",
+            "auth/verify-firebase-token",
             "auth/refresh",
         )
 
     @Provides
     @Singleton
     fun provideOkHttpClient(tokenStore: TokenStorage): OkHttpClient {
+        // ── Logging interceptor ──────────────────────────────────────────────
         val logging =
             HttpLoggingInterceptor().apply {
                 level =
-                    if (BuildConfig.DEBUG) {
+                    if (AppConfig.isLoggingEnabled) {
                         HttpLoggingInterceptor.Level.BODY
                     } else {
                         HttpLoggingInterceptor.Level.NONE
                     }
             }
 
+        // ── Auth interceptor (attach Bearer token) ───────────────────────────
         val authInterceptor =
             okhttp3.Interceptor { chain ->
                 val original = chain.request()
-                val pathSegments = original.url.encodedPath
+                val encodedPath = original.url.encodedPath
 
-                val isAuthEndpoint =
-                    unauthenticatedPaths.any { path ->
-                        pathSegments.contains(path)
-                    }
-
-                if (isAuthEndpoint) {
+                val isUnauthenticated = unauthenticatedPaths.any { encodedPath.contains(it) }
+                if (isUnauthenticated) {
                     chain.proceed(original)
                 } else {
                     val token = tokenStore.getAccessToken()
@@ -76,6 +78,7 @@ object NetworkModule {
                 }
             }
 
+        // ── Token authenticator (handle 401 → refresh → retry once) ─────────
         val tokenAuthenticator =
             object : Authenticator {
                 override fun authenticate(
@@ -87,11 +90,16 @@ object NetworkModule {
 
                     val refreshToken = tokenStore.getRefreshToken() ?: return null
 
-                    // Synchronously call the refresh endpoint
-                    val refreshClient = OkHttpClient()
+                    // Synchronously call the refresh endpoint (separate bare client)
+                    val refreshClient =
+                        OkHttpClient.Builder()
+                            .connectTimeout(AppConfig.connectTimeoutMs, TimeUnit.MILLISECONDS)
+                            .readTimeout(AppConfig.readTimeoutMs, TimeUnit.MILLISECONDS)
+                            .build()
+
                     val refreshRequest =
                         okhttp3.Request.Builder()
-                            .url("${BuildConfig.API_BASE_URL}auth/refresh")
+                            .url("${AppConfig.apiBaseUrl}auth/refresh")
                             .post(
                                 """{"refresh_token":"$refreshToken"}"""
                                     .toRequestBody("application/json".toMediaType()),
@@ -102,7 +110,6 @@ object NetworkModule {
                         val refreshResponse = refreshClient.newCall(refreshRequest).execute()
                         if (refreshResponse.isSuccessful) {
                             val body = refreshResponse.body?.string() ?: return null
-                            // Parse the new access token from JSON manually to avoid circular dep
                             val tokenMatch = Regex(""""access_token"\s*:\s*"([^"]+)"""").find(body)
                             val newToken = tokenMatch?.groupValues?.getOrNull(1) ?: return null
                             tokenStore.saveAccessToken(newToken)
@@ -120,10 +127,15 @@ object NetworkModule {
                 }
             }
 
+        // ── Assemble the client ──────────────────────────────────────────────
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(logging)
             .authenticator(tokenAuthenticator)
+            .connectTimeout(AppConfig.connectTimeoutMs, TimeUnit.MILLISECONDS)
+            .readTimeout(AppConfig.readTimeoutMs, TimeUnit.MILLISECONDS)
+            .writeTimeout(AppConfig.readTimeoutMs, TimeUnit.MILLISECONDS)
+            .retryOnConnectionFailure(AppConfig.retryOnConnectionFailure)
             .build()
     }
 
@@ -131,7 +143,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl(BuildConfig.API_BASE_URL)
+            .baseUrl(AppConfig.apiBaseUrl)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

@@ -1,15 +1,21 @@
 """
-Auth endpoints — send OTP, verify OTP, register, refresh token, logout.
+Auth endpoints — verify Firebase token, register, refresh token, logout.
 
-All endpoints are unauthenticated except /register, /refresh, /logout.
-See docs/jira/kiro-prompts/auth/ for detailed specs.
+/verify-firebase-token is unauthenticated (caller has no ChitSmart JWT yet).
+/register requires a valid JWT issued by verify-firebase-token.
+/refresh and /logout use refresh tokens directly.
 """
 
-import hashlib
+import logging
 import secrets
 from datetime import datetime, timedelta, timezone
 
+import firebase_admin
 from fastapi import APIRouter, Depends, HTTPException, status
+from firebase_admin import auth as firebase_auth
+from firebase_admin import credentials
+
+logger = logging.getLogger(__name__)
 from pydantic import BaseModel, field_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,10 +31,23 @@ from app.core.security import (
 router = APIRouter()
 
 
+# ── Firebase initialisation (idempotent) ──────────────────────────────────────
+
+
+def _get_firebase_app() -> firebase_admin.App:
+    """Return the already-initialised Firebase app, or initialise it on first call."""
+    try:
+        return firebase_admin.get_app()
+    except ValueError:
+        cred = credentials.Certificate(settings.FIREBASE_SERVICE_ACCOUNT_PATH)
+        return firebase_admin.initialize_app(cred)
+
+
 # ── Schemas ───────────────────────────────────────────────────────────────────
 
 
-class SendOtpRequest(BaseModel):
+class VerifyFirebaseTokenRequest(BaseModel):
+    firebase_id_token: str
     mobile_number: str
 
     @field_validator("mobile_number")
@@ -39,16 +58,6 @@ class SendOtpRequest(BaseModel):
         if not re.match(r"^\+91[6-9]\d{9}$", v):
             raise ValueError("Invalid Indian mobile number. Must be +91 followed by 10 digits starting 6-9.")
         return v
-
-
-class SendOtpResponse(BaseModel):
-    message: str
-    expires_in_seconds: int
-
-
-class VerifyOtpRequest(BaseModel):
-    mobile_number: str
-    otp: str
 
 
 class AuthTokenResponse(BaseModel):
@@ -81,106 +90,53 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
-# ── Rate limiting helper (simple DB-based, no Redis dependency) ───────────────
-
-
-async def check_otp_rate_limit(mobile_number: str, db: AsyncSession) -> None:
-    """Raise 429 if more than 3 OTP requests in the last 60 minutes."""
-    from app.models.otp_session import OtpSession
-
-    one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
-    result = await db.execute(
-        select(OtpSession).where(OtpSession.mobile_number == mobile_number).where(OtpSession.created_at >= one_hour_ago)
-    )
-    recent_count = len(result.scalars().all())
-    if recent_count >= 3:
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Too many OTP requests. Please wait before requesting again.",
-        )
-
-
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
 
-@router.post("/send-otp", response_model=SendOtpResponse)
-async def send_otp(
-    request: SendOtpRequest,
-    db: AsyncSession = Depends(get_db),
-) -> SendOtpResponse:
-    """
-    Send a 6-digit OTP to the provided Indian mobile number.
-    Rate-limited to 3 requests per mobile per hour.
-    In DEBUG mode, OTP is logged to console instead of sending SMS.
-    """
-    from app.models.otp_session import OtpSession
-    from app.services.sms_service import send_sms_otp
-
-    await check_otp_rate_limit(request.mobile_number, db)
-
-    # Generate OTP
-    otp = str(secrets.randbelow(900000) + 100000)
-    otp_hash = hashlib.sha256(otp.encode()).hexdigest()
-    expires_at = datetime.now(timezone.utc) + timedelta(minutes=settings.OTP_EXPIRE_MINUTES)
-
-    # Persist OTP session
-    session = OtpSession(
-        mobile_number=request.mobile_number,
-        otp_hash=otp_hash,
-        expires_at=expires_at,
-    )
-    db.add(session)
-    await db.commit()
-
-    # Send SMS (or log in DEBUG)
-    await send_sms_otp(mobile_number=request.mobile_number, otp=otp)
-
-    return SendOtpResponse(
-        message="OTP sent successfully",
-        expires_in_seconds=settings.OTP_EXPIRE_MINUTES * 60,
-    )
-
-
-@router.post("/verify-otp", response_model=AuthTokenResponse)
-async def verify_otp(
-    request: VerifyOtpRequest,
+@router.post("/verify-firebase-token", response_model=AuthTokenResponse)
+async def verify_firebase_token(
+    request: VerifyFirebaseTokenRequest,
     db: AsyncSession = Depends(get_db),
 ) -> AuthTokenResponse:
     """
-    Verify the 6-digit OTP. Returns JWT tokens and is_new_user flag.
-    Creates a member record with kyc_status=NOT_REQUIRED if the mobile is new.
+    Verify a Firebase Phone Auth ID token.
+
+    Flow:
+    1. Android app completes Firebase phone OTP → receives Firebase ID token.
+    2. App sends token + mobile_number here.
+    3. We verify with Firebase Admin SDK and issue ChitSmart JWT tokens.
+    4. Member record is created if the mobile number is new.
+
+    The otp_sessions table is left untouched (no new writes).
     """
     from app.models.member import AccountStatus, KYCStatus, Member
     from app.models.member_session import MemberSession
-    from app.models.otp_session import OtpSession
 
-    # Find latest valid unused OTP for this mobile
-    result = await db.execute(
-        select(OtpSession)
-        .where(OtpSession.mobile_number == request.mobile_number)
-        .where(OtpSession.is_used.is_(False))
-        .where(OtpSession.expires_at > datetime.now(timezone.utc))
-        .order_by(OtpSession.created_at.desc())
-        .limit(1)
-    )
-    otp_session = result.scalar_one_or_none()
+    # Initialise Firebase Admin SDK (idempotent)
+    _get_firebase_app()
 
-    if not otp_session:
-        raise HTTPException(status_code=status.HTTP_410_GONE, detail="OTP expired or not found")
+    # Verify the Firebase ID token
+    try:
+        decoded = firebase_auth.verify_id_token(request.firebase_id_token)
+    except Exception as exc:
+        logger.warning("Firebase token verification failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Firebase token verification failed: {exc}",
+        )
 
-    # Verify hash
-    provided_hash = hashlib.sha256(request.otp.encode()).hexdigest()
-    if provided_hash != otp_session.otp_hash:
-        otp_session.attempt_count += 1
-        await db.commit()
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect OTP")
-
-    # Mark OTP as used
-    otp_session.is_used = True
-    await db.commit()
+    # Confirm phone number in token matches what the app sent
+    token_phone: str = decoded.get("phone_number", "")
+    if token_phone != request.mobile_number:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Phone number mismatch between Firebase token and request",
+        )
 
     # Find or create member
-    member_result = await db.execute(select(Member).where(Member.mobile_number == request.mobile_number))
+    member_result = await db.execute(
+        select(Member).where(Member.mobile_number == request.mobile_number)
+    )
     member = member_result.scalar_one_or_none()
     is_new_user = member is None
 
@@ -199,7 +155,7 @@ async def verify_otp(
         member.is_mobile_verified = True
         await db.commit()
 
-    # Issue tokens
+    # Issue ChitSmart JWT + refresh token
     access_token = create_access_token(subject=str(member.id))
     refresh_token = secrets.token_urlsafe(64)
     refresh_hash = hash_refresh_token(refresh_token)
@@ -226,8 +182,8 @@ async def register(
     current_member=Depends(get_current_member),
 ) -> AuthTokenResponse:
     """
-    Update member profile after OTP verification (called when is_new_user=true).
-    Requires a valid JWT from verify-otp.
+    Update member profile after Firebase verification (called when is_new_user=true).
+    Requires a valid JWT from verify-firebase-token.
     NO Aadhaar or PAN fields — KYC is deferred.
     """
     from datetime import date

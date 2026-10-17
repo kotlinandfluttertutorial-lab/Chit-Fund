@@ -59,7 +59,7 @@
 | SECRET_KEY | Random 32-byte hex, never in source | ✅ `.env.example` has placeholder |
 | DATABASE_URL | Contains password — never commit | ✅ `.gitignore` excludes `.env` |
 | OPENAI_API_KEY | Never logged, never sent to client | ✅ Server-side only |
-| RAZORPAY_KEY_SECRET | Never sent to client (only key_id) | ✅ |
+| PAYMENT_KEY_SECRET | Never sent to client (only key_id, when a gateway is integrated) | ✅ |
 | OTP never logged in production | `DEBUG=true` check before logging | ✅ |
 | PII not in logs | No mobile numbers, names, or IDs in log messages | ⬜ TODO: audit all log.info calls |
 
@@ -91,7 +91,7 @@
 | State Chit Fund Rules | State-specific requirements (Tamil Nadu, Kerala, etc.) | Confirm foreman registration number per state |
 | DPDPA 2023 | Digital Personal Data Protection Act | Privacy notice, consent capture, data retention policy |
 | PMLA 2002 | Anti-money laundering | KYC required before large transactions (deferred) |
-| RBI Payment Guidelines | UPI and payment gateway compliance | Razorpay merchant agreement, settlement account |
+| RBI Payment Guidelines | UPI and payment gateway compliance | Select and onboard a payment aggregator before processing live payments |
 | Income Tax | TDS on chit fund dividends | Consult CA before production |
 
 ---
@@ -107,10 +107,10 @@ Run through this before going live:
 - [ ] Enable PostgreSQL SSL connections (`sslmode=require` in `DATABASE_URL`)
 - [ ] Set `DEBUG=false` in production `.env`
 - [ ] Review all `log.info` calls — remove any that contain OTPs, mobile numbers, or account numbers
-- [ ] Confirm Razorpay webhook secret is set and different from dev
+- [ ] If a payment gateway is integrated: confirm webhook secret is set and distinct from dev keys
 - [ ] Run `pip audit` — check for vulnerable Python packages
 - [ ] Run `npm audit` — check for vulnerable Node packages
-- [ ] Test payment webhook with Razorpay test mode before going live
+- [ ] If a payment gateway is integrated: test the webhook handler with the gateway's test mode before going live
 - [ ] Confirm `alembic upgrade head` runs successfully on the production database
 - [ ] Take a database backup before first production migration
 - [ ] Confirm legal review is complete for the chit fund's state registration

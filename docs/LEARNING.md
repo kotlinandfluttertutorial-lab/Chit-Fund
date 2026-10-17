@@ -337,7 +337,7 @@ If the database is compromised, hashed OTPs cannot be reversed. With plaintext O
 ### Payment webhook security
 
 ```python
-# Razorpay requires HMAC-SHA256 verification before trusting any webhook
+# Always verify HMAC-SHA256 signatures before trusting any payment webhook
 expected = hmac.new(
     secret.encode(),
     f"{order_id}|{payment_id}".encode(),
@@ -781,7 +781,7 @@ This is more reliable than human review at the end of a long implementation sess
 
 ### Immediate (production blockers)
 1. **Android build** — add Inter font TTF files to `res/font/`, configure signing keystore, set `API_BASE_URL` in `local.properties`
-2. **Backend production config** — real Razorpay key, real OpenAI key, managed PostgreSQL (not Docker on dev machine)
+2. **Backend production config** — real OpenAI key, managed PostgreSQL (not Docker on dev machine); add payment gateway keys when a gateway is integrated
 3. **Database on production** — run `alembic upgrade head` against a managed cloud PostgreSQL instance
 4. **Policy documents** — ingest approved chit fund policy PDFs into `policy_chunks` table using `app/ai/document_ingestion.py`
 

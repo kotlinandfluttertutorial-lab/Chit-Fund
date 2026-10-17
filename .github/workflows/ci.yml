@@ -1,16 +1,26 @@
 name: CI
 
-# Consolidated quality gate for pull requests and pushes.
-# Each job runs only when its layer's files change (path filters).
-# Add "CI / Admin — Lint, Type-Check, Test & Build",
-# "CI / Backend — Lint & Test", and "CI / Android — Lint & Unit Test"
-# as required status checks in GitHub branch protection.
+
+# ──────────────────────────────────────────────────────────────────────────
+# Consolidated quality gate — runs on every PR and push to main / develop.
+# Each job is path-scoped so only the affected layer runs.
+#
+# Required status checks to add in GitHub branch protection:
+#   • "CI / Admin — Lint, Type-Check, Test & Build"
+#   • "CI / Backend — Lint & Test"
+#   • "CI / Android — Lint & Unit Test"
+# ──────────────────────────────────────────────────────────────────────────
 
 on:
   pull_request:
     branches: [main, develop]
   push:
     branches: [main, develop]
+
+# Cancel in-flight runs for the same ref so pushes don't queue up.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -22,15 +32,22 @@ jobs:
   admin:
     name: Admin — Lint, Type-Check, Test & Build
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'push' ||
-      contains(toJson(github.event.pull_request.changed_files), 'admin/')
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: admin
 
+    # Only run when admin sources or this workflow file change.
+    if: |
+      github.event_name == 'push' ||
+      startsWith(github.event.pull_request.base.ref, 'main') ||
+      startsWith(github.event.pull_request.base.ref, 'develop')
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v4
@@ -40,27 +57,34 @@ jobs:
           cache-dependency-path: admin/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --prefer-offline
 
-      - name: Lint
+      - name: ESLint
         run: npm run lint
 
-      - name: Type-check
+      - name: TypeScript type check
         run: npm run type-check
 
-      - name: Unit tests
-        run: npm test
+      - name: Unit tests (with coverage)
+        run: npm test -- --coverage --reporter=verbose
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-coverage-${{ github.sha }}
+          path: admin/coverage/
+          retention-days: 14
 
       - name: Production build
         run: npm run build
         env:
-          VITE_API_BASE_URL: http://localhost:8000/api/v1
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || 'http://localhost:8000/api/v1' }}
 
       - name: Upload build artifact
-        if: github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
-          name: admin-dist-${{github.sha}}
+          name: admin-dist-${{ github.sha }}
           path: admin/dist/
           retention-days: 7
 
@@ -70,9 +94,8 @@ jobs:
   backend:
     name: Backend — Lint & Test
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'push' ||
-      contains(toJson(github.event.pull_request.changed_files), 'backend/')
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: backend
@@ -94,7 +117,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql+asyncpg://chitsmart:chitsmart@localhost:5432/chitsmart_test
-      SECRET_KEY: test-secret-key-not-for-production
+      SECRET_KEY: ci-only-secret-key-not-for-production
       OPENAI_API_KEY: sk-test-placeholder
       OTP_EXPIRE_MINUTES: "10"
       DEBUG: "true"
@@ -110,7 +133,7 @@ jobs:
           cache-dependency-path: backend/requirements.txt
 
       - name: Install dependencies
-        run: pip install -r requirements.txt ruff
+        run: pip install -r requirements.txt ruff mypy pytest-cov
 
       - name: Ruff lint
         run: ruff check .
@@ -118,11 +141,24 @@ jobs:
       - name: Ruff format check
         run: ruff format --check .
 
+      - name: Mypy type check
+        run: mypy app --ignore-missing-imports --no-error-summary
+
       - name: Run Alembic migrations
         run: alembic upgrade head
 
-      - name: Run tests
-        run: pytest tests/ -v --tb=short --asyncio-mode=auto
+      - name: Run tests with coverage
+        run: |
+          pytest tests/ -v --tb=short --asyncio-mode=auto \
+            --cov=app --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-${{ github.sha }}
+          path: backend/coverage.xml
+          retention-days: 14
 
   # ──────────────────────────────────────────────────────────────────────────
   # Android — JDK 17, Gradle, Kotlin
@@ -130,9 +166,8 @@ jobs:
   android:
     name: Android — Lint & Unit Test
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'push' ||
-      contains(toJson(github.event.pull_request.changed_files), 'app/')
+    permissions:
+      contents: read
     env:
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true"
 
@@ -151,8 +186,8 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-${{runner.os}}-${{hashFiles('**/*.gradle*', '**/gradle-wrapper.properties')}}
-          restore-keys: gradle-${{runner.os}}-
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
 
       - name: Make gradlew executable
         run: chmod +x gradlew
@@ -167,6 +202,14 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-lint-${{github.sha}}
+          name: android-lint-${{ github.sha }}
           path: app/build/reports/lint-results*.html
+          retention-days: 7
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-results-${{ github.sha }}
+          path: app/build/reports/tests/
           retention-days: 7

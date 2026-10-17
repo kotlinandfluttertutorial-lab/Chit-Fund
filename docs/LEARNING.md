@@ -130,6 +130,48 @@ No database migration needed. No data migration. Minimal risk.
 
 ## Part 3 — Android development
 
+### Build variants (product flavors)
+
+The Android app uses a single flavor dimension `environment` with two flavors:
+
+```
+localDebug     — development against local Docker API
+localRelease   — local API, release-signed (rare; for testing proguard locally)
+cloudDebug     — staging cloud API, debug build
+cloudRelease   — production cloud API, signed .aab for Play Store
+```
+
+Each flavor injects three `BuildConfig` fields via `app/build.gradle.kts`:
+
+```kotlin
+buildConfigField("String",  "API_BASE_URL",         /* from local.properties */)
+buildConfigField("String",  "BUILD_VARIANT",        "\"local\"" or "\"cloud\"")
+buildConfigField("Boolean", "IS_LOGGING_ENABLED",   /* true for local, false for cloudRelease */)
+```
+
+`AppConfig.kt` (`utils/AppConfig.kt`) is the runtime singleton that surfaces all of these:
+
+```kotlin
+object AppConfig {
+    val apiBaseUrl: String = BuildConfig.API_BASE_URL
+    val buildVariant: String = BuildConfig.BUILD_VARIANT
+    val isLoggingEnabled: Boolean = BuildConfig.IS_LOGGING_ENABLED
+    val isLocal: Boolean get() = buildVariant == "local"
+    val isCloud: Boolean get() = buildVariant == "cloud"
+    val connectTimeoutMs: Long = if (isLocal) 10_000L else 30_000L
+    val readTimeoutMs: Long = if (isLocal) 30_000L else 60_000L
+    val retryOnConnectionFailure: Boolean = isCloud
+}
+```
+
+`NetworkModule.kt` reads `AppConfig` instead of raw `BuildConfig` — this is the only place OkHttp is configured. Switching variants in Android Studio automatically applies the right URL, timeouts, and logging level.
+
+**API URL override without touching build.gradle:** Set keys in `local.properties` (gitignored):
+```properties
+local.api.base.url=http://10.0.2.2:8000/api/v1/
+cloud.api.base.url=https://api.chitsmart.app/api/v1/
+```
+
 ### Architecture
 
 ```
@@ -288,6 +330,50 @@ Indian formatting differs from Western: `₹23,750` is "Twenty-Three Thousand Se
 ---
 
 ## Part 4 — Backend API
+
+### Build variants (ENV=local|cloud)
+
+The Python config system (`app/core/config.py`) uses pydantic-settings v2 with a named `ENV` field:
+
+```python
+class Settings(BaseSettings):
+    ENV: Literal["local", "cloud"] = "local"
+    DEBUG: bool = False  # auto-set by model_validator
+
+    @model_validator(mode="after")
+    def _apply_variant_defaults(self) -> "Settings":
+        if os.getenv("DEBUG") is None:
+            object.__setattr__(self, "DEBUG", self.ENV == "local")
+        return self
+
+    @property
+    def is_local(self) -> bool: return self.ENV == "local"
+    @property
+    def is_cloud(self) -> bool: return self.ENV == "cloud"
+    @property
+    def cors_origins(self) -> list[str]: ...
+```
+
+`ENV=local` auto-enables `DEBUG=True` (Swagger docs, verbose OTP logging). `ENV=cloud` auto-disables it. Both can be overridden explicitly.
+
+The Dockerfile is multi-stage:
+
+```
+base  — shared Python deps
+dev   — hot-reload, no baked source (used by docker-compose.yml)
+prod  — source baked in, runs alembic upgrade head before uvicorn workers
+        (used by docker-compose.cloud.yml)
+```
+
+Two `docker-compose` files:
+- `docker-compose.yml` — local dev: `target: dev`, volume-mounted source, hot-reload
+- `docker-compose.cloud.yml` — cloud override: `target: prod`, no volume, no local DB, secrets from env
+
+Environment file conventions:
+- `.env.local.example` → copy to `.env.local` for local dev
+- `.env.cloud.example` → documentation only; set vars via secret manager in cloud
+
+New field `FIREBASE_SERVICE_ACCOUNT_JSON` allows cloud deployments to pass the Firebase key as an inline JSON string (no file on disk) instead of a file path.
 
 ### Async everywhere
 
@@ -713,7 +799,7 @@ This is more reliable than human review at the end of a long implementation sess
 | `ui/profile/HelpCentreScreen.kt` | Help centre |
 | `ui/profile/PreferencesScreen.kt` | Language & preferences |
 
-**Support files (7 files)**
+**Support files (8 files)**
 
 | File | Purpose |
 |---|---|
@@ -721,6 +807,7 @@ This is more reliable than human review at the end of a long implementation sess
 | `ui/theme/Color.kt` | Brand colour tokens |
 | `ui/theme/Type.kt` | Inter typography scale |
 | `ui/theme/Theme.kt` | Material 3 colour scheme |
+| `utils/AppConfig.kt` | Build-variant runtime config (apiBaseUrl, timeouts, logging) |
 | `utils/CurrencyUtils.kt` | Indian number-to-words converter |
 | `MainActivity.kt` | Single-activity host |
 | `ChitSmartApplication.kt` | Hilt entry point |
@@ -731,7 +818,7 @@ This is more reliable than human review at the end of a long implementation sess
 |---|---|
 | `ai/` | `chat_service.py`, `embeddings.py`, `prompts.py`, `rag_pipeline.py`, `tools.py`, `tool_executor.py` |
 | `api/v1/endpoints/` | 15 endpoint files (auth, payments, payouts, members, chit_groups, installments, ledger, reports, ai_assistant + 6 admin stubs) |
-| `core/` | `config.py`, `database.py`, `deps.py`, `security.py` + `router.py` |
+| `core/` | `config.py` (ENV=local\|cloud variant system), `database.py`, `deps.py`, `security.py` + `router.py` |
 | `models/` | `base.py`, `member.py`, `member_session.py`, `otp_session.py`, `chit_group.py`, `payment.py`, `policy_document.py`, `deferred_schema.py` |
 | `repositories/` | `payment_repo.py`, `installment_repo.py` |
 | `schemas/` | `payment.py` |
@@ -780,21 +867,21 @@ This is more reliable than human review at the end of a long implementation sess
 ## Part 10 — What to build next
 
 ### Immediate (production blockers)
-1. **Android build** — add Inter font TTF files to `res/font/`, configure signing keystore, set `API_BASE_URL` in `local.properties`
-2. **Backend production config** — real OpenAI key, managed PostgreSQL (not Docker on dev machine); add payment gateway keys when a gateway is integrated
-3. **Database on production** — run `alembic upgrade head` against a managed cloud PostgreSQL instance
+1. **Android build** — add Inter font TTF files to `res/font/`, configure signing keystore; API URLs are already set in `local.properties`
+2. **Backend production config** — set cloud env vars (`SECRET_KEY`, `OPENAI_API_KEY`, managed PostgreSQL URL); use `docker-compose.cloud.yml` + the `prod` Dockerfile stage
+3. **Database on production** — `alembic upgrade head` runs automatically in the `prod` stage before uvicorn starts
 4. **Policy documents** — ingest approved chit fund policy PDFs into `policy_chunks` table using `app/ai/document_ingestion.py`
 
 ### High priority
-5. **Backend endpoint implementations** — 13 stub routers exist (`members.py`, `chit_groups.py`, `installments.py`, etc.) — implement real DB queries for each
+5. **Backend endpoint implementations** — 9 stub routers (`members.py`, `chit_groups.py`, `installments.py`, etc.) need real DB queries
 6. **Automated tests** — pytest-asyncio for backend auth + payments; Compose UI tests for Android; Vitest for admin
-7. **CI/CD** — activate `.github/workflows/ci.yml` (3 jobs: backend-ci, admin-ci, android-ci)
+7. **CI/CD** — activate `.github/workflows/ci.yml`; add `cloud.api.base.url` as a CI secret for `assembleCloudRelease`
 
 ### Future releases (deferred by design)
 8. **KYC release** — UIDAI API, PAN validation, admin review workflow, member document upload
 9. **Auctions release** — WebSocket real-time bidding, bid validation, result finalization, dispute workflow
-10. **Payout approval** — maker-checker workflow, bank transfer initiation, maker-checker audit trail
+10. **Payout approval** — maker-checker workflow, bank transfer initiation, audit trail
 
 ---
 
-*This document reflects the complete implementation as of project completion: 63/63 Jira stories Done, TypeScript 0 errors, Vite build clean, Python AST check clean.*
+*This document reflects the complete implementation as of project completion: 63/63 Jira stories Done, TypeScript 0 errors, Vite build clean, Python AST check clean. Local/cloud build variants added to Android (product flavors) and Python backend (ENV=local|cloud, multi-stage Dockerfile).*

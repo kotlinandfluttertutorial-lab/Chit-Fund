@@ -1,6 +1,6 @@
 # ChitSmart — Project Status
 
-**Last updated:** 15/10/2026  
+**Last updated:** 17/10/2026 — added local/cloud build variants (Android product flavors + Python ENV system)  
 **Jira project:** CHIT on androidassistant.atlassian.net
 
 ---
@@ -59,7 +59,12 @@
 - ✅ Auth API (OTP send/verify, register, refresh, logout)
 - ✅ Payments API (internal order management, webhook handler, payment history, receipt)
 - ✅ AI backend (RAG pipeline, pgvector, read-only tools, SSE streaming)
-- ✅ Docker Compose for local dev
+- ✅ Docker Compose for local dev (`docker-compose.yml` — dev stage, hot-reload)
+- ✅ Cloud Docker override (`docker-compose.cloud.yml` — prod stage, baked source, multi-worker)
+- ✅ Multi-stage Dockerfile (`base` / `dev` / `prod`) — auto-migrates on prod startup
+- ✅ Backend build variants: `ENV=local` (debug, hot-reload, .env.local) / `ENV=cloud` (multi-worker, no file secrets)
+- ✅ Android product flavors: `local` (`.local` app ID, emulator URL) / `cloud` (production ID, cloud URL)
+- ✅ `AppConfig.kt` — runtime variant singleton (timeouts, logging, retry policy)
 - ✅ Alembic migrations
 - ✅ CI/CD pipeline definition (`.github/workflows/ci.yml`)
 - ✅ Security: JWT auth, webhook signature verification, OTP hashing, append-only financial records
@@ -70,9 +75,10 @@
 | Item | Priority | Effort |
 |---|---|---|
 | Android font files (Inter TTF in res/font/) | P0 | 30 min |
+| Android signing keystore for cloudRelease | P0 | 1 hour |
 | Real backend endpoint implementations (members, chit_groups, installments, ledger, reports — 9 stub routers) | P0 | ~2 weeks |
 | Policy document ingestion into policy_chunks table | P0 | 2 hours |
-| Production secrets (real OpenAI key, managed PostgreSQL, payment gateway keys when gateway is integrated) | P0 | 1 day |
+| Production secrets (real OpenAI key, managed PostgreSQL URL, payment gateway keys — use `docker-compose.cloud.yml` + `.env.cloud.example` reference) | P0 | 1 day |
 | Automated test suite (backend pytest, admin Vitest, Android Compose tests) | P1 | 1 week |
 | Load testing | P1 | 3 days |
 | Legal/compliance review (Chit Funds Act, DPDPA, payment provider T&Cs) | P0 | External |

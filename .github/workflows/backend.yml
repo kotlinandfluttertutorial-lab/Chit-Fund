@@ -1,5 +1,22 @@
 name: Backend CI
 
+# ──────────────────────────────────────────────────────────────────────────
+# Runs on every push / PR that touches backend sources.
+# Jobs:
+#   lint    — Ruff + Mypy
+#   test    — pytest against a live Postgres 16 container (with pgvector)
+#   docker  — build, scan (Trivy), sign (cosign), and push to GHCR
+#   deploy  — rolling restart on staging (develop) or production (main)
+#
+# Required secrets:
+#   GHCR is authenticated via the built-in GITHUB_TOKEN.
+#   COSIGN_PRIVATE_KEY / COSIGN_PASSWORD     — image signing (optional but recommended)
+#   DEPLOY_SSH_KEY                           — SSH private key for deploy host
+#   DEPLOY_HOST_STAGING / DEPLOY_HOST_PROD   — deploy target hostnames
+#   DEPLOY_USER                              — SSH user on deploy hosts
+#   SLACK_WEBHOOK_URL                        — failure notifications (optional)
+# ──────────────────────────────────────────────────────────────────────────
+
 on:
   push:
     branches: [main, develop]
@@ -12,26 +29,37 @@ on:
       - "backend/**"
       - ".github/workflows/backend.yml"
 
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 defaults:
   run:
     working-directory: backend
 
 env:
   PYTHON_VERSION: "3.12"
-  # Test database — spun up by the service container below
+  IMAGE_REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/chitsmart-backend
+  # ── Test database (service container) ──────────────────────────────────
   DATABASE_URL: postgresql+asyncpg://chitsmart:chitsmart@localhost:5432/chitsmart_test
-  SECRET_KEY: test-secret-key-not-for-production-use
+  SECRET_KEY: ci-only-secret-key-not-for-production
   OPENAI_API_KEY: sk-test-placeholder
   OTP_EXPIRE_MINUTES: "10"
   DEBUG: "true"
 
 jobs:
-  # ──────────────────────────────────────────────
-  # 1. Lint & type-check
-  # ──────────────────────────────────────────────
+  # ──────────────────────────────────────────────────────────────────────
+  # 1. Lint & static analysis
+  # ──────────────────────────────────────────────────────────────────────
   lint:
     name: Lint & Type Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -55,12 +83,14 @@ jobs:
       - name: Mypy type check
         run: mypy app --ignore-missing-imports --no-error-summary
 
-  # ──────────────────────────────────────────────
-  # 2. Unit + integration tests
-  # ──────────────────────────────────────────────
+  # ──────────────────────────────────────────────────────────────────────
+  # 2. Tests against live Postgres
+  # ──────────────────────────────────────────────────────────────────────
   test:
     name: Test (Python ${{ env.PYTHON_VERSION }})
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     services:
       postgres:
@@ -88,22 +118,41 @@ jobs:
           cache-dependency-path: backend/requirements.txt
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt pytest-cov
 
       - name: Run Alembic migrations on test DB
         run: alembic upgrade head
 
-      - name: Run tests
-        run: pytest tests/ -v --tb=short --asyncio-mode=auto
+      - name: Run tests with coverage
+        run: |
+          pytest tests/ -v --tb=short --asyncio-mode=auto \
+            --cov=app --cov-report=xml:coverage.xml --cov-report=term-missing \
+            --junitxml=test-results.xml
 
-  # ──────────────────────────────────────────────
-  # 3. Build Docker image (main / develop only)
-  # ──────────────────────────────────────────────
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results-${{ github.sha }}
+          path: |
+            backend/test-results.xml
+            backend/coverage.xml
+          retention-days: 14
+
+  # ──────────────────────────────────────────────────────────────────────
+  # 3. Build → Scan → Sign → Push Docker image
+  #    Runs on push to main or develop only (not on PRs).
+  # ──────────────────────────────────────────────────────────────────────
   docker:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
     needs: [lint, test]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write       # push to GHCR
+      id-token: write       # needed by cosign OIDC signing
+      security-events: write # upload Trivy SARIF
 
     steps:
       - uses: actions/checkout@v4
@@ -111,33 +160,145 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GitHub Container Registry
+      - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.IMAGE_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Derive image tag
+      # Deterministic, portable image tags.
+      - name: Generate image metadata
         id: meta
-        run: |
-          BRANCH="${GITHUB_REF#refs/heads/}"
-          SHA="${GITHUB_SHA::8}"
-          if [ "$BRANCH" = "main" ]; then
-            echo "tag=ghcr.io/${{ github.repository_owner }}/chitsmart-backend:latest" >> "$GITHUB_OUTPUT"
-            echo "extra_tag=ghcr.io/${{ github.repository_owner }}/chitsmart-backend:$SHA" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag=ghcr.io/${{ github.repository_owner }}/chitsmart-backend:develop" >> "$GITHUB_OUTPUT"
-            echo "extra_tag=ghcr.io/${{ github.repository_owner }}/chitsmart-backend:develop-$SHA" >> "$GITHUB_OUTPUT"
-          fi
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-,format=short
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
-      - name: Build and push
+      - name: Build and push image
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: ./backend
           push: true
-          tags: |
-            ${{ steps.meta.outputs.tag }}
-            ${{ steps.meta.outputs.extra_tag }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Multi-platform build for ARM64 (AWS Graviton / Apple Silicon) + AMD64.
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # Include build provenance attestation.
+          provenance: true
+          sbom: true
+
+      # ── Security scan ──────────────────────────────────────────────────
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          exit-code: "1"         # Fail the build on CRITICAL/HIGH findings.
+          ignore-unfixed: true
+
+      - name: Upload Trivy SARIF report
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-backend
+
+      # ── Image signing (cosign keyless via OIDC) ───────────────────────
+      - name: Install cosign
+        if: github.ref == 'refs/heads/main'
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign image with cosign (keyless OIDC)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cosign sign --yes \
+            "${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}"
+
+  # ──────────────────────────────────────────────────────────────────────
+  # 4. Deploy
+  #    staging  → develop branch push
+  #    production → main branch push (after docker succeeds)
+  # ──────────────────────────────────────────────────────────────────────
+  deploy-staging:
+    name: Deploy → Staging
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    permissions:
+      contents: read
+    environment:
+      name: staging
+      url: https://api.staging.chitsmart.in
+
+    steps:
+      - name: SSH rolling restart (staging)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST_STAGING }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            IMAGE="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:develop"
+            docker pull "$IMAGE"
+            docker compose -f /opt/chitsmart/docker-compose.yml \
+              up -d --no-deps --pull always backend
+            docker image prune -f
+
+  deploy-production:
+    name: Deploy → Production
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+    environment:
+      name: production
+      url: https://api.chitsmart.in
+
+    steps:
+      - name: SSH rolling restart (production)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST_PROD }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            IMAGE="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+            docker pull "$IMAGE"
+            docker compose -f /opt/chitsmart/docker-compose.yml \
+              up -d --no-deps --pull always backend
+            docker image prune -f
+
+  # ──────────────────────────────────────────────────────────────────────
+  # 5. Failure notification
+  # ──────────────────────────────────────────────────────────────────────
+  notify-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [lint, test, docker, deploy-staging, deploy-production]
+    if: failure() && github.event_name == 'push'
+    permissions:
+      contents: none
+
+    steps:
+      - name: Send Slack alert
+        if: ${{ vars.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":x: *Backend CI failed* on `${{ github.ref_name }}` — <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
+            }

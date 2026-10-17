@@ -132,16 +132,15 @@ Header "Android  (Kotlin / Jetpack Compose)"
 
 $gradlew = Join-Path $REPO_ROOT "gradlew.bat"
 if (Test-Path $gradlew) {
-    Invoke-Check "Android compile"    { & $gradlew :app:compileDebugKotlin --quiet 2>&1 } ".\gradlew :app:compileDebugKotlin"
-    Invoke-Check "Android lintDebug"  { & $gradlew lintDebug               --quiet 2>&1 } ".\gradlew lintDebug"
-    Invoke-Check "Android lint"       { & $gradlew lint                    --quiet 2>&1 } ".\gradlew lint"
-    Invoke-Check "ktlint check"       { & $gradlew ktlintCheck             --quiet 2>&1 } ".\gradlew ktlintFormat"
-    Invoke-Check "ktlint format"      { & $gradlew ktlintFormat            --quiet 2>&1 } ".\gradlew ktlintFormat"
-    Invoke-Check "Android unit tests" { & $gradlew :app:testDebugUnitTest  --quiet 2>&1 } ".\gradlew :app:testDebugUnitTest"
+    Invoke-Check "Android Lint (LocalDebug)"  { & $gradlew lintLocalDebug       --quiet 2>&1 } ".\gradlew lintLocalDebug"
+    Invoke-Check "Android Lint (CloudDebug)"  { & $gradlew lintCloudDebug       --quiet 2>&1 } ".\gradlew lintCloudDebug"
+    Invoke-Check "ktlint check"               { & $gradlew ktlintCheck          --quiet 2>&1 } ".\gradlew ktlintFormat"
+    Invoke-Check "ktlint format"              { & $gradlew ktlintFormat         --quiet 2>&1 } ".\gradlew ktlintFormat"
+    Invoke-Check "Android unit tests"         { & $gradlew :app:testDebugUnitTest --quiet 2>&1 } ".\gradlew :app:testDebugUnitTest"
 } else {
     Warn "gradlew.bat not found at repo root - skipping Android checks"
     Warn "These run automatically in GitHub Actions (android.yml)"
-    Warn "Run manually once gradlew exists: .\gradlew lintDebug lint ktlintCheck ktlintFormat :app:testDebugUnitTest"
+    Warn "Run manually once gradlew exists: .\gradlew lintLocalDebug lintCloudDebug ktlintCheck ktlintFormat :app:testDebugUnitTest"
 }
 
 # ----------------------------------------------------------

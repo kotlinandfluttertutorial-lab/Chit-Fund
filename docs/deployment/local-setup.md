@@ -2,6 +2,8 @@
 
 Complete step-by-step setup for a developer joining the project.
 
+**Updated:** Added `local`/`cloud` build variants to the backend (`ENV=local|cloud`) and Android product flavors (`localDebug` / `cloudRelease`).
+
 ---
 
 ## Quick start (5 minutes)
@@ -12,15 +14,15 @@ git clone <repo-url>
 cd Chit-Fund
 
 # 2. Start the database
-docker-compose up -d db
+docker compose up -d db
 
-# 3. Backend setup
+# 3. Backend setup (local variant)
 cd backend
 python -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # macOS/Linux
+.venv\Scripts\activate           # Windows
+# source .venv/bin/activate      # macOS/Linux
 pip install -r requirements.txt
-copy .env.example .env          # fill in SECRET_KEY and OPENAI_API_KEY
+copy .env.local.example .env.local   # fill in SECRET_KEY and OPENAI_API_KEY
 alembic upgrade head
 uvicorn app.main:app --reload --port 8000
 
@@ -30,7 +32,7 @@ npm install
 npm run dev
 ```
 
-API: http://localhost:8000  
+API: http://localhost:8000 · Swagger docs: http://localhost:8000/docs (local variant only)  
 Admin: http://localhost:5173
 
 ### Android Firebase configuration
@@ -43,14 +45,27 @@ those checks do not contact Firebase. Release builds require the real
 configuration. The Android release workflow restores it from the
 base64-encoded `GOOGLE_SERVICES_JSON_BASE64` repository secret.
 
+**Note on build variants:** The Android app has two product flavors — `local`
+(targets `local.api.base.url` from `local.properties`, app ID suffix `.local`) and
+`cloud` (targets `cloud.api.base.url`, plain `com.chitsmart` ID). In Android Studio,
+select the active variant via **Build → Select Build Variant** and pick `localDebug`
+for day-to-day development.
+
 ---
 
 ## Environment variables reference
 
-### backend/.env
+### backend/.env.local (local variant)
+
+Copy from `.env.local.example`:
+
+```bash
+cp backend/.env.local.example backend/.env.local
+```
 
 ```env
-# Application
+# Build variant — tells config.py which defaults to apply
+ENV=local
 APP_NAME=ChitSmart API
 APP_VERSION=0.1.0
 DEBUG=true
@@ -66,32 +81,53 @@ ACCESS_TOKEN_EXPIRE_MINUTES=1440
 REFRESH_TOKEN_EXPIRE_DAYS=30
 ALGORITHM=HS256
 
-# OTP
-OTP_EXPIRE_MINUTES=10
-OTP_LENGTH=6
-
-# SMS — in DEBUG mode, OTP is logged to console instead of SMS
-SMS_PROVIDER=twilio
-SMS_API_KEY=
-SMS_SENDER_ID=CHTSMT
+# Firebase — path to local service account JSON file
+FIREBASE_SERVICE_ACCOUNT_PATH=firebase-service-account.json
 
 # OpenAI — required for AI assistant
 OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-4o
 OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 
-# Payment gateway — no third-party gateway is integrated in this release.
-# PAYMENT_KEY_ID and PAYMENT_KEY_SECRET are reserved for a future integration.
-# PAYMENT_KEY_ID=
-# PAYMENT_KEY_SECRET=
+# Payment gateway (use test keys locally)
+PAYMENT_KEY_ID=rzp_test_REPLACE_ME
+PAYMENT_KEY_SECRET=REPLACE_ME
 
 # CORS — comma-separated origins allowed
 ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+
+# File storage
+STORAGE_BACKEND=local
+STORAGE_LOCAL_PATH=./uploads
+```
+
+> **Why `.env.local` instead of `.env`?**  
+> `config.py` loads both files (`.env` first as legacy fallback, then `.env.local` which takes precedence).
+> `.env.cloud.example` documents cloud variables — in cloud deployments all vars are set via the
+> cloud provider's secret manager, no file needed.
+
+### backend/.env.cloud.example (cloud variant reference)
+
+This file is **documentation only** — do not use it as a runtime file. In cloud deployments, set all variables as environment variables in your cloud provider:
+
+```env
+ENV=cloud
+DATABASE_URL=postgresql+asyncpg://USER:PASSWORD@HOST:5432/chitsmart_prod
+SECRET_KEY=<64-char hex>
+FIREBASE_SERVICE_ACCOUNT_JSON={"type":"service_account",...}  # inline JSON, no file
+OPENAI_API_KEY=sk-...
+PAYMENT_KEY_ID=rzp_live_...
+ALLOWED_ORIGINS=https://admin.yourdomain.com
+STORAGE_BACKEND=s3
+AWS_BUCKET_NAME=chitsmart-uploads
+WEB_CONCURRENCY=4
 ```
 
 ### admin/.env.local
 
 ```env
+VITE_API_BASE_URL=http://localhost:8000/api/v1
+```
 VITE_API_BASE_URL=http://localhost:8000/api/v1
 ```
 
@@ -123,11 +159,17 @@ alembic upgrade head
 ## Useful dev commands
 
 ```bash
-# Backend — run with auto-reload
-uvicorn app.main:app --reload --port 8000
+# Backend — run with auto-reload (local variant)
+ENV=local uvicorn app.main:app --reload --port 8000
 
 # Backend — run tests
 pytest tests/ -v --asyncio-mode=auto
+
+# Android — build local debug APK
+.\gradlew assembleLocalDebug
+
+# Android — build cloud release APK
+.\gradlew assembleCloudRelease
 
 # Admin — TypeScript check
 npx tsc --noEmit
@@ -138,8 +180,8 @@ npm run build
 # Admin — run tests
 npm run test
 
-# Docker — view logs
-docker-compose logs -f db
+# Docker — view logs (updated command)
+docker compose logs -f db
 
 # Docker — connect to PostgreSQL directly
 docker exec -it chitsmart_db psql -U chitsmart -d chitsmart_dev

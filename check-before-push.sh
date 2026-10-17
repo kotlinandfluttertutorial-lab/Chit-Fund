@@ -152,11 +152,18 @@ if [ ! -f "$GRADLEW" ]; then
   warn "gradlew not found at repo root — skipping Android checks"
   warn "Gradle checks run automatically in GitHub Actions CI (android.yml)"
 else
-  info "Running Android Lint..."
-  if (cd "$REPO_ROOT" && ./gradlew lint --quiet 2>&1); then
-    pass "Android Lint"
+  info "Running Android Lint (LocalDebug variant)..."
+  if (cd "$REPO_ROOT" && ./gradlew lintLocalDebug --quiet 2>&1); then
+    pass "Android Lint (LocalDebug)"
   else
-    fail "Android Lint — run: ./gradlew lint"
+    fail "Android Lint (LocalDebug) — run: ./gradlew lintLocalDebug"
+  fi
+
+  info "Running Android Lint (CloudDebug variant)..."
+  if (cd "$REPO_ROOT" && ./gradlew lintCloudDebug --quiet 2>&1); then
+    pass "Android Lint (CloudDebug)"
+  else
+    fail "Android Lint (CloudDebug) — run: ./gradlew lintCloudDebug"
   fi
 
   info "Running unit tests..."

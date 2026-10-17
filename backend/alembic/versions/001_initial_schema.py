@@ -210,7 +210,7 @@ def upgrade() -> None:
     op.create_index("ix_ledger_entries_chit_group_id", "ledger_entries", ["chit_group_id"])
 
     # ── policy_chunks (AI RAG) ────────────────────────────────────────────────
-    op.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+    # vector extension already enabled above
     op.create_table(
         "policy_chunks",
         sa.Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),

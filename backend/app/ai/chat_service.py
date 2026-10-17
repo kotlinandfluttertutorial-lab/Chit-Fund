@@ -133,7 +133,6 @@ async def stream_chat_response(
         # Collect streamed content and tool calls
         collected_content = []
         tool_calls: list[dict] = []
-        current_tool_call: dict | None = None
         finish_reason: str | None = None
 
         async for chunk in stream:

@@ -14,8 +14,6 @@ import firebase_admin
 from fastapi import APIRouter, Depends, HTTPException, status
 from firebase_admin import auth as firebase_auth
 from firebase_admin import credentials
-
-logger = logging.getLogger(__name__)
 from pydantic import BaseModel, field_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,6 +25,8 @@ from app.core.security import (
     create_access_token,
     hash_refresh_token,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -134,9 +134,7 @@ async def verify_firebase_token(
         )
 
     # Find or create member
-    member_result = await db.execute(
-        select(Member).where(Member.mobile_number == request.mobile_number)
-    )
+    member_result = await db.execute(select(Member).where(Member.mobile_number == request.mobile_number))
     member = member_result.scalar_one_or_none()
     is_new_user = member is None
 

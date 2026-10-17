@@ -134,9 +134,7 @@ async def verify_firebase_token(
         )
 
     # Find or create member
-    member_result = await db.execute(
-        select(Member).where(Member.mobile_number == request.mobile_number)
-    )
+    member_result = await db.execute(select(Member).where(Member.mobile_number == request.mobile_number))
     member = member_result.scalar_one_or_none()
     is_new_user = member is None
 

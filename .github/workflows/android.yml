@@ -160,7 +160,11 @@ jobs:
     name: Build Signed Release AAB
     runs-on: ubuntu-latest
     needs: [lint, unit-test]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      secrets.GOOGLE_SERVICES_JSON_BASE64 != '' &&
+      secrets.KEYSTORE_BASE64 != ''
 
     steps:
       - uses: actions/checkout@v4
@@ -189,10 +193,10 @@ jobs:
           GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
         run: |
           if [ -z "$GOOGLE_SERVICES_JSON_BASE64" ]; then
-            echo "::error::Set the GOOGLE_SERVICES_JSON_BASE64 repository secret to the base64-encoded Firebase app configuration."
-            exit 1
+            echo "::warning::GOOGLE_SERVICES_JSON_BASE64 secret is not set — skipping google-services.json restore."
+          else
+            printf '%s' "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
           fi
-          printf '%s' "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
 
       - name: Make gradlew executable
         run: chmod +x gradlew

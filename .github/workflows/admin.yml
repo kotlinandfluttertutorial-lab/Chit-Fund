@@ -67,7 +67,7 @@ jobs:
           cache-dependency-path: admin/package-lock.json
 
       - name: Install dependencies
-        run: npm ci --prefer-offline
+        run: npm install --prefer-offline
 
       - name: ESLint
         run: npm run lint
@@ -107,7 +107,7 @@ jobs:
           cache-dependency-path: admin/package-lock.json
 
       - name: Install dependencies
-        run: npm ci --prefer-offline
+        run: npm install --prefer-offline
 
       # Use GitHub Actions variables (vars.*) for non-sensitive build-time config.
       # Set VITE_API_BASE_URL in Settings → Environments → Variables per environment.

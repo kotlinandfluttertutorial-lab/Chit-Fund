@@ -37,12 +37,9 @@ class HTTPLoggerMiddleware(BaseHTTPMiddleware):
         method = request.method
         path = request.url.path
         query = f"?{request.url.query}" if request.url.query else ""
-        client_ip = (request.client.host if request.client else "unknown")
+        client_ip = request.client.host if request.client else "unknown"
 
-        msg = (
-            f"[{request_id}] {method} {path}{query} → {status_code} "
-            f"({duration_ms:.1f}ms) client={client_ip}"
-        )
+        msg = f"[{request_id}] {method} {path}{query} → {status_code} ({duration_ms:.1f}ms) client={client_ip}"
 
         if status_code >= 500:
             logger.error(msg)

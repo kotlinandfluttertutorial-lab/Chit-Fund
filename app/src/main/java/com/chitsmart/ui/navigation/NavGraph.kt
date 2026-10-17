@@ -1,5 +1,6 @@
 package com.chitsmart.ui.navigation
 
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -13,7 +14,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import android.net.Uri
 import com.chitsmart.ui.assistant.AIChatScreen
 import com.chitsmart.ui.assistant.AssistantHomeScreen
 import com.chitsmart.ui.assistant.HumanSupportScreen
@@ -71,7 +71,10 @@ object AppRoutes {
     const val HUMAN_SUPPORT = "human_support"
 
     // Helper builders
-    fun otp(mobileNumber: String, verificationId: String) = "otp/$mobileNumber/${Uri.encode(verificationId)}"
+    fun otp(
+        mobileNumber: String,
+        verificationId: String,
+    ) = "otp/$mobileNumber/${Uri.encode(verificationId)}"
 
     fun registration(mobileNumber: String) = "registration/$mobileNumber"
 
@@ -170,10 +173,14 @@ fun ChitSmartNavGraph(navController: NavHostController) {
 
         composable(
             route = AppRoutes.OTP,
-            arguments = listOf(
-                navArgument("mobileNumber") { type = NavType.StringType },
-                navArgument("verificationId") { type = NavType.StringType; defaultValue = "" },
-            ),
+            arguments =
+                listOf(
+                    navArgument("mobileNumber") { type = NavType.StringType },
+                    navArgument("verificationId") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    },
+                ),
         ) { backStack ->
             val mobile = backStack.arguments?.getString("mobileNumber") ?: ""
             OTPScreen(

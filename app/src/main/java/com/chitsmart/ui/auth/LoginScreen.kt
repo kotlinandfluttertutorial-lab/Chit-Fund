@@ -1,5 +1,6 @@
 package com.chitsmart.ui.auth
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import android.app.Activity
 
 // ── Colour tokens from Figma (node 1:2) ──────────────────────────────────────
 private val PageBg = Color(0xFFF9F9FF)
@@ -542,7 +542,6 @@ fun LoginScreen(
         }
     }
 }
-
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 840, name = "Login Screen")
 @Composable

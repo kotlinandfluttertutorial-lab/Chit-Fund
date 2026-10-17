@@ -19,7 +19,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class AuthModule {
-
     /** Binds the concrete [TokenStore] to the [TokenStorage] interface. */
     @Binds
     @Singleton

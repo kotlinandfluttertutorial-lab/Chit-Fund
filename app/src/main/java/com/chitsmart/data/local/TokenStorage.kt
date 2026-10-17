@@ -7,8 +7,12 @@ package com.chitsmart.data.local
  */
 interface TokenStorage {
     fun saveAccessToken(token: String)
+
     fun saveRefreshToken(token: String)
+
     fun getAccessToken(): String?
+
     fun getRefreshToken(): String?
+
     fun clearTokens()
 }

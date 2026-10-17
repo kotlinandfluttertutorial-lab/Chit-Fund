@@ -4,7 +4,7 @@
 **Figma file:** https://www.figma.com/design/H3sDKKBcj9dveyJdgs7Jn5/Untitled  
 **Figma frames:** App-Payment-3.6-PaymentFlow-Default (1:939), App-Payment-3.7-PaymentHistory-Default (1:2165), App-Payments-4.1-PaymentsHome-Default (1:717), App-Payments-4.2-PayoutHistory-Default (1:2471)  
 **Spec:** .kiro/specs/payment/  
-**Stack:** Android (Kotlin, Jetpack Compose) + FastAPI backend + Razorpay gateway
+**Stack:** Android (Kotlin, Jetpack Compose) + FastAPI backend
 
 ---
 
@@ -83,7 +83,7 @@ Response: { "payment_id": "uuid", "gateway_order_id": "...", "amount": 2500.00 }
 ```
 
 ### POST `/api/v1/payments/webhook`
-Handle Razorpay payment callbacks (mark success/failure, write ledger entry, send notification).
+Handle payment gateway callbacks (mark success/failure, write ledger entry, send notification).
 
 ### GET `/api/v1/payments`
 Paginated payment history for the authenticated member.

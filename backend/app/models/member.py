@@ -5,15 +5,17 @@ KYC fields (aadhaar_number, pan_number, kyc_status, kyc_documents) are
 included in the schema for future use but NOT exposed via the customer API
 in this release. See docs/scope-decisions.md Decision 2.
 """
+
 import enum
-from sqlalchemy import Column, String, Boolean, Date, Enum, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
+
+from sqlalchemy import Boolean, Column, Date, Enum, String
 from sqlalchemy.orm import relationship
-from app.models.base import Base, UUIDMixin, TimestampMixin
+
+from app.models.base import Base, TimestampMixin, UUIDMixin
 
 
 class KYCStatus(str, enum.Enum):
-    NOT_REQUIRED = "NOT_REQUIRED"   # default for this release
+    NOT_REQUIRED = "NOT_REQUIRED"  # default for this release
     PENDING = "PENDING"
     UNDER_REVIEW = "UNDER_REVIEW"
     VERIFIED = "VERIFIED"
@@ -69,4 +71,4 @@ class Member(Base, UUIDMixin, TimestampMixin):
     memberships = relationship("ChitMembership", back_populates="member")
     bank_accounts = relationship("BankAccount", back_populates="member")
     nominees = relationship("Nominee", back_populates="member")
-    otp_sessions = relationship("OTPSession", back_populates="member")
+    sessions = relationship("MemberSession", back_populates="member")

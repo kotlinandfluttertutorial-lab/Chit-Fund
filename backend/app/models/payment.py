@@ -4,12 +4,14 @@ Payment and financial models.
 Financial records are NEVER hard-deleted. Use status = VOIDED with a reason.
 See docs/scope-decisions.md and .kiro/steering/architecture.md.
 """
+
 import enum
-from sqlalchemy import Column, String, Integer, Numeric, Boolean, Enum, ForeignKey, Text, DateTime
+
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, Numeric, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from datetime import timezone
-from app.models.base import Base, UUIDMixin, TimestampMixin
+
+from app.models.base import Base, TimestampMixin, UUIDMixin
 
 
 class PaymentMethod(str, enum.Enum):
@@ -18,7 +20,7 @@ class PaymentMethod(str, enum.Enum):
     DEBIT_CARD = "DEBIT_CARD"
     NEFT = "NEFT"
     RTGS = "RTGS"
-    CASH = "CASH"          # admin offline marking
+    CASH = "CASH"  # admin offline marking
 
 
 class PaymentStatus(str, enum.Enum):
@@ -27,7 +29,7 @@ class PaymentStatus(str, enum.Enum):
     SUCCESSFUL = "SUCCESSFUL"
     FAILED = "FAILED"
     REFUNDED = "REFUNDED"
-    VOIDED = "VOIDED"      # never deleted — mark as voided with reason
+    VOIDED = "VOIDED"  # never deleted — mark as voided with reason
 
 
 class LedgerEntryType(str, enum.Enum):
@@ -43,7 +45,7 @@ class InstallmentSchedule(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "installment_schedules"
 
     chit_group_id = Column(UUID(as_uuid=True), ForeignKey("chit_groups.id"), nullable=False)
-    month_number = Column(Integer, nullable=False)   # 1-based (month 1, 2, …24)
+    month_number = Column(Integer, nullable=False)  # 1-based (month 1, 2, …24)
     due_date = Column(DateTime(timezone=True), nullable=False)
     amount_per_member = Column(Numeric(12, 2), nullable=False)
 
@@ -59,14 +61,14 @@ class Payment(Base, UUIDMixin, TimestampMixin):
     installment_schedule_id = Column(UUID(as_uuid=True), ForeignKey("installment_schedules.id"), nullable=False)
     amount = Column(Numeric(12, 2), nullable=False)
     late_fee = Column(Numeric(12, 2), default=0, nullable=False)
-    total_amount = Column(Numeric(12, 2), nullable=False)   # amount + late_fee
+    total_amount = Column(Numeric(12, 2), nullable=False)  # amount + late_fee
     payment_method = Column(Enum(PaymentMethod), nullable=False)
     status = Column(Enum(PaymentStatus), default=PaymentStatus.PENDING, nullable=False)
     gateway_reference = Column(String(255), nullable=True)
     bank_reference = Column(String(255), nullable=True)
     upi_vpa = Column(String(255), nullable=True)
     failure_reason = Column(String(512), nullable=True)
-    void_reason = Column(String(512), nullable=True)   # if VOIDED
+    void_reason = Column(String(512), nullable=True)  # if VOIDED
     receipt_number = Column(String(100), unique=True, nullable=True)
 
     member = relationship("Member")

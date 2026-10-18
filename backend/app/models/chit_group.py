@@ -37,11 +37,11 @@ class ChitGroup(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "chit_groups"
 
     name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    chit_value: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)  # e.g. 50000.00
+    chit_value: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     monthly_installment: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
-    duration_months: Mapped[int] = mapped_column(Integer, nullable=False)  # e.g. 24
+    duration_months: Mapped[int] = mapped_column(Integer, nullable=False)
     max_members: Mapped[int] = mapped_column(Integer, nullable=False)
-    foreman_commission_pct: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False)  # e.g. 5.00
+    foreman_commission_pct: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False)
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
     status: Mapped[ChitGroupStatus] = mapped_column(
         Enum(ChitGroupStatus),
@@ -50,9 +50,6 @@ class ChitGroup(Base, UUIDMixin, TimestampMixin):
     )
     terms_document_url: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-
-    # Auction schema fields — present but unused in this release
-    # next_auction_date is stored for informational display only
     next_auction_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
 
     # Relationships
@@ -69,7 +66,7 @@ class ChitMembership(Base, UUIDMixin, TimestampMixin):
     chit_group_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("chit_groups.id"), nullable=False
     )
-    member_number: Mapped[int] = mapped_column(Integer, nullable=False)  # member's number within the group
+    member_number: Mapped[int] = mapped_column(Integer, nullable=False)
     enrollment_date: Mapped[date] = mapped_column(Date, nullable=False)
     status: Mapped[MembershipStatus] = mapped_column(
         Enum(MembershipStatus),

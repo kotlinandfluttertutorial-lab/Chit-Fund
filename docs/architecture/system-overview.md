@@ -133,6 +133,90 @@ Payment orders are managed internally. A gateway integration
 | Payment | Internal order management | No external gateway dependency in this release; gateway integration planned |
 | Containerisation | Docker + Docker Compose | Reproducible dev environment, PostgreSQL with pgvector |
 
+## Observability architecture
+
+Full requirements: `.kiro/specs/observability/requirements.md` (Epic KAN-317)
+
+### Signal types and their destinations
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    FastAPI Backend                                │
+│                                                                   │
+│  Every request ──► Logging middleware                            │
+│      │              │  correlation_id, path, method,             │
+│      │              │  status_code, duration_ms → stdout (JSON)  │
+│      │              ▼                                             │
+│      │         Domain events ──► Structured log lines            │
+│      │         (OTP, payment, AI, admin actions)                  │
+│      │                                                            │
+│      ├──► /health   ── liveness probe (container orchestrator)  │
+│      ├──► /ready    ── readiness probe (load balancer)           │
+│      └──► /metrics  ── Prometheus scrape (internal only)         │
+│                                                                   │
+│  Unhandled exceptions ──► CRITICAL log + optional Sentry         │
+│  Slow DB queries (>500ms) ──► WARNING log                        │
+│  AI calls ──► cost/latency log + ai_usage_log table              │
+│  Admin actions ──► audit_log table (same transaction)            │
+└──────────────────┬──────────────────────────────────────────────┘
+                   │ stdout (JSON logs)
+                   ▼
+          Log aggregation layer
+          (Docker log driver / cloud log collector)
+                   │
+          ┌────────┴────────┐
+          ▼                 ▼
+     Log store          Metrics store
+     (90-day ops /      (Prometheus /
+      7-year audit)      Grafana)
+          │                 │
+          └────────┬────────┘
+                   ▼
+             Alerts & dashboards
+             (operations team)
+
+┌──────────────────────┐    ┌──────────────────────┐
+│  Admin Dashboard     │    │  Android App          │
+│  (React)             │    │  (Kotlin/Compose)     │
+│                      │    │                       │
+│  X-Correlation-ID    │    │  X-Correlation-ID     │
+│  logged on 4xx/5xx   │    │  sent on every request│
+│                      │    │                       │
+│  Sentry browser SDK  │    │  Firebase Crashlytics  │
+│  (optional, via      │    │  (release builds only) │
+│  VITE_SENTRY_DSN)    │    │  last_correlation_id   │
+└──────────────────────┘    │  Crashlytics key      │
+                            └──────────────────────┘
+```
+
+### Key observability contracts
+
+| Signal | Where | Retention |
+|---|---|---|
+| Structured JSON logs (all requests + domain events) | stdout → log aggregator | 90 days |
+| Audit logs (admin financial actions) | `audit_log` table + log aggregator | 7 years |
+| AI usage logs (tokens, cost, latency) | `ai_usage_log` table + log aggregator | 13 months |
+| Prometheus metrics (HTTP, business, DB pool) | `/metrics` endpoint | 13 months |
+| Android crash reports | Firebase Crashlytics | Per Crashlytics policy |
+| Admin dashboard JS errors | Sentry (optional) | Per Sentry plan |
+
+### Correlation ID flow
+
+```
+Android app ──── X-Correlation-ID: <uuid> ────► Backend
+                                                  │
+                                    every log line │ "correlation_id": "<uuid>"
+                                                  │
+Backend ──── X-Correlation-ID: <uuid> ──────────► Admin dashboard
+                                                   (logged on API errors)
+```
+
+This single UUID allows support staff to trace a user-reported error from the
+Android crash report → the admin dashboard API error → the backend log lines,
+without needing a distributed tracing system.
+
+---
+
 ## What is NOT in this architecture
 
 By explicit scope decision (`docs/scope-decisions.md`):

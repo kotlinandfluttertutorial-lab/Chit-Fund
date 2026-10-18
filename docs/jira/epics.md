@@ -24,6 +24,7 @@ Deferred epics (KYC, Auctions/Bidding) are listed but marked DEFERRED — do not
 | KAN-250 | Admin — Settings & RBAC | 4 roles, permission matrix, admin user management | P1 |
 | KAN-251 | Backend — Core API | FastAPI setup, auth, shared models, Alembic migrations | P0 |
 | KAN-252 | Infrastructure | PostgreSQL setup, CI/CD, environment configs, Docker | P0 |
+| KAN-317 | Observability | Structured logging, health/readiness/metrics endpoints, AI cost tracking, audit trail, alerts, crash reporting | P1 |
 
 ## Deferred Epics (do not start in this release)
 

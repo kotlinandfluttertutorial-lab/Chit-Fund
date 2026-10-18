@@ -41,6 +41,22 @@ The user MUST be able to log out from the Profile screen. On logout, all tokens 
 - Tokens MUST be signed with HS256 and a secret key managed via environment variable.
 - Mobile numbers MUST be stored in normalised E.164 format (+91XXXXXXXXXX).
 
+### Observability (cross-cutting — see `.kiro/specs/observability/requirements.md`)
+
+The following observability requirements apply specifically to the auth module:
+
+- `POST /auth/send-otp` MUST emit a structured log entry for every attempt: `member_id`
+  (or last-4 mobile digits), `provider`, `success` — per REQ-OBS-003.
+- `POST /auth/verify-otp` MUST emit a log entry including `attempt_number`,
+  `remaining_attempts`, and `success` — per REQ-OBS-003.
+- Failed OTP attempts MUST increment the `otp_verified_total{success="false"}` counter —
+  per REQ-OBS-006.
+- Mobile numbers MUST appear in logs as last-4 digits only (e.g. `****4210`) — per
+  REQ-OBS-004. Full mobile numbers and OTP values are PROHIBITED in log output.
+- JWT tokens and refresh tokens MUST never appear in any log line — per REQ-OBS-004.
+- Auth endpoints MUST include `correlation_id` in every log line — per REQ-OBS-001.
+- OTP send failures beyond the alert threshold trigger an alert — per REQ-OBS-013.
+
 ---
 
 ## Out of scope (this release)

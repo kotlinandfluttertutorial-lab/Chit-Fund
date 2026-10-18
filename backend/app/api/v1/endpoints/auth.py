@@ -138,7 +138,7 @@ async def verify_firebase_token(
     member = member_result.scalar_one_or_none()
     is_new_user = member is None
 
-    if is_new_user:
+    if member is None:
         member = Member(
             mobile_number=request.mobile_number,
             full_name="",  # filled in /register

@@ -158,6 +158,12 @@ class PaymentService:
 
         # Reload updated payment
         payment = await self.payment_repo.get_by_id(payment.id)
+        if payment is None:
+            # Unreachable: the payment was just updated successfully above.
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Payment not found after status update",
+            )
 
         # Double-entry ledger: credit the group collection account
         current_balance = await self.payment_repo.get_running_balance(payment.chit_group_id)

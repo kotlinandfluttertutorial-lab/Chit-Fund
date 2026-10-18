@@ -13,9 +13,11 @@ Admin RAG pipeline uses this model internally via rag_pipeline.py.
 
 import uuid
 from datetime import datetime, timezone
+from typing import Optional
 
-from sqlalchemy import Column, DateTime, Integer, String, Text
+from sqlalchemy import DateTime, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
 
@@ -41,18 +43,18 @@ class PolicyChunk(Base):
 
     __tablename__ = "policy_chunks"
 
-    id = Column(
+    id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
         nullable=False,
     )
-    document_name = Column(String(512), nullable=False, index=True)
-    section_reference = Column(String(255), nullable=False)
-    content = Column(Text, nullable=False)
-    language = Column(String(10), default="en", nullable=False)
-    page_number = Column(Integer, nullable=True)
-    created_at = Column(
+    document_name: Mapped[str] = mapped_column(String(512), nullable=False, index=True)
+    section_reference: Mapped[str] = mapped_column(String(255), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    language: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
+    page_number: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         nullable=False,

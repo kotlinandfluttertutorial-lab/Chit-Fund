@@ -65,6 +65,13 @@ class Settings(BaseSettings):
     FIREBASE_SERVICE_ACCOUNT_JSON: Optional[str] = None
 
     # ------------------------------------------------------------------ #
+    # SMS / OTP provider — "firebase" (default), "twilio", "msg91"
+    # In DEBUG mode send_sms_otp returns before reaching the provider switch,
+    # so this only affects the non-DEBUG warning path.
+    # ------------------------------------------------------------------ #
+    SMS_PROVIDER: str = "firebase"
+
+    # ------------------------------------------------------------------ #
     # OpenAI
     # ------------------------------------------------------------------ #
     OPENAI_API_KEY: Optional[str] = None

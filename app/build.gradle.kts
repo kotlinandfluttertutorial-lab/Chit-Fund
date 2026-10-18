@@ -30,9 +30,24 @@ fun localProp(
     fallback: String,
 ): String = (localProps.getProperty(key) ?: fallback).let { "\"$it\"" }
 
+fun signingProp(key: String): String? =
+    providers.environmentVariable(key).orNull?.takeIf { it.isNotBlank() }
+        ?: localProps.getProperty(key)?.takeIf { it.isNotBlank() }
+
 android {
     namespace = "com.chitsmart"
     compileSdk = 35
+
+    signingConfigs {
+        create("release") {
+            storeFile =
+                signingProp("KEYSTORE_PATH")?.let { rootProject.file(it) }
+                    ?: rootProject.file("chitsmart-release.jks")
+            storePassword = signingProp("KEYSTORE_PASSWORD")
+            keyAlias = signingProp("KEY_ALIAS")
+            keyPassword = signingProp("KEY_PASSWORD")
+        }
+    }
 
     defaultConfig {
         applicationId = "com.chitsmart"
@@ -102,6 +117,7 @@ android {
             buildConfigField("Boolean", "IS_LOGGING_ENABLED", "true")
         }
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

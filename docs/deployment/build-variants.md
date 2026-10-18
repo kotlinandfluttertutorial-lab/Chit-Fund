@@ -107,17 +107,23 @@ app/src/cloudRelease/java/…  — cloud + release only
 | Variant | Signing |
 |---|---|
 | `*Debug` | Android Studio auto-generated debug keystore |
-| `localRelease` | Same debug keystore acceptable for local testing |
-| `cloudRelease` | Production keystore (stored as `KEYSTORE_BASE64` GitHub secret) |
+| `localRelease` | Release keystore |
+| `cloudRelease` | Production release keystore (stored as `KEYSTORE_BASE64` GitHub secret) |
 
-Keystore secrets required in GitHub Actions for `cloudRelease`:
+Both release variants use the `release` signing config. For local builds, add
+these values to the ignored root `local.properties` file (or set them as
+environment variables; environment variables take precedence):
 
 ```
-KEYSTORE_BASE64      base64-encoded .jks file
-KEYSTORE_PASSWORD    keystore password
-KEY_ALIAS            key alias
-KEY_PASSWORD         key password
+KEYSTORE_PATH=chitsmart-release.jks
+KEYSTORE_PASSWORD=...
+KEY_ALIAS=...
+KEY_PASSWORD=...
 ```
+
+GitHub Actions supplies the same signing values as environment variables and
+restores the keystore from the `KEYSTORE_BASE64` secret before building
+`cloudRelease`.
 
 ---
 

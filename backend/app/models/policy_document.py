@@ -25,20 +25,6 @@ from app.models.base import Base
 class PolicyChunk(Base):
     """
     A chunk of a policy document for vector similarity search.
-
-    Columns:
-        id              UUID primary key
-        document_name   Human-readable document name (e.g. "Chit Funds Act 1982")
-        section_reference  Section number / header (e.g. "Section 4")
-        content         Raw text of the chunk
-        language        BCP-47 language code, default 'en'
-        page_number     Optional source page number
-        created_at      Timestamp when the chunk was ingested
-
-    The `embedding` column (vector(1536)) is added to the table via:
-        ALTER TABLE policy_chunks ADD COLUMN embedding vector(1536);
-    in Alembic migration 001. It is not mapped here to avoid hard-coupling
-    the Python model layer to the pgvector extension at import time.
     """
 
     __tablename__ = "policy_chunks"

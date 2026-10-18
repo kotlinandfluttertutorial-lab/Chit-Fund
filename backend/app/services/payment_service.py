@@ -37,7 +37,7 @@ class PaymentService:
         self.payment_repo = payment_repo
         self.installment_repo = installment_repo
 
-    # ── Create payment intent ─────────────────────────────────────────────────
+    # ── Create payment intent ─────────────────────────────────────────────────────
 
     async def create_payment_intent(
         self,
@@ -45,14 +45,6 @@ class PaymentService:
         member: Member,
         request: PaymentCreateRequest,
     ) -> PaymentResponse:
-        """
-        Create a payment order and save a PENDING Payment record.
-        Returns PaymentResponse with gateway_reference = internal order_id.
-
-        No external gateway call is made in this release.  When a payment
-        gateway is integrated, replace _create_internal_order with the
-        gateway's order-creation call and update process_webhook accordingly.
-        """
         schedule = await self.installment_repo.get_by_id(request.installment_schedule_id)
         if schedule is None:
             raise HTTPException(
@@ -64,7 +56,6 @@ class PaymentService:
         late_fee = Decimal("0.00")
         total_amount = amount + late_fee
 
-        # Generate an internal order reference (no external gateway call)
         order_id = self._create_internal_order(member_id=member.id)
 
         payment = await self.payment_repo.create(
@@ -82,27 +73,15 @@ class PaymentService:
         return PaymentResponse.model_validate(payment)
 
     def _create_internal_order(self, member_id: uuid.UUID) -> str:
-        """
-        Generate a unique internal order reference.
-        Format: order_<16 hex chars>
-        Replace this method when integrating a payment gateway.
-        """
         return f"order_{uuid.uuid4().hex[:16]}"
 
-    # ── Webhook ───────────────────────────────────────────────────────────────
+    # ── Webhook ──────────────────────────────────────────────────────────────────────────
 
     def verify_webhook_signature(
         self,
         payload_bytes: bytes,
         signature: str,
     ) -> bool:
-        """
-        Verify a webhook payload signature using HMAC-SHA256.
-        key = PAYMENT_KEY_SECRET, message = raw payload bytes.
-
-        Returns False when no PAYMENT_KEY_SECRET is configured (dev mode).
-        Replace the signature scheme to match whichever gateway is integrated.
-        """
         if not settings.PAYMENT_KEY_SECRET:
             return False
         expected = hmac.new(
@@ -120,15 +99,6 @@ class PaymentService:
         signature: str,
         payload_bytes: bytes,
     ) -> None:
-        """
-        Process a payment.captured webhook event.
-        1. Verify signature.
-        2. Find payment by order_id (gateway_reference).
-        3. Mark SUCCESSFUL, generate receipt_number.
-        4. Write double-entry LedgerEntry.
-
-        The field name gateway_payment_id is gateway-agnostic.
-        """
         if not self.verify_webhook_signature(payload_bytes, signature):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -137,14 +107,11 @@ class PaymentService:
 
         payment = await self.payment_repo.get_by_gateway_reference(order_id)
         if payment is None:
-            # Unknown order — log and ignore (may be from a different environment)
             return
 
         if payment.status == PaymentStatus.SUCCESSFUL:
-            # Idempotent — already processed
             return
 
-        # Generate receipt number: CS-YYYYMM-XXXXXX
         now = datetime.now(timezone.utc)
         seq = str(payment.id).replace("-", "")[-6:].upper()
         receipt_number = f"CS-{now.strftime('%Y%m')}-{seq}"
@@ -180,7 +147,7 @@ class PaymentService:
             running_balance=new_balance,
         )
 
-    # ── Receipt ───────────────────────────────────────────────────────────────
+    # ── Receipt ──────────────────────────────────────────────────────────────────────────
 
     async def get_receipt(
         self,
@@ -207,7 +174,6 @@ class PaymentService:
                 detail="Receipt not yet available — payment is not completed",
             )
 
-        # Load related chit group and schedule
         group_result = await db.execute(select(ChitGroup).where(ChitGroup.id == payment.chit_group_id))
         group = group_result.scalar_one_or_none()
 

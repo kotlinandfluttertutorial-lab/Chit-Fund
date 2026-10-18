@@ -19,19 +19,33 @@ The platform includes:
 
 ## Quick start
 
-```bash
-# Start the database
-docker-compose up -d db
+### Option A — Local dev (no Docker for app code, fastest)
 
-# Backend
-cd backend && pip install -r requirements.txt
-cp .env.example .env  # fill in SECRET_KEY, OPENAI_API_KEY
+```bash
+# 1. Start the database
+docker compose up -d db
+
+# 2. Backend
+cd backend
+python -m venv .venv
+.venv\Scripts\activate              # Windows — use source .venv/bin/activate on macOS/Linux
+pip install -r requirements.txt
+cp .env.local.example .env.local    # fill in SECRET_KEY, OPENAI_API_KEY
 alembic upgrade head
 uvicorn app.main:app --reload --port 8000
 
-# Admin dashboard (new terminal)
+# 3. Admin dashboard (new terminal)
 cd admin && npm install && npm run dev
 ```
+
+### Option B — Full local Docker stack
+
+```bash
+cp backend/.env.local.example backend/.env.local   # fill in SECRET_KEY, OPENAI_API_KEY
+docker compose up --build
+```
+
+API: http://localhost:8000 · Admin: http://localhost:5173
 
 See **[docs/RUNNING.md](docs/RUNNING.md)** for the complete setup guide including Android.
 
@@ -50,6 +64,48 @@ See **[docs/RUNNING.md](docs/RUNNING.md)** for the complete setup guide includin
 
 ---
 
+## Build variants
+
+Both the Android app and the Python backend support two named environments:
+
+| Variant | Purpose | API target |
+|---|---|---|
+| **local** | Developer machine / local Docker | `http://127.0.0.1:8000` (emulator) or your LAN IP |
+| **cloud** | Staging / production | `https://api.chitsmart.app/api/v1/` |
+
+### Android
+
+Two product flavors under the `environment` dimension:
+
+```bash
+./gradlew assembleLocalDebug      # local emulator — hot-reload backend
+./gradlew assembleCloudDebug      # cloud staging — debug APK
+./gradlew assembleCloudRelease    # cloud production — signed APK
+```
+
+Override the API URL without touching `build.gradle.kts` — set it in `local.properties`:
+
+```properties
+local.api.base.url=http://127.0.0.1:8000/api/v1/
+cloud.api.base.url=https://api.chitsmart.app/api/v1/
+```
+
+### Backend
+
+Set `ENV=local` (default, debug on, hot-reload) or `ENV=cloud` (debug off, multi-worker):
+
+```bash
+# Local dev
+ENV=local uvicorn app.main:app --reload --port 8000
+
+# Cloud Docker (multi-stage Dockerfile — prod stage)
+docker compose -f docker-compose.yml -f docker-compose.cloud.yml up -d
+```
+
+See **[docs/deployment/build-variants.md](docs/deployment/build-variants.md)** for the full matrix.
+
+---
+
 ## Documentation
 
 | Document | Contents |
@@ -61,6 +117,7 @@ See **[docs/RUNNING.md](docs/RUNNING.md)** for the complete setup guide includin
 | [docs/architecture/system-overview.md](docs/architecture/system-overview.md) | System diagram, data flows, technology decisions |
 | [docs/security/security-checklist.md](docs/security/security-checklist.md) | Pre-production security review checklist |
 | [docs/deployment/local-setup.md](docs/deployment/local-setup.md) | Full developer onboarding guide |
+| [docs/deployment/build-variants.md](docs/deployment/build-variants.md) | All build variants — Android, backend, admin |
 | [docs/design/google-stitch-master-prompt.md](docs/design/google-stitch-master-prompt.md) | UI generation prompt (Google Stitch, Batches A–D) |
 | [docs/design/figma-mcp-implementation.md](docs/design/figma-mcp-implementation.md) | Figma MCP setup and screen-to-code node ID mapping |
 
@@ -71,10 +128,13 @@ See **[docs/RUNNING.md](docs/RUNNING.md)** for the complete setup guide includin
 ```
 Chit-Fund/
 ├── app/                    Android app
-│   └── src/main/java/com/chitsmart/
-│       ├── ui/             27 screens organised by feature
-│       ├── utils/          CurrencyUtils (Indian number words)
-│       └── MainActivity.kt
+│   └── src/
+│       ├── main/java/com/chitsmart/
+│       │   ├── ui/             27 screens organised by feature
+│       │   ├── di/             Hilt modules (NetworkModule reads AppConfig)
+│       │   └── utils/          CurrencyUtils + AppConfig (build-variant runtime config)
+│       ├── local/              Flavor source set — local-only code
+│       └── cloud/              Flavor source set — cloud-only code
 │
 ├── admin/                  Admin dashboard
 │   └── src/
@@ -84,20 +144,24 @@ Chit-Fund/
 │       └── types/          TypeScript domain types
 │
 ├── backend/                REST API
-│   └── app/
-│       ├── ai/             RAG pipeline, embeddings, tools, chat
-│       ├── api/v1/         15 endpoint modules
-│       ├── core/           config, database, deps, security
-│       ├── models/         SQLAlchemy ORM models
-│       ├── repositories/   DB query layer
-│       ├── schemas/        Pydantic request/response models
-│       └── services/       Business logic
+│   ├── app/
+│   │   ├── ai/             RAG pipeline, embeddings, tools, chat
+│   │   ├── api/v1/         15 endpoint modules
+│   │   ├── core/           config (ENV=local|cloud), database, deps, security
+│   │   ├── models/         SQLAlchemy ORM models
+│   │   ├── repositories/   DB query layer
+│   │   ├── schemas/        Pydantic request/response models
+│   │   └── services/       Business logic
+│   ├── Dockerfile          Multi-stage: dev (hot-reload) + prod (baked, multi-worker)
+│   ├── .env.local.example  Template for local variant
+│   └── .env.cloud.example  Reference for cloud env vars
 │
 ├── docs/                   All documentation
 ├── .kiro/
 │   ├── steering/           Always-loaded project constraints (scope + architecture)
 │   └── skills/             Reusable implementation guides (5 skills)
-├── docker-compose.yml
+├── docker-compose.yml      Local dev stack (dev Dockerfile stage, hot-reload)
+├── docker-compose.cloud.yml  Cloud override (prod stage, no volume, no local DB)
 └── README.md
 ```
 

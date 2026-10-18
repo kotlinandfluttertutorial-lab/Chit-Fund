@@ -25,6 +25,9 @@ docker run -d \
   -e POSTGRES_DB=chitsmart_dev \
   -p 5432:5432 \
   postgres:16
+  
+  docker run -d \ --name chitsmart-db \ -e POSTGRES_USER=chitsmart \ -e POSTGRES_PASSWORD=password \ -ee POSTGRES_DB=chitsmart_dev \  -p 5432:5432 \ postgres:16
+
 
 # 5. Run migrations
 alembic upgrade head

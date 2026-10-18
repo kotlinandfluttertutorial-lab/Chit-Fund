@@ -1043,7 +1043,7 @@ Every application layer has four environments with different build configuration
 
 | Variant | Gradle task | `API_BASE_URL` | Signing |
 |---|---|---|---|
-| Local emulator (debug) | `assembleDebug` | `http://10.0.2.2:8000/api/v1` | Debug keystore |
+| Local emulator (debug) | `assembleDebug` | `http://127.0.0.1:8000/api/v1` | Debug keystore |
 | Local device (debug) | `assembleDebug` | `http://<LAN-IP>:8000/api/v1` | Debug keystore |
 | CI / release | `bundleRelease` | Injected via GitHub secret | Production keystore |
 | Production | `bundleRelease` | Production API URL | Production keystore |

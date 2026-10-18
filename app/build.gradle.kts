@@ -30,9 +30,24 @@ fun localProp(
     fallback: String,
 ): String = (localProps.getProperty(key) ?: fallback).let { "\"$it\"" }
 
+fun signingProp(key: String): String? =
+    providers.environmentVariable(key).orNull?.takeIf { it.isNotBlank() }
+        ?: localProps.getProperty(key)?.takeIf { it.isNotBlank() }
+
 android {
     namespace = "com.chitsmart"
     compileSdk = 35
+
+    signingConfigs {
+        create("release") {
+            storeFile =
+                signingProp("KEYSTORE_PATH")?.let { rootProject.file(it) }
+                    ?: rootProject.file("chitsmart-release.jks")
+            storePassword = signingProp("KEYSTORE_PASSWORD")
+            keyAlias = signingProp("KEY_ALIAS")
+            keyPassword = signingProp("KEY_PASSWORD")
+        }
+    }
 
     defaultConfig {
         applicationId = "com.chitsmart"
@@ -62,7 +77,7 @@ android {
             buildConfigField(
                 "String",
                 "API_BASE_URL",
-                localProp("local.api.base.url", "http://10.0.2.2:8000/api/v1/"),
+                localProp("local.api.base.url", "http://127.0.0.1:8000/api/v1/"),
             )
             buildConfigField("String", "BUILD_VARIANT", "\"local\"")
             buildConfigField("Boolean", "IS_LOGGING_ENABLED", "true")
@@ -102,6 +117,7 @@ android {
             buildConfigField("Boolean", "IS_LOGGING_ENABLED", "true")
         }
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -240,4 +256,10 @@ tasks.register("testDebugUnitTest") {
     group = "verification"
     description = "Runs the cloud debug unit tests."
     dependsOn("testCloudDebugUnitTest")
+}
+
+tasks.register("compileDebugKotlin") {
+    group = "build"
+    description = "Compiles the cloud debug Kotlin source."
+    dependsOn("compileCloudDebugKotlin")
 }

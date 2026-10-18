@@ -18,10 +18,10 @@ Design decisions:
 
 import json
 import logging
-from typing import AsyncGenerator
+from typing import AsyncGenerator, cast
 
 from openai import AsyncOpenAI
-from openai.types.chat import ChatCompletionMessageParam
+from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.prompts import build_system_prompt
@@ -88,13 +88,13 @@ async def stream_chat_response(
         )
 
         # Emit policy references so the client can show chips
-        for chunk in chunks:
+        for policy_chunk in chunks:
             yield _sse(
                 "policy",
                 {
-                    "document_name": chunk.document_name,
-                    "section_reference": chunk.section_reference,
-                    "similarity": round(chunk.similarity, 3),
+                    "document_name": policy_chunk.document_name,
+                    "section_reference": policy_chunk.section_reference,
+                    "similarity": round(policy_chunk.similarity, 3),
                 },
             )
 
@@ -123,7 +123,7 @@ async def stream_chat_response(
         stream = await client.chat.completions.create(
             model=settings.OPENAI_MODEL,  # gpt-4o
             messages=messages,
-            tools=ACCOUNT_TOOLS,
+            tools=cast(list[ChatCompletionToolParam], ACCOUNT_TOOLS),
             tool_choice="auto",
             stream=True,
             temperature=0.2,  # lower temperature for factual accuracy

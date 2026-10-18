@@ -1,0 +1,95 @@
+version: 2
+
+# ──────────────────────────────────────────────────────────────────────────
+# Dependabot configuration for ChitSmart.
+# Keeps all four dependency ecosystems up to date automatically.
+# PRs are grouped by area (production, dev) to reduce noise.
+# ──────────────────────────────────────────────────────────────────────────
+
+updates:
+  # ── GitHub Actions ──────────────────────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Kolkata
+    labels:
+      - dependencies
+      - github-actions
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # ── Admin dashboard (npm) ───────────────────────────────────────────────
+  - package-ecosystem: npm
+    directory: /admin
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Kolkata
+    labels:
+      - dependencies
+      - admin
+    commit-message:
+      prefix: "chore(admin)"
+    groups:
+      admin-production:
+        dependency-type: production
+        patterns:
+          - "*"
+      admin-development:
+        dependency-type: development
+        patterns:
+          - "*"
+    # Don't open PRs for major version bumps automatically — review manually.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # ── Backend (pip) ───────────────────────────────────────────────────────
+  - package-ecosystem: pip
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Kolkata
+    labels:
+      - dependencies
+      - backend
+    commit-message:
+      prefix: "chore(backend)"
+    groups:
+      backend-deps:
+        patterns:
+          - "*"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # ── Android (gradle) ────────────────────────────────────────────────────
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Kolkata
+    labels:
+      - dependencies
+      - android
+    commit-message:
+      prefix: "chore(android)"
+    groups:
+      android-deps:
+        patterns:
+          - "*"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

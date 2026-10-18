@@ -65,6 +65,13 @@ class Settings(BaseSettings):
     FIREBASE_SERVICE_ACCOUNT_JSON: Optional[str] = None
 
     # ------------------------------------------------------------------ #
+    # SMS / OTP provider — "firebase" (default), "twilio", "msg91"
+    # In DEBUG mode send_sms_otp returns before reaching the provider switch,
+    # so this only affects the non-DEBUG warning path.
+    # ------------------------------------------------------------------ #
+    SMS_PROVIDER: str = "firebase"
+
+    # ------------------------------------------------------------------ #
     # OpenAI
     # ------------------------------------------------------------------ #
     OPENAI_API_KEY: Optional[str] = None
@@ -103,13 +110,10 @@ class Settings(BaseSettings):
     # pydantic-settings v2 config
     # ------------------------------------------------------------------ #
     model_config = SettingsConfigDict(
-        # Load .env.local first (local dev), fall back to .env (legacy).
-        # In cloud (ENV=cloud) these files won't exist and that's fine —
-        # pydantic-settings silently skips missing files.
         env_file=[".env", ".env.local"],
         env_file_encoding="utf-8",
         case_sensitive=True,
-        extra="ignore",  # tolerate unknown keys (e.g. SMS_*, OTP_*)
+        extra="ignore",
     )
 
     # ------------------------------------------------------------------ #
@@ -120,7 +124,6 @@ class Settings(BaseSettings):
         """Auto-set DEBUG based on ENV when the caller hasn't set it explicitly."""
         env_debug = os.getenv("DEBUG")
         if env_debug is None:
-            # Caller didn't set DEBUG — derive from variant
             object.__setattr__(self, "DEBUG", self.ENV == "local")
         return self
 

@@ -1,6 +1,6 @@
 # ChitSmart — How to Run the Platform
 
-> **Updated:** After full implementation — 27 Android screens, 24 admin pages, 40 backend files.
+> **Updated:** After adding local/cloud build variants to backend (ENV=local|cloud, multi-stage Dockerfile) and Android (localDebug / cloudRelease product flavors).
 
 This document covers running all three applications locally:
 1. **Backend API** (Python / FastAPI)
@@ -30,32 +30,40 @@ docker --version    # 24.x.x or later
 
 ## 1. Backend API
 
+The backend has two named variants controlled by the `ENV` environment variable:
+
+| `ENV` | Debug | Workers | `.env` file | Use for |
+|---|---|---|---|---|
+| `local` (default) | `true` | 1 (hot-reload) | `.env.local` | Development on your machine |
+| `cloud` | `false` | `WEB_CONCURRENCY` (default 2) | none (env vars only) | Staging / production |
+
 ### Step 1 — Start the database
 
 ```bash
 # From the repository root
-docker-compose up -d db
+docker compose up -d db
 ```
 
 This starts **PostgreSQL 16** with **pgvector** on port `5432`.
 
 Wait until healthy:
 ```bash
-docker-compose ps
+docker compose ps
 # State should show: healthy
 ```
 
-### Step 2 — Configure environment
+### Step 2 — Configure environment (local variant)
 
 ```bash
 cd backend
-copy .env.example .env          # Windows
-# cp .env.example .env          # macOS/Linux
+copy .env.local.example .env.local     # Windows
+# cp .env.local.example .env.local     # macOS/Linux
 ```
 
-Open `.env` and fill in at minimum:
+Open `.env.local` and fill in at minimum:
 
 ```env
+ENV=local
 DATABASE_URL=postgresql+asyncpg://chitsmart:password@localhost:5432/chitsmart_dev
 SECRET_KEY=your-random-secret-key-here
 DEBUG=true
@@ -66,6 +74,11 @@ Generate a secret key:
 ```bash
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
+
+> **Why `.env.local` instead of `.env`?**  
+> The backend loads both: `.env` is the legacy fallback, `.env.local` takes precedence.
+> New developers should use `.env.local` — it maps to the `local` variant.
+> `.env.cloud.example` documents the variables needed for cloud deployments (set via secret manager, not a file).
 
 ### Step 3 — Create virtual environment and install dependencies
 
@@ -100,11 +113,15 @@ This creates all 16 tables including deferred schema (kyc_documents, auctions, b
 ### Step 5 — Start the API server
 
 ```bash
+# Local variant — auto-reload, DEBUG=true, docs at /docs
 uvicorn app.main:app --reload --port 8000
+
+# Or set ENV explicitly
+ENV=local uvicorn app.main:app --reload --port 8000
 ```
 
 **API is running at:** http://localhost:8000  
-**Swagger docs:** http://localhost:8000/docs *(DEBUG=true only)*
+**Swagger docs:** http://localhost:8000/docs *(local variant only — disabled when ENV=cloud)*
 
 ### Verify it works
 
@@ -131,19 +148,39 @@ curl -X POST http://localhost:8000/api/v1/auth/verify-otp \
 # Returns: {"is_new_user": true, "access_token": "...", "refresh_token": "..."}
 ```
 
-### Ingest policy documents for AI assistant (optional)
+### Full Docker stack (local variant)
 
-The AI assistant uses RAG over approved policy documents. To enable policy search:
+Runs everything in containers with hot-reload via a bind mount:
 
 ```bash
-# Place PDF files in backend/data/approved_policies/
-# Then run the ingestion script:
+# Start DB + API together (local dev stage)
+docker compose up --build
+
+# Rebuild after requirements.txt changes
+docker compose up --build api
+```
+
+The `docker-compose.yml` targets the **dev** Dockerfile stage, mounts `./backend` as a volume, and runs uvicorn with `--reload`.
+
+### Cloud Docker stack
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.cloud.yml up -d
+```
+
+The cloud override targets the **prod** Dockerfile stage: source is baked in, no volume mount, `alembic upgrade head` runs before uvicorn starts, `WEB_CONCURRENCY` workers are launched.
+
+All secrets must be set as environment variables — no `.env` file on disk in cloud.
+
+### Ingest policy documents for AI assistant (optional)
+
+```bash
 python -m app.ai.document_ingestion \
   --pdf data/approved_policies/chit_funds_act_1982.pdf \
   --name "Chit Funds Act, 1982"
 ```
 
-Without ingestion, the assistant still works but returns generic responses without policy citations.
+Without ingestion, the assistant still works for account queries but returns generic responses without policy citations.
 
 ---
 
@@ -218,6 +255,16 @@ npm run build
 
 ## 3. Android App
 
+The Android app has two product flavors under the `environment` dimension:
+
+| Flavor | Application ID | App name | API target |
+|---|---|---|---|
+| `local` | `com.chitsmart.local` | ChitSmart Dev | `local.api.base.url` in `local.properties` |
+| `cloud` | `com.chitsmart` | ChitSmart | `cloud.api.base.url` in `local.properties` |
+
+Both flavors combine with `debug` and `release` build types, giving four variants:
+`localDebug`, `localRelease`, `cloudDebug`, `cloudRelease`.
+
 ### Prerequisites
 
 1. Open **Android Studio**
@@ -246,20 +293,54 @@ The app uses Inter font. Add these files to `app/src/main/res/font/`:
 
 > If you skip this step, the build fails with "Cannot find font resource". Temporarily comment out the `FontFamily` block in `Type.kt` to build without custom fonts.
 
-### Step 3 — Configure API URL
+### Step 3 — Configure API URLs in local.properties
 
-The app uses `http://10.0.2.2:8000` by default (Android emulator loopback → host machine).
+The API URL is read from `local.properties` — never hard-coded in `build.gradle.kts`.
 
-For a physical device, update `app/build.gradle.kts`:
-```kotlin
-buildConfigField("String", "API_BASE_URL", "\"http://YOUR_PC_IP:8000/api/v1/\"")
+```properties
+# local.properties (already present — never commit this file)
+local.api.base.url=http://127.0.0.1:8000/api/v1/   # emulator → host machine
+cloud.api.base.url=https://api.chitsmart.app/api/v1/
+
+# Physical device on the same Wi-Fi? Use your machine's LAN IP:
+# local.api.base.url=http://192.168.1.x:8000/api/v1/
 ```
 
-### Step 4 — Run on emulator
+`10.0.2.2` is the Android emulator's alias for the host machine's `localhost`.
 
-1. Select your AVD in the device toolbar
-2. Click ▶ **Run** (Shift+F10)
-3. First build takes ~2 minutes; subsequent builds are faster
+### Step 4 — Select the active variant and run
+
+In Android Studio, open **Build → Select Build Variant** and pick:
+- `localDebug` — for development against a local backend
+- `cloudDebug` — for testing against staging cloud API
+
+Or build from the command line:
+
+```bash
+# Local emulator (most common during development)
+.\gradlew assembleLocalDebug
+
+# Cloud debug APK (for staging testing)
+.\gradlew assembleCloudDebug
+
+# Cloud production APK (for release)
+.\gradlew assembleCloudRelease
+```
+
+### Step 5 — Understand AppConfig at runtime
+
+`AppConfig.kt` (in `utils/`) exposes all variant values at runtime:
+
+```kotlin
+AppConfig.apiBaseUrl         // the active API base URL
+AppConfig.buildVariant       // "local" or "cloud"
+AppConfig.isLoggingEnabled   // true in local/debug, false in cloudRelease
+AppConfig.isLocal            // shorthand boolean
+AppConfig.connectTimeoutMs   // 10s local, 30s cloud
+AppConfig.retryOnConnectionFailure  // false locally, true in cloud
+```
+
+`NetworkModule` uses these to configure OkHttp — no manual changes needed when switching variants.
 
 ### Complete screen directory (27 screens)
 
@@ -304,14 +385,14 @@ Open **3 terminal windows**:
 
 **Terminal 1 — Database:**
 ```bash
-docker-compose up db
+docker compose up db
 ```
 
-**Terminal 2 — Backend API:**
+**Terminal 2 — Backend API (local variant):**
 ```bash
 cd backend
 .venv\Scripts\activate      # Windows
-uvicorn app.main:app --reload --port 8000
+ENV=local uvicorn app.main:app --reload --port 8000
 ```
 
 **Terminal 3 — Admin Dashboard:**
@@ -320,7 +401,7 @@ cd admin
 npm run dev
 ```
 
-**Android Studio:** Run the app on the Pixel 6 emulator.
+**Android Studio:** Select `localDebug` build variant and run on Pixel 6 emulator.
 
 ---
 
@@ -330,8 +411,8 @@ npm run dev
 
 The database has tables from a previous run. Reset:
 ```bash
-docker-compose down -v       # removes the pgdata volume entirely
-docker-compose up -d db
+docker compose down -v       # removes the pgdata volume entirely
+docker compose up -d db
 alembic upgrade head
 ```
 
@@ -339,13 +420,17 @@ alembic upgrade head
 
 Inter font files are missing from `res/font/`. See Step 2 above. Quick workaround: comment out `FontFamily(...)` in `Type.kt` and replace with the system default.
 
+### Android build variant not showing in Studio
+
+Open **Build → Select Build Variant**. If only `debug` and `release` are shown, trigger a Gradle sync: **File → Sync Project with Gradle Files**.
+
 ### Admin dashboard blank page
 
 Make sure Vite dev server is running (`npm run dev`) and you're visiting `http://localhost:5173` not `localhost:5174` or another port.
 
 ### OTP not received on phone
 
-In `DEBUG=true`, the OTP is logged to the API terminal, not sent via SMS. Look for:
+In `ENV=local` / `DEBUG=true`, the OTP is logged to the API terminal, not sent via SMS. Look for:
 ```
 [DEV OTP] +91XXXXXXXXXX → 123456
 ```
@@ -356,11 +441,15 @@ Migrations haven't run. Activate the virtualenv and run `alembic upgrade head` f
 
 ### AI assistant returns "I don't know" for everything
 
-No policy documents have been ingested into `policy_chunks`. Run the document ingestion script (see Step 5 in the backend section above). The assistant still works for account queries (outstanding balance, next installment) without policy documents.
+No policy documents have been ingested into `policy_chunks`. Run the document ingestion script (see the backend section above). The assistant still works for account queries without policy documents.
 
 ### `npx tsc --noEmit` fails after pulling changes
 
 Run `npm install` first — new dependencies may have been added. Then re-run the type check.
+
+### Backend docs (`/docs`) not accessible
+
+The Swagger UI is only served when `ENV=local` (or `DEBUG=true`). In `ENV=cloud`, `docs_url` is `None`. Switch to the local variant for API exploration.
 
 ---
 
@@ -369,7 +458,7 @@ Run `npm install` first — new dependencies may have been added. Then re-run th
 | Service | URL | Default credentials |
 |---|---|---|
 | Backend API | http://localhost:8000 | — |
-| API Swagger docs | http://localhost:8000/docs | — (DEBUG only) |
+| API Swagger docs | http://localhost:8000/docs | — (local variant only) |
 | Admin Dashboard | http://localhost:5173 | — |
 | PostgreSQL | localhost:5432 | user: `chitsmart` / pass: `password` / db: `chitsmart_dev` |
 | Android emulator | localhost:5554 | — |

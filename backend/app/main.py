@@ -2,11 +2,27 @@
 ChitSmart FastAPI application entry point.
 """
 
+import logging
+import sys
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import app.models  # noqa: F401 — registers all ORM models with SQLAlchemy mapper
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.logging import HTTPLoggerMiddleware
+import app.models  # noqa: F401 — registers all ORM models with SQLAlchemy mapper
+
+# ---------------------------------------------------------------------------
+# Logging configuration
+# ---------------------------------------------------------------------------
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.DEBUG if settings.DEBUG else logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(name)s  %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -14,6 +30,9 @@ app = FastAPI(
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url="/redoc" if settings.DEBUG else None,
 )
+
+# HTTP request/response logger (register before CORS so it captures every request)
+app.add_middleware(HTTPLoggerMiddleware)
 
 # CORS
 app.add_middleware(

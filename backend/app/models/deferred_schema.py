@@ -56,7 +56,7 @@ class KYCDocument(Base, UUIDMixin, TimestampMixin):
         default=KYCDocumentStatus.UPLOADED,
         nullable=False,
     )
-    extracted_data: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON of AI-extracted fields
+    extracted_data: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     reviewer_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     reviewed_by_admin_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), nullable=True)
 

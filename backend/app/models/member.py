@@ -56,13 +56,11 @@ class Member(Base, UUIDMixin, TimestampMixin):
     is_mobile_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # KYC — schema present, NOT exposed via API in this release
-    # kyc_status default NOT_REQUIRED for all members in this release
     kyc_status: Mapped[KYCStatus] = mapped_column(
         Enum(KYCStatus),
         default=KYCStatus.NOT_REQUIRED,
         nullable=False,
     )
-    # Aadhaar and PAN stored encrypted; NOT collected via customer app in this release
     aadhaar_number_encrypted: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     pan_number_encrypted: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 

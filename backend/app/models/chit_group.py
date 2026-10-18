@@ -79,7 +79,7 @@ class ChitMembership(Base, UUIDMixin, TimestampMixin):
 
     # Payout tracking — read-only in this release
     payout_received: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    payout_month: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # which month the member received payout
+    payout_month: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # month the member received payout
 
     # Relationships
     member = relationship("Member", back_populates="memberships")

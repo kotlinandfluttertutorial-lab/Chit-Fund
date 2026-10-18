@@ -56,7 +56,7 @@ class KYCDocument(Base, UUIDMixin, TimestampMixin):
         default=KYCDocumentStatus.UPLOADED,
         nullable=False,
     )
-    extracted_data: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON of AI-extracted fields
+    extracted_data: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     reviewer_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     reviewed_by_admin_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), nullable=True)
 
@@ -145,7 +145,7 @@ class Payout(Base, UUIDMixin, TimestampMixin):
     foreman_commission: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     net_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     bank_account_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("bank_accounts.id"), nullable=True
+        UUID(as_uuid=True), nullable=True  # FK to bank_accounts kept in DB schema; model removed
     )
     bank_reference: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     status: Mapped[PayoutStatus] = mapped_column(

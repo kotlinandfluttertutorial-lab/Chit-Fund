@@ -44,7 +44,7 @@ URLs are read from `local.properties` — never hard-coded in `build.gradle.kts`
 
 ```properties
 # local.properties
-local.api.base.url=http://10.0.2.2:8000/api/v1/   # emulator → host loopback
+local.api.base.url=http://127.0.0.1:8000/api/v1/   # emulator → host loopback
 cloud.api.base.url=https://api.chitsmart.app/api/v1/
 
 # Physical device on same Wi-Fi:

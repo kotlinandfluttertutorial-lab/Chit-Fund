@@ -378,7 +378,7 @@ Nav graph entry point: `app/src/main/java/com/chitsmart/ui/navigation/NavGraph.k
 
 | Flavor | App ID | API target |
 |---|---|---|
-| `local` | `com.chitsmart.local` | `local.api.base.url` from `local.properties` → `http://10.0.2.2:8000/api/v1/` |
+| `local` | `com.chitsmart.local` | `local.api.base.url` from `local.properties` → `http://127.0.0.1:8000/api/v1/` |
 | `cloud` | `com.chitsmart` | `cloud.api.base.url` from `local.properties` → `https://api.chitsmart.app/api/v1/` |
 
 **Build commands:**
@@ -548,7 +548,7 @@ npm run dev
 ### Step 4 — Android app
 1. Open the `Chit-Fund` repo root in Android Studio.
 2. Add Inter font files to `app/src/main/res/font/` (inter_regular.ttf, inter_medium.ttf, inter_semibold.ttf, inter_bold.ttf) — build fails without them.
-3. In `local.properties` set `local.api.base.url=http://10.0.2.2:8000/api/v1/`.
+3. In `local.properties` set `local.api.base.url=http://127.0.0.1:8000/api/v1/`.
 4. Select **Build Variant → localDebug** and run on Pixel 6 emulator (API 34).
 
 ### Full Docker stack (alternative)

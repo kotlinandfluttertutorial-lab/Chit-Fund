@@ -1,11 +1,11 @@
-# Kiro Prompt — KAN-325: Slow Query Detection
+﻿# Kiro Prompt — CHIT-325: Slow Query Detection
 
-**Ticket:** KAN-325  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-325  
+**Epic:** CHIT-317 — Observability  
 **Priority:** Medium  
 **Skill:** Use the `fastapi-endpoint` skill  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-008  
-**Prerequisites:** KAN-318 (logging middleware)  
+**Prerequisites:** CHIT-318 (logging middleware)  
 **Files:**
 - `backend/app/core/database.py` (add SQLAlchemy event listener)
 

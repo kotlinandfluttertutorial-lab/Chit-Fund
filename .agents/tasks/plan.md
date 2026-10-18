@@ -48,7 +48,7 @@
 
 **Android token storage:** `androidx.security:security-crypto` is already in `build.gradle.kts`. Store `access_token` and `refresh_token` in `EncryptedSharedPreferences` under keys `"access_token"` and `"refresh_token"`. Wrap in a `TokenStore` singleton provided by Hilt (`@Singleton`). The `DataStore` dependency in the build file is for user preferences (onboarding flag, language) — keep that separate from tokens.
 
-**Retrofit base URL:** already set in `build.gradle.kts` as `BuildConfig.API_BASE_URL = "http://10.0.2.2:8000/api/v1/"` for the emulator. OkHttp `AuthInterceptor` reads the access token from `TokenStore` and attaches it as `Authorization: Bearer <token>` on every request except auth endpoints.
+**Retrofit base URL:** already set in `build.gradle.kts` as `BuildConfig.API_BASE_URL = "http://127.0.0.1:8000/api/v1/"` for the emulator. OkHttp `AuthInterceptor` reads the access token from `TokenStore` and attaches it as `Authorization: Bearer <token>` on every request except auth endpoints.
 
 **Error-state mapping:**
 

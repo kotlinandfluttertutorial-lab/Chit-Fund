@@ -1,10 +1,10 @@
-# Kiro Prompt — KAN-326: Correlation ID Propagation
+﻿# Kiro Prompt — CHIT-326: Correlation ID Propagation
 
-**Ticket:** KAN-326  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-326  
+**Epic:** CHIT-317 — Observability  
 **Priority:** High  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-010  
-**Prerequisites:** KAN-318 (logging middleware — backend side already done)  
+**Prerequisites:** CHIT-318 (logging middleware — backend side already done)  
 **Files:**
 - `app/src/main/java/com/chitsmart/core/network/ApiClient.kt` (Android — add header)
 - `admin/src/api/client.ts` (Admin dashboard — log correlation ID on error)
@@ -14,7 +14,7 @@
 ## Objective
 
 Complete the correlation ID flow across all three layers:
-1. **Backend** — already done in KAN-318 (reads/generates header, returns in response).
+1. **Backend** — already done in CHIT-318 (reads/generates header, returns in response).
 2. **Android** — send `X-Correlation-ID` on every API request; store last value for Crashlytics.
 3. **Admin dashboard** — log `X-Correlation-ID` from every 4xx/5xx API error response.
 
@@ -25,7 +25,7 @@ Before writing any code:
    Retrofit/OkHttp client file) — understand how the HTTP client is constructed.
 2. Read `admin/src/api/client.ts` — understand the Axios or fetch-based client.
 3. Read `backend/app/core/middleware.py` — confirm `X-Correlation-ID` is already
-   returned in the response header (from KAN-318).
+   returned in the response header (from CHIT-318).
 
 ## Android — OkHttp interceptor
 
@@ -40,7 +40,7 @@ import java.util.UUID
 
 /**
  * Adds X-Correlation-ID to every outbound request.
- * Stores the latest correlation ID for Crashlytics (KAN-327).
+ * Stores the latest correlation ID for Crashlytics (CHIT-327).
  */
 object CorrelationIdInterceptor : Interceptor {
 
@@ -102,7 +102,7 @@ apiClient.interceptors.response.use(
           `correlation_id: ${correlationId} — ` +
           `path: ${error.config?.url}`,
       );
-      // If Sentry is integrated (KAN-329), attach the correlation ID
+      // If Sentry is integrated (CHIT-329), attach the correlation ID
       if (typeof window.__chitsmart_sentry !== "undefined") {
         window.__chitsmart_sentry.setTag("correlation_id", correlationId);
       }
@@ -137,4 +137,4 @@ export default apiClient;
 
 - Android: `./gradlew :app:testDebugUnitTest` passes including `CorrelationIdInterceptorTest`
 - Admin: `npm test` passes including `apiClient.interceptor.test.ts`
-- Backend: existing KAN-318 tests already cover the backend side
+- Backend: existing CHIT-318 tests already cover the backend side

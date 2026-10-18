@@ -70,7 +70,7 @@ Both the Android app and the Python backend support two named environments:
 
 | Variant | Purpose | API target |
 |---|---|---|
-| **local** | Developer machine / local Docker | `http://10.0.2.2:8000` (emulator) or your LAN IP |
+| **local** | Developer machine / local Docker | `http://127.0.0.1:8000` (emulator) or your LAN IP |
 | **cloud** | Staging / production | `https://api.chitsmart.app/api/v1/` |
 
 ### Android
@@ -86,7 +86,7 @@ Two product flavors under the `environment` dimension:
 Override the API URL without touching `build.gradle.kts` — set it in `local.properties`:
 
 ```properties
-local.api.base.url=http://10.0.2.2:8000/api/v1/
+local.api.base.url=http://127.0.0.1:8000/api/v1/
 cloud.api.base.url=https://api.chitsmart.app/api/v1/
 ```
 

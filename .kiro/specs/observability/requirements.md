@@ -1,6 +1,6 @@
-# Observability — Requirements
+﻿# Observability — Requirements
 
-**Epic:** KAN-317  
+**Epic:** CHIT-317  
 **Spec path:** `.kiro/specs/observability/`  
 **Steering:** `.kiro/steering/architecture.md`, `.kiro/steering/security.md`  
 **Scope:** Cross-cutting — applies to backend API, admin dashboard, and Android app  
@@ -489,4 +489,4 @@ query template
 | `docs/architecture/system-overview.md` | System topology — where observability signals flow |
 | `docs/deployment/cicd.md` | CI/CD pipeline — where health checks are exercised |
 | `docs/deployment/build-variants.md` | Environment-specific observability configuration |
-| `docs/jira/epics.md` | Parent epic: KAN-317 — Observability |
+| `docs/jira/epics.md` | Parent epic: CHIT-317 — Observability |

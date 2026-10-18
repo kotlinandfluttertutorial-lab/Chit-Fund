@@ -1,11 +1,11 @@
-# Kiro Prompt — KAN-320: Prometheus Metrics Endpoint
+﻿# Kiro Prompt — CHIT-320: Prometheus Metrics Endpoint
 
-**Ticket:** KAN-320  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-320  
+**Epic:** CHIT-317 — Observability  
 **Priority:** High  
 **Skill:** Use the `fastapi-endpoint` skill  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-006  
-**Prerequisites:** KAN-318 (logging middleware — correlation ID on `request.state`)  
+**Prerequisites:** CHIT-318 (logging middleware — correlation ID on `request.state`)  
 **Files:**
 - `backend/app/core/metrics.py` (new)
 - `backend/app/api/v1/endpoints/health.py` (add `/metrics` route)

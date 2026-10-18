@@ -71,6 +71,4 @@ class Member(Base, UUIDMixin, TimestampMixin):
 
     # Relationships
     memberships = relationship("ChitMembership", back_populates="member")
-    bank_accounts = relationship("BankAccount", back_populates="member")
-    nominees = relationship("Nominee", back_populates="member")
     sessions = relationship("MemberSession", back_populates="member")

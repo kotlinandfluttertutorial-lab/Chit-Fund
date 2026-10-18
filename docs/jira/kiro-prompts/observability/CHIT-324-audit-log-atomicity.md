@@ -1,7 +1,7 @@
-# Kiro Prompt — KAN-324: Audit Log Atomicity
+﻿# Kiro Prompt — CHIT-324: Audit Log Atomicity
 
-**Ticket:** KAN-324  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-324  
+**Epic:** CHIT-317 — Observability  
 **Priority:** Highest  
 **Skill:** Use the `database-migration` skill and `fastapi-endpoint` skill  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-014  

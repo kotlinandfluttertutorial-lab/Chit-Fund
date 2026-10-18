@@ -39,7 +39,14 @@ def _get_firebase_app() -> firebase_admin.App:
     try:
         return firebase_admin.get_app()
     except ValueError:
-        cred = credentials.Certificate(settings.FIREBASE_SERVICE_ACCOUNT_PATH)
+        if settings.FIREBASE_SERVICE_ACCOUNT_JSON:
+            # Inline JSON supplied (cloud / CI deployments)
+            import json as _json
+
+            cred = credentials.Certificate(_json.loads(settings.FIREBASE_SERVICE_ACCOUNT_JSON))
+        else:
+            # File path (local dev — put the downloaded key at FIREBASE_SERVICE_ACCOUNT_PATH)
+            cred = credentials.Certificate(settings.FIREBASE_SERVICE_ACCOUNT_PATH)
         return firebase_admin.initialize_app(cred)
 
 

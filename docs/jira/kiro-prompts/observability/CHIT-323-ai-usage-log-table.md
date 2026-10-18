@@ -1,11 +1,11 @@
-# Kiro Prompt — KAN-323: AI Usage Log Table and Tracking
+﻿# Kiro Prompt — CHIT-323: AI Usage Log Table and Tracking
 
-**Ticket:** KAN-323  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-323  
+**Epic:** CHIT-317 — Observability  
 **Priority:** Medium  
 **Skill:** Use the `database-migration` skill  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-009  
-**Prerequisites:** KAN-318 (logging), KAN-320 (metrics — `ai_tokens_used_total`, `ai_request_duration_seconds`)  
+**Prerequisites:** CHIT-318 (logging), CHIT-320 (metrics — `ai_tokens_used_total`, `ai_request_duration_seconds`)  
 **Files:**
 - `backend/migrations/versions/002_add_ai_usage_log.py` (new Alembic migration)
 - `backend/app/models/ai_usage_log.py` (new model)

@@ -1,10 +1,10 @@
-# Kiro Prompt — KAN-322: Sensitive Data Redaction Enforcement
+﻿# Kiro Prompt — CHIT-322: Sensitive Data Redaction Enforcement
 
-**Ticket:** KAN-322  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-322  
+**Epic:** CHIT-317 — Observability  
 **Priority:** Highest  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-004  
-**Prerequisites:** KAN-318 (logging middleware — `safe_log_fields` utility)  
+**Prerequisites:** CHIT-318 (logging middleware — `safe_log_fields` utility)  
 **Files:**
 - `backend/app/core/logging.py` (extend redaction rules)
 - `backend/tests/test_redaction.py` (new)
@@ -13,7 +13,7 @@
 
 ## Objective
 
-Harden the `safe_log_fields` redaction utility from KAN-318 and add a comprehensive
+Harden the `safe_log_fields` redaction utility from CHIT-318 and add a comprehensive
 unit test suite that proves sensitive values never reach log output. This ticket is a
 security control — treat any test failure as a critical defect.
 
@@ -21,8 +21,8 @@ security control — treat any test failure as a critical defect.
 
 Before writing any code:
 1. Read `backend/app/core/logging.py` — read the current `safe_log_fields` and
-   `redact_mobile` implementations added in KAN-318.
-2. Check if KAN-318 is already merged. If not, implement the redaction utility here
+   `redact_mobile` implementations added in CHIT-318.
+2. Check if CHIT-318 is already merged. If not, implement the redaction utility here
    as the primary ticket.
 3. Read `backend/app/services/` — identify every place a logger is called to verify
    no raw sensitive values are passed as log `extra` fields.

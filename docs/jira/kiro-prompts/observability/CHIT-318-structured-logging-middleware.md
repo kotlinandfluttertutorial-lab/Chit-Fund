@@ -1,7 +1,7 @@
-# Kiro Prompt — KAN-318: Structured Logging Middleware
+﻿# Kiro Prompt — CHIT-318: Structured Logging Middleware
 
-**Ticket:** KAN-318  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-318  
+**Epic:** CHIT-317 — Observability  
 **Priority:** High  
 **Skill:** Use the `fastapi-endpoint` skill  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-001, REQ-OBS-002  

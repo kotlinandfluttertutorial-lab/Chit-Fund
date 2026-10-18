@@ -1,11 +1,11 @@
-# Kiro Prompt — KAN-321: Domain Event Logging
+﻿# Kiro Prompt — CHIT-321: Domain Event Logging
 
-**Ticket:** KAN-321  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-321  
+**Epic:** CHIT-317 — Observability  
 **Priority:** High  
 **Skill:** Use the `fastapi-endpoint` skill  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-003  
-**Prerequisites:** KAN-318 (logging middleware and `safe_log_fields`)  
+**Prerequisites:** CHIT-318 (logging middleware and `safe_log_fields`)  
 **Files:**
 - `backend/app/services/auth_service.py`
 - `backend/app/services/payment_service.py`
@@ -18,9 +18,9 @@
 ## Objective
 
 Add a structured `INFO` log entry for every significant domain event defined in
-REQ-OBS-003. Each log line must use the `safe_log_fields` utility from KAN-318 to
+REQ-OBS-003. Each log line must use the `safe_log_fields` utility from CHIT-318 to
 prevent PII leakage. Simultaneously increment the corresponding Prometheus counter
-from KAN-320.
+from CHIT-320.
 
 ## Repository inspection
 
@@ -28,7 +28,7 @@ Before writing any code:
 1. Read each service file listed above — identify the exact function where each event
    occurs (e.g. `send_otp`, `verify_otp`, `create_payment`, `process_webhook`).
 2. Read `backend/app/core/logging.py` — confirm `safe_log_fields` is available.
-3. Read `backend/app/core/metrics.py` — confirm all counters from KAN-320 are defined.
+3. Read `backend/app/core/metrics.py` — confirm all counters from CHIT-320 are defined.
 4. Do NOT add logging to endpoint handlers — it belongs in the service layer only.
 
 ## Events to instrument
@@ -197,7 +197,7 @@ logger.info("admin_action", extra=safe_log_fields(
 ## Obtaining `correlation_id` in services
 
 Services are called from endpoint handlers. Pass `correlation_id` from
-`request.state.correlation_id` (set by the logging middleware in KAN-318) through to
+`request.state.correlation_id` (set by the logging middleware in CHIT-318) through to
 the service call:
 
 ```python

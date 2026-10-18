@@ -60,12 +60,8 @@ class ChitGroup(Base, UUIDMixin, TimestampMixin):
 class ChitMembership(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "chit_memberships"
 
-    member_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("members.id"), nullable=False
-    )
-    chit_group_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("chit_groups.id"), nullable=False
-    )
+    member_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("members.id"), nullable=False)
+    chit_group_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("chit_groups.id"), nullable=False)
     member_number: Mapped[int] = mapped_column(Integer, nullable=False)
     enrollment_date: Mapped[date] = mapped_column(Date, nullable=False)
     status: Mapped[MembershipStatus] = mapped_column(

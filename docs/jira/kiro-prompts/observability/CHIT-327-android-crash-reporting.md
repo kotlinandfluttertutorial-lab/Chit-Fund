@@ -1,11 +1,11 @@
-# Kiro Prompt — KAN-327: Android Crash Reporting
+﻿# Kiro Prompt — CHIT-327: Android Crash Reporting
 
-**Ticket:** KAN-327  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-327  
+**Epic:** CHIT-317 — Observability  
 **Priority:** High  
 **Skill:** Use the `android-screen` skill  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-012  
-**Prerequisites:** KAN-326 (correlation ID — `CorrelationIdInterceptor.lastCorrelationId`)  
+**Prerequisites:** CHIT-326 (correlation ID — `CorrelationIdInterceptor.lastCorrelationId`)  
 **Files:**
 - `app/build.gradle.kts` (add Crashlytics dependency)
 - `app/google-services.json` (placeholder — team must add real file)

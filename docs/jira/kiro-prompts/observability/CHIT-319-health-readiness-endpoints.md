@@ -1,7 +1,7 @@
-# Kiro Prompt — KAN-319: Health and Readiness Endpoints
+﻿# Kiro Prompt — CHIT-319: Health and Readiness Endpoints
 
-**Ticket:** KAN-319  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-319  
+**Epic:** CHIT-317 — Observability  
 **Priority:** High  
 **Skill:** Use the `fastapi-endpoint` skill  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-005  
@@ -24,7 +24,7 @@ Before writing any code:
    authentication middleware is applied. Identify the mechanism to exclude paths.
 2. Read `backend/app/api/v1/router.py` — understand the router structure.
 3. Read `backend/app/core/middleware.py` — confirm `_SKIP_LOGGING` set exists
-   (added in KAN-318); if not yet merged, add `/health` and `/ready` to it here.
+   (added in CHIT-318); if not yet merged, add `/health` and `/ready` to it here.
 4. Read `backend/app/core/database.py` — understand the async session factory.
 
 ## Implementation

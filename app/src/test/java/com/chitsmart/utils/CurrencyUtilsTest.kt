@@ -4,7 +4,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class CurrencyUtilsTest {
-
     @Test
     fun `amountToIndianWords handles zero`() {
         assertEquals("Zero Rupees Only", CurrencyUtils.amountToIndianWords(0L))

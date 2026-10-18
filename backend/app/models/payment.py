@@ -48,9 +48,7 @@ class LedgerEntryType(str, enum.Enum):
 class InstallmentSchedule(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "installment_schedules"
 
-    chit_group_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("chit_groups.id"), nullable=False
-    )
+    chit_group_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("chit_groups.id"), nullable=False)
     month_number: Mapped[int] = mapped_column(Integer, nullable=False)  # 1-based (month 1, 2, …24)
     due_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     amount_per_member: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
@@ -98,9 +96,7 @@ class LedgerEntry(Base, UUIDMixin, TimestampMixin):
     chit_group_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("chit_groups.id"), nullable=False, index=True
     )
-    member_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("members.id"), nullable=True
-    )
+    member_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("members.id"), nullable=True)
     payment_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         UUID(as_uuid=True), ForeignKey("payments.id"), nullable=True
     )

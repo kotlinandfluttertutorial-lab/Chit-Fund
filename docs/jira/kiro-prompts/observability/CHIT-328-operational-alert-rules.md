@@ -1,10 +1,10 @@
-# Kiro Prompt — KAN-328: Operational Alert Rules
+﻿# Kiro Prompt — CHIT-328: Operational Alert Rules
 
-**Ticket:** KAN-328  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-328  
+**Epic:** CHIT-317 — Observability  
 **Priority:** High  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-013  
-**Prerequisites:** KAN-318 (logging), KAN-320 (Prometheus metrics)  
+**Prerequisites:** CHIT-318 (logging), CHIT-320 (Prometheus metrics)  
 **Files:**
 - `infra/alerting/prometheus-rules.yml` (new)
 - `infra/alerting/README.md` (new)
@@ -190,4 +190,4 @@ Document:
 
 - `promtool check rules infra/alerting/prometheus-rules.yml` passes (if `promtool` is available; otherwise YAML validation passes)
 - README reviewed by at least one team member
-- All 9 rules present and correctly reference the metrics from KAN-320
+- All 9 rules present and correctly reference the metrics from CHIT-320

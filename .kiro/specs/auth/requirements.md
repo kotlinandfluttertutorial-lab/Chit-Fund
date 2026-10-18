@@ -1,4 +1,4 @@
-# Authentication & Registration — Requirements
+﻿# Authentication & Registration — Requirements
 
 **Epic:** CS-EP-01  
 **Figma frames:** App-Auth-1.1 through App-Auth-1.5  

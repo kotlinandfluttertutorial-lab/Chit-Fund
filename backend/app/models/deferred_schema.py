@@ -145,7 +145,7 @@ class Payout(Base, UUIDMixin, TimestampMixin):
     foreman_commission: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     net_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     bank_account_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("bank_accounts.id"), nullable=True
+        UUID(as_uuid=True), nullable=True  # FK to bank_accounts kept in DB schema; model removed
     )
     bank_reference: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     status: Mapped[PayoutStatus] = mapped_column(

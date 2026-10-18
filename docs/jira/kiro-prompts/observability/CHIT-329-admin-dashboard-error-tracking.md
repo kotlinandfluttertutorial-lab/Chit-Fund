@@ -1,11 +1,11 @@
-# Kiro Prompt — KAN-329: Admin Dashboard Error Tracking (Sentry)
+﻿# Kiro Prompt — CHIT-329: Admin Dashboard Error Tracking (Sentry)
 
-**Ticket:** KAN-329  
-**Epic:** KAN-317 — Observability  
+**Ticket:** CHIT-329  
+**Epic:** CHIT-317 — Observability  
 **Priority:** Medium  
 **Skill:** Use the `admin-dashboard-component` skill  
 **Spec:** `.kiro/specs/observability/requirements.md` — REQ-OBS-011  
-**Prerequisites:** KAN-326 (correlation ID in admin API client)  
+**Prerequisites:** CHIT-326 (correlation ID in admin API client)  
 **Files:**
 - `admin/src/main.tsx` (initialise Sentry)
 - `admin/src/api/client.ts` (attach correlation ID to Sentry scope)
@@ -28,7 +28,7 @@ Before writing any code:
 1. Read `admin/package.json` — check if `@sentry/react` is already present.
 2. Read `admin/src/main.tsx` — understand where to add Sentry initialisation.
 3. Read `admin/src/App.tsx` — understand the component tree to wrap with error boundary.
-4. Read `admin/src/api/client.ts` — confirm the API error interceptor from KAN-326
+4. Read `admin/src/api/client.ts` — confirm the API error interceptor from CHIT-326
    is present. The Sentry integration extends it.
 5. Read `admin/.env.example` — check current env var list.
 
@@ -71,7 +71,7 @@ if (dsn) {
   });
 }
 
-// Expose on window for use in the API client interceptor (KAN-326)
+// Expose on window for use in the API client interceptor (CHIT-326)
 (window as any).__chitsmart_sentry = dsn ? Sentry : undefined;
 ```
 
@@ -155,7 +155,7 @@ VITE_SENTRY_ENVIRONMENT=development
 - [ ] When `VITE_SENTRY_DSN` is set to a valid DSN, Sentry initialises silently
 - [ ] An uncaught JavaScript exception triggers `Sentry.captureException`
 - [ ] A React component crash is caught by `ErrorBoundary` and reported to Sentry
-- [ ] A 500 API response logs the `correlation_id` to console (from KAN-326 interceptor)
+- [ ] A 500 API response logs the `correlation_id` to console (from CHIT-326 interceptor)
   and sets it as a Sentry tag
 - [ ] `event.request.data` and `event.request.cookies` are stripped before transmission
   (verified in `beforeSend` callback test)

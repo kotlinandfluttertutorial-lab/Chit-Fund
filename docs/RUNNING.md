@@ -299,7 +299,7 @@ The API URL is read from `local.properties` — never hard-coded in `build.gradl
 
 ```properties
 # local.properties (already present — never commit this file)
-local.api.base.url=http://10.0.2.2:8000/api/v1/   # emulator → host machine
+local.api.base.url=http://127.0.0.1:8000/api/v1/   # emulator → host machine
 cloud.api.base.url=https://api.chitsmart.app/api/v1/
 
 # Physical device on the same Wi-Fi? Use your machine's LAN IP:

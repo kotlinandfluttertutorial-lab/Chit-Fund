@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-# ── Firebase initialisation (idempotent) ──────────────────────────────────────
+# ── Firebase initialisation (idempotent) ────────────────────────────────────────────
 
 
 def _get_firebase_app() -> firebase_admin.App:
@@ -43,7 +43,7 @@ def _get_firebase_app() -> firebase_admin.App:
         return firebase_admin.initialize_app(cred)
 
 
-# ── Schemas ───────────────────────────────────────────────────────────────────
+# ── Schemas ──────────────────────────────────────────────────────────────────────────
 
 
 class VerifyFirebaseTokenRequest(BaseModel):
@@ -90,7 +90,7 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
-# ── Endpoints ─────────────────────────────────────────────────────────────────
+# ── Endpoints ──────────────────────────────────────────────────────────────────────────
 
 
 @router.post("/verify-firebase-token", response_model=AuthTokenResponse)
@@ -106,8 +106,6 @@ async def verify_firebase_token(
     2. App sends token + mobile_number here.
     3. We verify with Firebase Admin SDK and issue ChitSmart JWT tokens.
     4. Member record is created if the mobile number is new.
-
-    The otp_sessions table is left untouched (no new writes).
     """
     from app.models.member import AccountStatus, KYCStatus, Member
     from app.models.member_session import MemberSession
@@ -138,7 +136,7 @@ async def verify_firebase_token(
     member = member_result.scalar_one_or_none()
     is_new_user = member is None
 
-    if is_new_user:
+    if member is None:
         member = Member(
             mobile_number=request.mobile_number,
             full_name="",  # filled in /register
@@ -188,10 +186,8 @@ async def register(
 
     from app.models.member import Gender
 
-    # Update name
     current_member.full_name = request.full_name
 
-    # Update optional fields
     if request.email is not None:
         current_member.email = request.email
 
@@ -216,13 +212,12 @@ async def register(
     await db.commit()
     await db.refresh(current_member)
 
-    # Issue a fresh access token; no new refresh token on profile update
     access_token = create_access_token(subject=str(current_member.id))
 
     return AuthTokenResponse(
         is_new_user=False,
         access_token=access_token,
-        refresh_token="",  # refresh token unchanged; client should keep existing one
+        refresh_token="",
     )
 
 

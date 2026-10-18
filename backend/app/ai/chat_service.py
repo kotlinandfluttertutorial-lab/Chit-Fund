@@ -18,10 +18,10 @@ Design decisions:
 
 import json
 import logging
-from typing import AsyncGenerator
+from typing import AsyncGenerator, cast
 
 from openai import AsyncOpenAI
-from openai.types.chat import ChatCompletionMessageParam
+from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.prompts import build_system_prompt
@@ -59,27 +59,7 @@ async def stream_chat_response(
     db: AsyncSession,
     language: str = "en",
 ) -> AsyncGenerator[str, None]:
-    """
-    Stream a GPT-4o response as SSE tokens.
-
-    Args:
-        user_message: The latest message from the member.
-        history:      Previous messages as list of {role, content} dicts.
-                      Should contain at most the last 10 exchanges.
-        member_id:    UUID string of the authenticated member.
-        db:           Async SQLAlchemy session for tool execution.
-        language:     BCP-47 language code for RAG language filtering.
-
-    Yields:
-        SSE-formatted strings. Events:
-        - "token"   : {"delta": "<partial text>"}
-        - "policy"  : {"document_name": "...", "section_reference": "...", "similarity": 0.9}
-        - "tool"    : {"name": "<tool_name>"}
-        - "done"    : {"finish_reason": "stop" | "tool_calls"}
-        - "error"   : {"message": "<error description>"}
-    """
     try:
-        # ── Step 1: Retrieve relevant policy chunks ────────────────────────────
         chunks = await retrieve_relevant_chunks(
             query=user_message,
             db=db,
@@ -87,18 +67,16 @@ async def stream_chat_response(
             language=language,
         )
 
-        # Emit policy references so the client can show chips
-        for chunk in chunks:
+        for policy_chunk in chunks:
             yield _sse(
                 "policy",
                 {
-                    "document_name": chunk.document_name,
-                    "section_reference": chunk.section_reference,
-                    "similarity": round(chunk.similarity, 3),
+                    "document_name": policy_chunk.document_name,
+                    "section_reference": policy_chunk.section_reference,
+                    "similarity": round(policy_chunk.similarity, 3),
                 },
             )
 
-        # ── Step 2: Build messages ─────────────────────────────────────────────
         system_prompt = build_system_prompt(
             policy_context=chunks,
             member_id=member_id,
@@ -108,29 +86,26 @@ async def stream_chat_response(
             {"role": "system", "content": system_prompt},
         ]
 
-        # Append conversation history (max 10 most recent exchanges = 20 messages)
         for msg in history[-20:]:
             role = msg.get("role", "user")
             if role in ("user", "assistant"):
                 messages.append({"role": role, "content": msg.get("content", "")})
 
-        # Append current user message
         messages.append({"role": "user", "content": user_message})
 
         client = _get_client()
 
-        # ── Step 3: First streaming call with tools ────────────────────────────
+        # First streaming call with tools
         stream = await client.chat.completions.create(
-            model=settings.OPENAI_MODEL,  # gpt-4o
+            model=settings.OPENAI_MODEL,
             messages=messages,
-            tools=ACCOUNT_TOOLS,
+            tools=cast(list[ChatCompletionToolParam], ACCOUNT_TOOLS),
             tool_choice="auto",
             stream=True,
-            temperature=0.2,  # lower temperature for factual accuracy
+            temperature=0.2,
             max_tokens=1024,
         )
 
-        # Collect streamed content and tool calls
         collected_content = []
         tool_calls: list[dict] = []
         finish_reason: str | None = None
@@ -142,17 +117,14 @@ async def stream_chat_response(
 
             finish_reason = chunk.choices[0].finish_reason or finish_reason
 
-            # Stream text tokens
             if delta.content:
                 collected_content.append(delta.content)
                 yield _sse("token", {"delta": delta.content})
 
-            # Accumulate tool calls
             if delta.tool_calls:
                 for tc_delta in delta.tool_calls:
                     if tc_delta.index is not None:
                         idx = tc_delta.index
-                        # Ensure the list is long enough
                         while len(tool_calls) <= idx:
                             tool_calls.append({"id": "", "name": "", "arguments": ""})
                         if tc_delta.id:
@@ -163,9 +135,7 @@ async def stream_chat_response(
                             if tc_delta.function.arguments:
                                 tool_calls[idx]["arguments"] += tc_delta.function.arguments
 
-        # ── Step 4: Execute tool calls if requested ────────────────────────────
         if tool_calls:
-            # Append the assistant's tool-call message
             messages.append(
                 {
                     "role": "assistant",
@@ -181,7 +151,6 @@ async def stream_chat_response(
                 }
             )
 
-            # Execute each tool and append results
             for tc in tool_calls:
                 yield _sse("tool", {"name": tc["name"]})
                 try:
@@ -204,7 +173,7 @@ async def stream_chat_response(
                     }
                 )
 
-            # ── Step 5: Second streaming call after tool results ───────────────
+            # Second streaming call after tool results
             stream2 = await client.chat.completions.create(
                 model=settings.OPENAI_MODEL,
                 messages=messages,

@@ -7,9 +7,11 @@ in this release. See docs/scope-decisions.md Decision 2.
 """
 
 import enum
+from datetime import date
+from typing import Optional
 
-from sqlalchemy import Boolean, Column, Date, Enum, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Boolean, Date, Enum, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
 
@@ -39,33 +41,33 @@ class Member(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "members"
 
     # Core identity — collected at registration
-    full_name = Column(String(255), nullable=False)
-    mobile_number = Column(String(15), unique=True, nullable=False, index=True)
-    email = Column(String(255), unique=True, nullable=True)
-    date_of_birth = Column(Date, nullable=True)
-    gender = Column(Enum(Gender), nullable=True)
+    full_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    mobile_number: Mapped[str] = mapped_column(String(15), unique=True, nullable=False, index=True)
+    email: Mapped[Optional[str]] = mapped_column(String(255), unique=True, nullable=True)
+    date_of_birth: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    gender: Mapped[Optional[Gender]] = mapped_column(Enum(Gender), nullable=True)
 
     # Account state
-    account_status = Column(
+    account_status: Mapped[AccountStatus] = mapped_column(
         Enum(AccountStatus),
         default=AccountStatus.ACTIVE,
         nullable=False,
     )
-    is_mobile_verified = Column(Boolean, default=False, nullable=False)
+    is_mobile_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # KYC — schema present, NOT exposed via API in this release
     # kyc_status default NOT_REQUIRED for all members in this release
-    kyc_status = Column(
+    kyc_status: Mapped[KYCStatus] = mapped_column(
         Enum(KYCStatus),
         default=KYCStatus.NOT_REQUIRED,
         nullable=False,
     )
     # Aadhaar and PAN stored encrypted; NOT collected via customer app in this release
-    aadhaar_number_encrypted = Column(String(512), nullable=True)
-    pan_number_encrypted = Column(String(512), nullable=True)
+    aadhaar_number_encrypted: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    pan_number_encrypted: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
 
     # Preferences
-    preferred_language = Column(String(10), default="en", nullable=False)
+    preferred_language: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
 
     # Relationships
     memberships = relationship("ChitMembership", back_populates="member")
